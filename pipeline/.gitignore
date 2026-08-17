@@ -1,0 +1,28 @@
+# ---------------------------------------------------------------------------
+# RESTRICTED DATA -- do not relax these patterns.
+#
+# This repo uses DHS Program survey microdata obtained under a signed agreement
+# that forbids redistributing record-level data, directly or inside any tool or
+# dashboard. `origin` is a public repository, so a bare `git add -A` after a
+# pipeline run would breach that agreement irreversibly -- once pushed, the data
+# is in the history even after deletion.
+#
+# Extension-based backstop patterns (*.DTA, *.ZIP, etc.) live in the root
+# .gitignore, repo-wide, in case a restricted file lands somewhere other than
+# here. See CLAUDE.md and docs/dhs-data-terms-constraints.md.
+# ---------------------------------------------------------------------------
+
+# Raw downloads: DHS recodes, WorldPop rasters, anything fetched.
+data/raw/
+
+# Intermediate artefacts. Anything with one row per household or per individual
+# belongs here and nowhere else.
+data/interim/
+
+# ---------------------------------------------------------------------------
+# Ordinary housekeeping
+# ---------------------------------------------------------------------------
+
+.venv/
+__pycache__/
+*.pyc

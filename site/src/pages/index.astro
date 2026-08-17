@@ -1,0 +1,380 @@
+---
+// Reads pipeline/data/regions.json off disk at build time -- the pipeline's
+// output is the single source of truth, and this file is never copied or
+// duplicated. Inlined into the page as JSON below rather than fetched at
+// runtime by site/app.js's predecessor, so there's no "must be served over
+// HTTP" failure mode left: the data is part of the HTML response.
+import fs from "node:fs";
+import path from "node:path";
+import "../styles/styles.css";
+
+const regionsPath = path.resolve(process.cwd(), "../pipeline/data/regions.json");
+const regionsJson = fs.readFileSync(regionsPath, "utf-8");
+// Defensive escaping in case a future field ever contains a literal "</script>"
+// sequence -- it would otherwise close the tag early and truncate the data.
+const inlineSafeJson = regionsJson.replace(/<\/script/gi, "<\\/script");
+
+/* Every figure quoted in the prose below is derived here, from the same file the
+ * page ships. None of them is typed by hand.
+ *
+ * This is not stylistic. The page's whole argument is that a number should never
+ * be substituted, imputed or assumed -- and it used to assert six figures in its
+ * own copy that the pipeline recomputes on every run. They were all correct, which
+ * is exactly the problem: nothing would have told anyone when they stopped being.
+ * The worst pair were four paragraphs apart and disagreed by construction, one
+ * hardcoded ("Four regions have no answer") and one computed by app.js from the
+ * same data. */
+const data = JSON.parse(regionsJson);
+const constants = data.constants;
+const surveyYear = data.sources.dhs.survey_year;
+const headline = constants.headline_indicator;
+
+const regionGradient = (region) => (region.quintiles || {})[headline] || null;
+const noDistortion = data.regions.filter(
+  (region) => (regionGradient(region)?.targeting_distortion ?? null) === null,
+);
+
+// The cost inputs' starting values. Placeholders, stated once here and bound into
+// the two fields below, because the worked example further down has to be chosen
+// against the same line they imply -- otherwise the page could name a region as
+// one that "would clear the line" while its own defaults shade it the other way.
+const defaultCostRemote = 1;
+const defaultCostInPerson = 2;
+const defaultLine = defaultCostRemote / defaultCostInPerson;
+
+// The worked example in section 5: of the regions that clear the default cost line
+// on average -- so the sentence's "would often clear the line" is true of it -- the
+// one with the worst targeting distortion. Picked by the data, not from memory.
+const worked = data.regions
+  .filter((region) => region[headline] !== null &&
+    region[headline] / 100 >= defaultLine &&
+    (regionGradient(region)?.targeting_distortion ?? null) !== null)
+  .sort((a, b) => regionGradient(a).targeting_distortion -
+    regionGradient(b).targeting_distortion)[0];
+const workedDistortion = regionGradient(worked).targeting_distortion;
+
+// Years elapsed since the survey, as of this build.
+const surveyAge = Number(data.generated.slice(0, 4)) - surveyYear;
+
+// The household-vs-personal spread quoted in the caveats.
+const spread = (key) => {
+  const q = data.national.wealth_gradient[key].by_quintile;
+  return { poorest: q[0].value, richest: q[4].value, fold: q[4].value / q[0].value };
+};
+const womanPhone = spread("phone_own_f");
+const householdPhone = spread(headline);
+
+const NUMBER_WORD = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
+  "Eight", "Nine", "Ten"];
+const inWords = (n) => NUMBER_WORD[n] ?? String(n);
+const pct1 = (v) => v.toFixed(1) + "%";
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Who does remote enrollment leave out? — Madagascar by region</title>
+</head>
+<body>
+
+<header class="masthead">
+  <p class="eyebrow">Enrollment model decision tool &middot; v2 &middot; proof of concept</p>
+  <h1>Remote enrollment doesn&rsquo;t just miss people. It misses the poorest first.</h1>
+  <p class="standfirst">
+    A regional phone-ownership rate tells you the <em>size</em> of the group remote
+    enrollment would exclude. It says nothing about its <em>composition</em> &mdash; and for
+    a programme targeted at poor households, composition is the whole question, because
+    the exclusion runs along the same axis as the eligibility criterion. Two regions can
+    report identical average ownership while one merely misses people and the other
+    selects against precisely the households the programme exists to reach.
+  </p>
+  <p class="provenance">
+    Built <span data-bind="generated">&mdash;</span> &middot;
+    sources verified against their live APIs on <span data-bind="verified">&mdash;</span> &middot; <span data-bind="region-count">{data.regions.length}</span> DHS survey regions
+  </p>
+</header>
+
+<main>
+
+<noscript>
+  <section class="panel warn">
+    <h2>This page needs JavaScript</h2>
+    <p>
+      The recommendation recomputes as you change the cost inputs, which is the point of
+      the tool, so the values are calculated in the browser rather than baked in. The
+      underlying data is a single file: <code>pipeline/data/regions.json</code>.
+    </p>
+  </section>
+</noscript>
+
+<div data-bind="load-error" class="panel warn" hidden>
+  <h2>Could not load the region data</h2>
+  <p>
+    The data this page needs is normally embedded in it at build time, so this means the
+    build itself is stale or broken rather than a network problem. Run <code>make build</code> (or <code>uv run python pipeline/run_all.py</code>) from the
+    repository root, then rebuild the site with <code>bun run build</code> in <code>site/</code>.
+  </p>
+</div>
+
+<div data-bind="app" hidden>
+
+  <!-- ------------------------------------------------------------------ -->
+  <section class="panel" id="gradient">
+    <h2>1. The gradient</h2>
+    <p class="lede">
+      Every digital channel a remote enrollment could use is distributed steeply by
+      wealth. The number on each card is <strong>targeting distortion</strong>: the
+      poorest fifth&rsquo;s share of everyone the channel reaches, divided by their share of
+      the population. 1.0 would mean the reachable pool mirrors the country. Below 1.0
+      means the channel selects against the poor.
+    </p>
+
+    <div class="gradient-grid" data-bind="gradient-grid"></div>
+
+    <p class="footnote" data-bind="gradient-note"></p>
+  </section>
+
+  <!-- ------------------------------------------------------------------ -->
+  <section class="panel panel--pending" id="pending">
+    <h2>2. The same question, region by region</h2>
+    <div data-bind="pending"></div>
+  </section>
+
+  <!-- ------------------------------------------------------------------ -->
+  <section class="panel" id="cost">
+    <h2>3. Your costs</h2>
+    <p class="lede">
+      This tool does not estimate costs, and no cost figure here comes from any dataset.
+      Your organisation knows its own cost structure; no public source does. The two
+      numbers below are <strong>placeholders</strong> &mdash; replace them.
+    </p>
+
+    <div class="cost-inputs">
+      <label>
+        <span class="label-text">Cost per remote enrollment</span>
+        <input type="number" data-bind="cost-remote" value={defaultCostRemote} min="0" step="0.1" inputmode="decimal">
+        <span class="hint">placeholder &middot; any consistent unit</span>
+      </label>
+      <label>
+        <span class="label-text">Cost per in-person enrollment</span>
+        <input type="number" data-bind="cost-inperson" value={defaultCostInPerson} min="0" step="0.1" inputmode="decimal">
+        <span class="hint">placeholder &middot; same unit</span>
+      </label>
+    </div>
+
+    <div class="derivation">
+      <p>
+        Under a remote-first approach you pay the remote cost for everyone, then pay the
+        in-person cost for the share who cannot complete it. That beats going in person
+        everywhere exactly when
+      </p>
+      <p class="formula">
+        reachable share &gt; cost&nbsp;remote &divide; cost&nbsp;in-person = <strong data-bind="ratio">{defaultLine.toFixed(2)}</strong>
+      </p>
+      <p>
+        So your cost inputs decide only where that line falls. Everything else is measured. <strong>Note what this arithmetic ignores:</strong> it treats every excluded
+        household as equally costly to reach in person. Section&nbsp;2 explains why that
+        assumption is the weakest thing on this page.
+      </p>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------------ -->
+  <section class="panel" id="basis">
+    <h2>4. What counts as &ldquo;reachable&rdquo;</h2>
+    <p class="lede">
+      There is no single measured number for &ldquo;could complete a remote enrollment&rdquo;.
+      Below are three readings of it. Each is a real DHS value or a stated combination of
+      two &mdash; none is a weighted index, because the weights would have to be invented.
+    </p>
+
+    <div class="basis-options" data-bind="basis-options"></div>
+    <p class="footnote" data-bind="basis-note"></p>
+  </section>
+
+  <!-- ------------------------------------------------------------------ -->
+  <section class="panel" id="result">
+    <h2>5. Regional averages</h2>
+    <p class="summary" data-bind="summary"></p>
+
+    <div class="map-and-key">
+      <figure class="map-figure">
+        <div data-bind="map"></div>
+        <figcaption>
+          Madagascar, <span data-bind="region-count">{data.regions.length}</span> DHS {surveyYear} survey regions.
+          Select a region for its detail.
+        </figcaption>
+      </figure>
+
+      <div class="key">
+        <h3>Key</h3>
+        <ul class="swatches">
+          <li><span class="swatch swatch--remote"></span> Remote-first is cheaper</li>
+          <li><span class="swatch swatch--inperson"></span> In person is cheaper</li>
+          <li><span class="swatch swatch--dashed"></span> Within {constants.tipping_band * 100} points of the line</li>
+          <li><span class="swatch swatch--missing"></span> No value for this basis</li>
+        </ul>
+        <p class="footnote">
+          Only two fills, far enough apart in lightness to stay distinct in greyscale.
+          Regions near the line carry a dashed edge rather than a third colour. Nothing on
+          this map depends on telling two hues apart.
+        </p>
+      </div>
+    </div>
+
+    <p class="footnote">
+      <strong>This map shades by average, and the average is not the decision.</strong> A region shaded for remote enrollment here may still exclude nearly all of its
+      poorest households: {worked.name} averages {pct1(worked[headline])} household phone ownership and would
+      often clear the line, yet its targeting distortion is {workedDistortion.toFixed(2)}. Open any region for the
+      number that actually matters &mdash; it sits at the top of the detail panel, above
+      everything the cost model says.
+    </p>
+  </section>
+
+  <!-- ------------------------------------------------------------------ -->
+  <section class="panel" id="detail-panel">
+    <h2>6. Region detail</h2>
+    <p class="lede" data-bind="detail-empty">Select a region on the map or in the table.</p>
+    <div data-bind="detail" hidden></div>
+  </section>
+
+  <!-- ------------------------------------------------------------------ -->
+  <section class="panel" id="table-panel">
+    <h2>7. All regions</h2>
+    <p class="lede">
+      Column headers sort. &ldquo;&mdash;&rdquo; means no value exists &mdash; never zero,
+      never imputed.
+    </p>
+    <div class="table-scroll">
+      <table data-bind="table">
+        <thead><tr data-bind="table-head"></tr></thead>
+        <tbody data-bind="table-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------------ -->
+  <section class="panel panel--caveat" id="wrong">
+    <h2>How this can be wrong</h2>
+
+    <div class="caveat">
+      <h3>{inWords(noDistortion.length)} region{noDistortion.length === 1 ? "" : "s"} have no answer, and they are not random</h3>
+      <p>
+        Wealth quintiles are national. A wealthy region holds almost no bottom-quintile
+        households and a poor one almost no top-quintile households, so the cells that
+        vanish are at both ends of the distribution &mdash; including Antananarivo capital,
+        which the survey records with no bottom-quintile households at all. Those are
+        exactly the regions where a targeted programme most wants an answer. Nothing is
+        estimated in their place.
+      </p>
+    </div>
+
+    <div class="caveat">
+      <h3>Distortion is computed on one survey's sample, not measured</h3>
+      <p>
+        A regional targeting distortion rests on five cells of a few hundred households
+        each. Cells between {constants.min_cases_suppress} and {constants.min_cases_flag} unweighted cases are shown but flagged, and they are
+        noisy: a handful of households moving between quintiles would shift the figure
+        materially. Treat the ranking as informative and the second decimal place as not.
+      </p>
+    </div>
+
+    <div class="caveat">
+      <h3>There is no connectivity layer at all</h3>
+      <p>
+        v1 used Ookla Speedtest tiles. They were removed, and not because the data was
+        thin &mdash; though it was. A Speedtest tile exists only where somebody owned a
+        smartphone, had working data, and chose to run a test. Every one of those filters
+        correlates with wealth, in the same direction as the exclusion this tool measures.
+        It could not distinguish &ldquo;no network&rdquo; from &ldquo;no smartphones&rdquo;
+        from &ldquo;nobody tested&rdquo;, which are three different decisions. <strong>So this page currently says nothing about whether a network exists.</strong> It measures who has a phone and who can use one, not whether there is signal.
+      </p>
+    </div>
+
+    <div class="caveat">
+      <h3>The DHS figures are self-reported and are from <span data-bind="dhs-year">&mdash;</span></h3>
+      <p>
+        Respondents were asked whether their household owns a mobile telephone; nobody
+        checked. {inWords(surveyAge)} years have passed and ownership has almost certainly risen. The
+        direction of that error is knowable; the size is not. Whether the <em>gradient</em> has flattened over those five years is not knowable at all from this data.
+      </p>
+    </div>
+
+    <div class="caveat">
+      <h3>Household ownership is not personal access</h3>
+      <p>
+        The headline DHS indicator counts households containing a phone. Individual
+        ownership among women is far lower &mdash; nationally {pct1(womanPhone.poorest)} in the poorest quintile
+        against {pct1(womanPhone.richest)} in the richest, a {womanPhone.fold.toFixed(1)}-fold spread against {householdPhone.fold.toFixed(1)}-fold for households.
+        The household figure hides an intra-household gap that runs the same way as
+        everything else here.
+      </p>
+    </div>
+
+    <div class="caveat">
+      <h3>The cost model treats all excluded households as alike</h3>
+      <p>
+        The arithmetic in section&nbsp;3 assumes one in-person cost per enrollment
+        regardless of who is being reached. In practice the households remote enrollment
+        excludes are disproportionately the remote, dispersed and poor ones &mdash; the
+        expensive ones. A single flat in-person cost therefore understates the cost of the
+        residual, and understates it most in exactly the regions where the distortion is
+        worst. Modelling travel time and settlement dispersion would fix this and is not
+        yet built.
+      </p>
+    </div>
+
+    <div class="caveat">
+      <h3>These are survey regions, not operational areas</h3>
+      <p>
+        DHS {surveyYear} survey regions will not match your districts or catchment areas, and
+        Madagascar&rsquo;s administrative divisions have changed since the survey. Analamanga
+        appears split into the capital and everything else, which is a DHS artefact.
+      </p>
+    </div>
+
+    <div class="caveat">
+      <h3>Population is modelled, not counted</h3>
+      <p>
+        Population figures use WorldPop&rsquo;s constrained <span data-bind="worldpop-year">&mdash;</span> raster, which is a model.
+        Madagascar&rsquo;s last census was 2018.
+      </p>
+    </div>
+
+    <div class="caveat">
+      <h3>What is not measured here at all</h3>
+      <p>
+        Whether people hold the identity documents a remote process would ask them to
+        photograph. Whether they would trust one. Whether a household that owns a phone
+        would let the eligible member use it. Network coverage, per the second caveat
+        above. These decide whether remote enrollment is <em>appropriate</em>; this page
+        addresses only whether it is <em>arithmetically possible</em>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------------ -->
+  <section class="panel" id="sources">
+    <h2>Sources</h2>
+    <div data-bind="sources"></div>
+
+    <h3>National reference</h3>
+    <p class="lede">A sanity check on whether the regional picture aggregates to something plausible.</p>
+    <div data-bind="findex"></div>
+
+    <p class="footnote">
+      Full licence terms are in <code>LICENSES.md</code>. Every source used here is CC BY 4.0
+      or equivalent; with Ookla removed, the published data carries no NonCommercial or
+      ShareAlike obligation.
+    </p>
+  </section>
+
+</div>
+</main>
+
+<script type="application/json" id="regions-data" set:html={inlineSafeJson}></script>
+<script src="../scripts/app.js"></script>
+</body>
+</html>

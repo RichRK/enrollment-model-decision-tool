@@ -1,0 +1,61 @@
+# ---------------------------------------------------------------------------
+# RESTRICTED DATA -- backstop patterns, repo-wide. Do not relax these.
+#
+# This repo uses DHS Program survey microdata obtained under a signed agreement
+# that forbids redistributing record-level data, directly or inside any tool or
+# dashboard. `origin` is a public repository, so committing it would breach that
+# agreement irreversibly -- once pushed, the data is in the history even after
+# deletion.
+#
+# The directory-level patterns (data/raw/, data/interim/) live in
+# pipeline/.gitignore now, next to where that data actually lands. The patterns
+# below stay here, repo-wide, on purpose: they're the backstop for a restricted
+# file landing somewhere other than pipeline/data/.
+#
+# See CLAUDE.md and pipeline/docs/dhs-data-terms-constraints.md.
+# ---------------------------------------------------------------------------
+
+# Statistical package formats, wherever they land. Belt and braces: the
+# directory-level patterns in pipeline/.gitignore should already cover them,
+# but DHS archives keep their own filenames and a file dropped in the wrong
+# directory must still be caught.
+*.DTA
+*.dta
+*.SAV
+*.sav
+*.SAS7BDAT
+*.sas7bdat
+*.SD2
+*.sd2
+
+# The rest of a DHS recode package. These are not the record data themselves --
+# .DCT/.DO/.MAP are variable definitions, .FRQ/.FRW are frequency listings -- but
+# they are part of the distributed dataset, which the agreement says is not to be
+# shared. Inside pipeline/data/raw/ they are already covered; these patterns are
+# the backstop for a file that lands somewhere else.
+*.DCT
+*.dct
+*.DO
+*.do
+*.FRQ
+*.frq
+*.FRW
+*.frw
+*.MAP
+*.map
+*.SPS
+*.sps
+*.SAS
+*.sas
+
+# Extraction leftovers from DHS archives.
+*.ZIP
+*.zip
+*.7z
+*.rar
+
+# ---------------------------------------------------------------------------
+# Ordinary housekeeping
+# ---------------------------------------------------------------------------
+
+.DS_Store

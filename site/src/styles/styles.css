@@ -1,0 +1,850 @@
+/* An analytical instrument, not a dashboard. Restraint is the design.
+ *
+ * Colour rules followed throughout:
+ *  - The two recommendation categories differ in LIGHTNESS as well as hue, so the
+ *    map reads correctly in greyscale and under protanopia/deuteranopia/tritanopia.
+ *  - Category is never signalled by hue alone: regions near the cost line carry a
+ *    dashed edge rather than a third fill, and every fill also has a text label
+ *    in the table.
+ *  - Nothing is red/green.
+ */
+
+:root {
+  --ink:        #16191c;
+  --ink-soft:   #4a5158;
+  --ink-faint:  #6d757d;
+  --rule:       #d9dde1;
+  --rule-soft:  #eaedf0;
+  --paper:      #ffffff;
+  --paper-tint: #f6f7f9;
+
+  /* Dark blue vs pale amber: ~4.2:1 apart in relative luminance, so they stay
+     distinguishable when printed in greyscale. */
+  --remote:     #1f4e79;
+  --remote-ink: #ffffff;
+  --inperson:   #edc373;
+  --inperson-ink: #3d2f14;
+  --tipping:    #b4bcc3;
+  --missing:    #ffffff;
+
+  /* The targeting-distortion severity ramp. One enum, four consumers
+     (.hero-num--*, .distortion-num--*, .dist-chip--*, .bar-cases--flagged), all
+     driven by app.js's distortionClass(). Declared once here because the three
+     colours used to be written out at each consumer and had already drifted.
+     Not red/green as a pair: the amber and green differ in lightness too. */
+  --sev-bad:    #b3261e;
+  --sev-warn:   #8a5a00;
+  --sev-ok:     #1a6b34;
+
+  --accent:     #1f4e79;
+  --warn-bg:    #fdf6e6;
+  --warn-rule:  #d6b45f;
+
+  --measure: 68ch;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  padding: 0 1.5rem 6rem;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+  font-feature-settings: "tnum" 0;
+}
+
+/* ---------------------------------------------------------------- masthead */
+
+.masthead {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 3.5rem 0 2rem;
+  border-bottom: 2px solid var(--ink);
+}
+
+.eyebrow {
+  margin: 0 0 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.masthead h1 {
+  margin: 0 0 1.25rem;
+  max-width: 22ch;
+  font-size: clamp(1.75rem, 4.2vw, 2.75rem);
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.standfirst {
+  margin: 0 0 1.25rem;
+  max-width: var(--measure);
+  font-size: 1.0625rem;
+  color: var(--ink-soft);
+}
+
+.provenance {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--ink-faint);
+}
+
+/* ------------------------------------------------------------------ panels */
+
+main { max-width: 1120px; margin: 0 auto; }
+
+.panel {
+  padding: 2.75rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.panel h2 {
+  margin: 0 0 0.875rem;
+  font-size: 1.0625rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.panel h3 {
+  margin: 2rem 0 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 650;
+}
+
+.lede {
+  margin: 0 0 1.5rem;
+  max-width: var(--measure);
+  color: var(--ink-soft);
+}
+
+.footnote {
+  margin: 1rem 0 0;
+  max-width: var(--measure);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--ink-faint);
+}
+
+.panel.warn {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-rule);
+  border-radius: 3px;
+}
+
+.panel.warn h2 { margin-top: 0; }
+.panel.warn p { max-width: var(--measure); margin-bottom: 0; }
+
+code {
+  padding: 0.1em 0.35em;
+  background: var(--paper-tint);
+  border: 1px solid var(--rule-soft);
+  border-radius: 2px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.875em;
+}
+
+/* ------------------------------------------------- wealth gradient cards */
+
+.gradient-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+  gap: 1.25rem;
+}
+
+.gradient-card {
+  margin: 0;
+  padding: 1.25rem 1.375rem 1rem;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: var(--paper);
+}
+
+.gradient-title {
+  margin-bottom: 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.gradient-hero {
+  display: flex;
+  gap: 0.625rem;
+  align-items: baseline;
+  margin-bottom: 1rem;
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+/* The hero figure uses proportional figures: it stands alone rather than
+   aligning in a column, so tabular-nums would only make it look mechanical. */
+.hero-num {
+  font-size: 2.5rem;
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+/* Status is carried by a word in the caption as well as the colour — the number
+   alone never signals severity. */
+.hero-num--bad     { color: var(--sev-bad); }
+.hero-num--warn    { color: var(--sev-warn); }
+.hero-num--ok      { color: var(--sev-ok); }
+.hero-num--neutral { color: var(--ink-faint); }
+
+.hero-cap {
+  font-size: 0.6875rem;
+  line-height: 1.25;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.bars { display: flex; flex-direction: column; gap: 2px; }
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 4.25rem 1fr 3rem;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.bar-label { font-size: 0.75rem; color: var(--ink-faint); }
+
+.bar-track { height: 0.875rem; background: var(--paper-tint); border-radius: 2px; }
+
+.bar-fill {
+  height: 100%;
+  /* Rounded data-end only, anchored flat against the baseline. */
+  border-radius: 0 3px 3px 0;
+  min-width: 2px;
+}
+
+.bar-value {
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--ink-soft);
+}
+
+.withheld-detail {
+  display: block;
+  margin-top: 0.375rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+}
+
+.gradient-foot {
+  margin-top: 0.875rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--rule-soft);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
+
+/* ------------------------------------------------------------- pending */
+
+.panel--pending { background: linear-gradient(var(--paper-tint), var(--paper-tint))
+                              no-repeat center / calc(100% + 3rem) 100%; }
+
+.pending-box {
+  max-width: var(--measure);
+  padding: 1.25rem 1.5rem;
+  background: var(--paper);
+  border: 1px solid var(--warn-rule);
+  border-left-width: 3px;
+  border-radius: 3px;
+}
+
+.pending-box h3 { margin: 0 0 0.5rem; font-size: 0.9375rem; }
+.pending-box p { margin: 0 0 0.75rem; font-size: 0.9375rem; color: var(--ink-soft); }
+.pending-sub { margin-top: 1rem !important; margin-bottom: 0.375rem !important;
+               font-size: 0.8125rem !important; font-weight: 600; }
+
+.pending-list { margin: 0; padding-left: 1.125rem; }
+.pending-list li { font-size: 0.8125rem; line-height: 1.7; color: var(--ink-soft); }
+
+/* ------------------------------------------------------------- cost inputs */
+
+.cost-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.cost-inputs label { display: block; }
+
+.label-text {
+  display: block;
+  margin-bottom: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 550;
+}
+
+.cost-inputs input {
+  display: block;
+  width: 9rem;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--ink-soft);
+  border-radius: 2px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.cost-inputs input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.hint {
+  display: block;
+  margin-top: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+}
+
+.derivation {
+  max-width: var(--measure);
+  padding: 1.25rem 1.5rem;
+  background: var(--paper-tint);
+  border-left: 3px solid var(--rule);
+}
+
+.derivation p { margin: 0 0 0.75rem; font-size: 0.9375rem; color: var(--ink-soft); }
+.derivation p:last-child { margin-bottom: 0; }
+
+.formula {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink) !important;
+}
+
+.formula strong { font-variant-numeric: tabular-nums; }
+
+/* ------------------------------------------------------------------- basis */
+
+.basis-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: var(--measure);
+}
+
+.basis-option {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.basis-option:hover { border-color: var(--ink-soft); }
+
+.basis-option:has(input:checked) {
+  border-color: var(--accent);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.basis-option input { margin-top: 0.3rem; accent-color: var(--accent); }
+.basis-option .name { display: block; font-weight: 550; font-size: 0.9375rem; }
+.basis-option .desc { display: block; margin-top: 0.125rem; font-size: 0.8125rem;
+                      color: var(--ink-faint); line-height: 1.5; }
+
+/* --------------------------------------------------------------- result/map */
+
+.summary {
+  max-width: var(--measure);
+  margin: 0 0 2rem;
+  padding: 1rem 1.25rem;
+  border-left: 3px solid var(--accent);
+  font-size: 1rem;
+}
+
+.summary strong { font-variant-numeric: tabular-nums; }
+
+/* The map column is sized to the map rather than stretched to the page. With the
+   SVG at its natural ~360 px the old 1fr track left the key stranded far to the
+   right across a field of white. */
+.map-and-key {
+  display: grid;
+  grid-template-columns: auto minmax(14rem, 20rem);
+  gap: 2.5rem;
+  align-items: start;
+  max-width: 46rem;
+}
+
+.map-figure { margin: 0; }
+
+/* Madagascar's bounding box is about twice as tall as it is wide. Setting both
+   width and height on the SVG made the element 840x680 while the drawing only
+   filled 358 px of it -- a sliver marooned in 240 px of dead space either side.
+   Drive the height and let the width come from the viewBox's intrinsic aspect
+   ratio, so the element is exactly the size of the map. */
+.map-figure svg {
+  display: block;
+  height: min(680px, 78vh);
+  width: auto;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.map-figure figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--ink-faint);
+}
+
+/* vector-effect is load-bearing, not decoration.
+ *
+ * Stroke widths on an SVG path are in USER units, and this viewBox is only ~7.5
+ * units wide against ~360 rendered pixels — one unit is 48 px. A stroke-width of
+ * 0.7 therefore painted a 34 px white band around every region, and the dashed
+ * "near the line" outline painted 67 px dashes. Antananarivo capital is 4.8 px
+ * across; it was entirely consumed by its own border.
+ *
+ * non-scaling-stroke makes these widths evaluate in screen pixels regardless of
+ * the viewBox scale, which is what the numbers below assume. Do not remove it
+ * without converting every width and dash length back to user units. */
+.region-shape {
+  stroke: var(--paper);
+  stroke-width: 0.75px;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+  cursor: pointer;
+  transition: opacity 90ms ease-out;
+}
+
+.region-shape:hover { opacity: 0.78; }
+
+/* "Near the line" is signalled by outline, not fill — see the note in app.js.
+   A dashed edge reads identically in colour, in greyscale and under any colour
+   vision deficiency. */
+.region-shape[data-tipping="true"] {
+  stroke: var(--ink);
+  stroke-width: 1.5px;
+  stroke-dasharray: 3px 2.25px;
+}
+
+/* `outline` is unusable on these paths — it must be off in every focus state.
+ *
+ * The paths carry tabindex="0", so a mouse click focuses them. A click matches
+ * :focus but NOT :focus-visible, so an `outline: none` scoped to :focus-visible
+ * never fired and Chromium drew its default `outline: auto 5px`. On an SVG path
+ * Chromium traces outline along the SHAPE GEOMETRY in user units — at ~48 px per
+ * unit that rendered as a black halo swallowing a third of the map on every click.
+ *
+ * An explicit `outline: 2px solid` is no better: Chromium resolves outline width
+ * on SVG children in user units too, so 2px became ~96 screen px. Same trap as
+ * stroke-width, and there is no `vector-effect` equivalent for outline.
+ *
+ * Keyboard focus therefore gets a drawn ring instead — two overlay paths appended
+ * last in the SVG so they sit above every region, in `site/app.js`. Their widths
+ * use vector-effect and so are honestly in screen pixels. */
+.region-shape:focus,
+.region-shape:focus-visible { outline: none; }
+
+.region-shape:focus-visible { stroke: var(--ink); stroke-width: 2.5px; }
+
+.region-shape[data-selected="true"] { stroke: var(--ink); stroke-width: 2.5px; }
+
+/* Keyboard focus ring: white halo under a dark ring, so it reads against both the
+   dark and the light fill. Hidden until a region takes visible focus. */
+.focus-ring {
+  fill: none;
+  pointer-events: none;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+  visibility: hidden;
+}
+
+.focus-ring--halo { stroke: #ffffff; stroke-width: 6px; }
+.focus-ring--edge { stroke: var(--ink); stroke-width: 2.5px; }
+.focus-ring[data-shown="true"] { visibility: visible; }
+
+.key h3 { margin-top: 0; }
+
+.swatches { margin: 0; padding: 0; list-style: none; }
+
+.swatches li {
+  display: flex;
+  gap: 0.625rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--ink-soft);
+}
+
+.swatch {
+  flex: 0 0 auto;
+  width: 1.5rem;
+  height: 1rem;
+  border: 1px solid var(--ink-faint);
+  border-radius: 1px;
+}
+
+.swatch--remote   { background: var(--remote); }
+.swatch--inperson { background: var(--inperson); }
+.swatch--missing  { background: var(--missing); }
+.swatch--dashed {
+  background: var(--paper);
+  border: 2px dashed var(--ink);
+  border-radius: 1px;
+}
+/* ------------------------------- per-region targeting distortion (headline) */
+
+.distortion-block {
+  max-width: var(--measure);
+  margin: 0 0 1.75rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--paper-tint);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 3px 3px 0;
+}
+
+.distortion-head {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 0.875rem;
+}
+
+/* Proportional figures: this stands alone rather than aligning in a column. */
+.distortion-num {
+  font-size: 3.25rem;
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.distortion-num--bad     { color: var(--sev-bad); }
+.distortion-num--warn    { color: var(--sev-warn); }
+.distortion-num--ok      { color: var(--sev-ok); }
+.distortion-num--neutral { color: var(--ink-faint); }
+
+.distortion-label {
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.distortion-verdict { margin-top: 0.25rem; font-size: 0.9375rem; line-height: 1.45; }
+
+.distortion-sentence {
+  margin: 0 0 1.25rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.distortion-block--absent { border-left-color: var(--warn-rule); }
+
+.distortion-absent-head {
+  font-size: 0.9375rem;
+  font-weight: 650;
+  margin-bottom: 0.375rem;
+}
+
+.distortion-absent-why {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.region-quintiles h4 {
+  margin: 0 0 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.region-quintiles .bar-row {
+  grid-template-columns: 4.25rem 1fr 3.25rem 3.5rem;
+}
+
+.bar-cases {
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--ink-faint);
+}
+
+.bar-cases--flagged { color: var(--sev-warn); font-weight: 600; }
+
+.bar-track--suppressed {
+  background: repeating-linear-gradient(45deg,
+    var(--paper-tint) 0 4px, var(--rule) 4px 5px);
+}
+
+.bar-value.is-missing { color: var(--ink-faint); font-weight: 400; }
+
+.dist-chip {
+  display: inline-block;
+  min-width: 2.75rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 2px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.dist-chip--bad  { background: #fbe9e7; color: #8c1d16; }
+.dist-chip--warn { background: #fdf3e0; color: #6d4700; }
+.dist-chip--ok   { background: #e6f4ea; color: #14522a; }
+
+/* ------------------------------------------------------------------ detail */
+
+.detail-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+}
+
+.detail-head h3 { margin: 0; font-size: 1.25rem; font-weight: 650; }
+
+.verdict {
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.verdict--remote   { background: var(--remote);   color: var(--remote-ink); }
+.verdict--inperson { background: var(--inperson); color: var(--inperson-ink); }
+.verdict--tipping  { background: var(--tipping);  color: var(--ink); }
+.verdict--missing  { background: var(--paper-tint); color: var(--ink-soft);
+                     border: 1px solid var(--rule); }
+
+.detail-reason {
+  max-width: var(--measure);
+  margin: 0 0 1.75rem;
+  color: var(--ink-soft);
+}
+
+.detail-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+  gap: 2rem;
+}
+
+.detail-group h4 {
+  margin: 0 0 0.625rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.field { padding: 0.625rem 0; border-bottom: 1px solid var(--rule-soft); }
+
+.field-row {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.field-label { font-size: 0.875rem; }
+
+.field-value {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.field-value.is-missing { color: var(--ink-faint); font-weight: 400; }
+
+.field-meta {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
+
+.field-meta .vintage {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Side-by-side comparison where two sources speak to the same thing. */
+.compare {
+  margin: 0 0 1rem;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.compare-head {
+  padding: 0.5rem 0.875rem;
+  background: var(--paper-tint);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.compare-body { display: grid; grid-template-columns: 1fr 1fr; }
+
+.compare-cell { padding: 0.875rem; }
+.compare-cell + .compare-cell { border-left: 1px solid var(--rule); }
+.compare-cell .num { display: block; font-size: 1.375rem; font-weight: 650;
+                     font-variant-numeric: tabular-nums; line-height: 1.2; }
+.compare-cell .cap { display: block; margin-top: 0.25rem; font-size: 0.75rem;
+                     line-height: 1.45; color: var(--ink-faint); }
+
+.compare-foot {
+  padding: 0.75rem 0.875rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* ------------------------------------------------------------------- table */
+
+.table-scroll { overflow-x: auto; }
+
+table {
+  width: 100%;
+  min-width: 54rem;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+th, td { padding: 0.5rem 0.75rem; text-align: right; white-space: nowrap; }
+
+/* Region names wrap, but give them enough room that "Analamanga excluding
+   capital" takes two lines rather than three and every row grows to match. */
+th:first-child, td:first-child {
+  text-align: left;
+  white-space: normal;
+  min-width: 11rem;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background: var(--paper);
+  border-bottom: 2px solid var(--ink);
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  user-select: none;
+}
+
+thead th:hover { color: var(--accent); }
+thead th .arrow { color: var(--ink-faint); font-weight: 400; }
+
+tbody tr { border-bottom: 1px solid var(--rule-soft); cursor: pointer; }
+tbody tr:hover { background: var(--paper-tint); }
+tbody tr[data-selected="true"] { background: var(--paper-tint);
+                                 box-shadow: inset 3px 0 0 var(--accent); }
+
+td.is-missing { color: var(--ink-faint); }
+
+.pill {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  border-radius: 2px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.pill--remote   { background: var(--remote);   color: var(--remote-ink); }
+.pill--inperson { background: var(--inperson); color: var(--inperson-ink); }
+.pill--tipping  { background: var(--tipping);  color: var(--ink); }
+.pill--missing  { background: var(--paper-tint); color: var(--ink-soft);
+                  border: 1px solid var(--rule); }
+
+/* ---------------------------------------------------------------- caveats */
+
+.panel--caveat { border-bottom: none; }
+
+.caveat {
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--rule-soft);
+}
+
+.caveat:first-of-type { border-top: 1px solid var(--rule); }
+.caveat h3 { margin: 0 0 0.375rem; font-size: 0.9375rem; font-weight: 650; }
+.caveat p { margin: 0; max-width: var(--measure); font-size: 0.9375rem;
+            color: var(--ink-soft); }
+
+/* ---------------------------------------------------------------- sources */
+
+.source-list { margin: 0 0 1rem; padding: 0; list-style: none; }
+
+.source-list li {
+  padding: 0.625rem 0;
+  border-bottom: 1px solid var(--rule-soft);
+  font-size: 0.875rem;
+}
+
+.source-list .what { font-weight: 550; }
+.source-list .meta { color: var(--ink-faint); }
+
+.findex-series { display: flex; flex-wrap: wrap; gap: 1.5rem; margin: 0.5rem 0 0;
+                 padding: 0; list-style: none; }
+.findex-series li { font-size: 0.875rem; }
+.findex-series .yr { display: block; font-size: 0.75rem; color: var(--ink-faint); }
+.findex-series .val { font-size: 1.125rem; font-weight: 650;
+                      font-variant-numeric: tabular-nums; }
+
+/* ------------------------------------------------------------- responsive */
+
+@media (max-width: 860px) {
+  .map-and-key { grid-template-columns: 1fr; gap: 1.5rem; }
+  .compare-body { grid-template-columns: 1fr; }
+  .compare-cell + .compare-cell { border-left: none; border-top: 1px solid var(--rule); }
+}
+
+@media (max-width: 560px) {
+  body { padding: 0 1rem 4rem; }
+  .cost-inputs { gap: 1.25rem; }
+}
+
+/* Printed greyscale is a supported output. Keep fills, drop interaction affordances. */
+@media print {
+  body { padding: 0; }
+  .panel { break-inside: avoid; border-bottom: 1px solid #999; }
+  .region-shape { cursor: default; }
+  thead th { cursor: default; }
+  table { min-width: 0; font-size: 0.75rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .region-shape { transition: none; }
+}
