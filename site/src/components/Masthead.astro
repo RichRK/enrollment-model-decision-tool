@@ -1,0 +1,22 @@
+---
+/* Title, one-sentence standfirst, provenance. Every figure is passed in from
+ * index.astro's frontmatter, which derives it from regions.json -- none of them
+ * is typed by hand. */
+interface Props {
+  country: string;
+  surveyYear: number;
+  regionCount: number;
+}
+const { country, regionCount } = Astro.props;
+---
+
+<header class="mast">
+  <p class="eyebrow">
+    {country} &middot; enrollment model decision tool &middot; v2 proof of concept
+  </p>
+  <h1>Remote enrollment vs. in-person registration</h1>
+  <p class="standfirst">
+    Where remote enrollment is cheaper across {regionCount} regions &mdash; and who it
+    would leave out.
+  </p>
+</header>

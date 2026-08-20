@@ -1,0 +1,59 @@
+---
+/* The "Your scenario" card at the top of the reading column: the two cost
+ * inputs, the line they imply, and the basis selector.
+ *
+ * Deliberately NOT a <form>. The data-agreement audit
+ * (site/tests/check-data.test.js) treats a <form> element as lead capture, and
+ * it is right to: nothing on this page submits anything anywhere. Bare
+ * <label><input> is all that is needed for two numbers read by a keystroke
+ * listener. */
+interface Props {
+  costRemote: number;
+  costInPerson: number;
+}
+const { costRemote, costInPerson } = Astro.props;
+---
+
+<aside class="ctrl">
+  <h2>Your scenario</h2>
+
+  <div class="sect">
+    <span class="slabel">Cost per enrollment</span>
+    <div class="costrow">
+      <label>
+        Remote
+        <input type="number" data-bind="cost-remote" value={costRemote} min="0" step="0.1" inputmode="decimal">
+      </label>
+      <label>
+        In person
+        <input type="number" data-bind="cost-inperson" value={costInPerson} min="0" step="0.1" inputmode="decimal">
+      </label>
+    </div>
+    <p class="linehint">
+      These are placeholders — please replace with your own figures. Remote-first wins where the reachable share clears
+      <strong data-bind="line">&mdash;</strong>.
+    </p>
+    <details class="derivation">
+      <summary>Where that line comes from</summary>
+      <p>
+        Under a remote-first approach you pay the remote cost for everyone, then pay the
+        in-person cost for the share who cannot complete it. That beats going in person
+        everywhere exactly when
+      </p>
+      <p class="formula">
+        reachable share &gt; cost&nbsp;remote &divide; cost&nbsp;in-person
+      </p>
+      <p>
+        So your cost inputs decide only where that line falls. Everything else is measured.
+        <strong>Note what this arithmetic ignores:</strong> it treats every excluded
+        household as equally costly to reach in person, and the notes below explain why
+        that assumption is the weakest thing on this page.
+      </p>
+    </details>
+  </div>
+
+  <div class="sect">
+    <span class="slabel">What counts as reachable</span>
+    <div data-bind="basis"></div>
+  </div>
+</aside>

@@ -148,9 +148,9 @@ non-disclosive.
 Its weighted denominators match `CO_MOBB_W_MOB` and `ED_LITR_W_LIT` exactly, both
 drawn on the same base of women interviewed, so the unweighted counts are almost
 certainly identical and could have been borrowed. That would have been reasoning
-rather than evidence. **The indicator is withheld instead**, recorded in
-`regions.json` under `national.wealth_gradient_withheld` and stated on the page, so
-it is visibly absent rather than quietly missing.
+rather than evidence. **The indicator was withheld instead**, recorded in
+`regions.json` under `national.wealth_gradient_withheld` so it was visibly absent
+rather than quietly missing.
 
 It cost the most striking card on the site — women's internet use had a targeting
 distortion of 0.02.
@@ -292,14 +292,13 @@ costs the remote price for everyone plus the in-person price for the share who
 cannot complete it, so it wins exactly when
 `reachable share > cost_remote / cost_inperson`.
 
-**"Reachable share" is a choice, not an index.** Three readings are offered — each a
-real DHS value or a stated combination of two. No weighted composite anywhere,
-because the weights would have to be invented. For the conjunction both Fréchet
-bounds are shown, because the survey never crosses the two conditions.
-
-**GeoPandas is not used.** Shapely handles the geometry, rasterio the raster. The
-lighter dependency tree is deliberate, against a constraint that this should still
-build in two years.
+**"Reachable share" is a choice, not an index.** Two readings are offered, each a
+real DHS value: household phone ownership, and personal ownership among women. No
+weighted composite anywhere, because the weights would have to be invented. A third
+reading, "owns a phone and is literate", was dropped — the survey never crosses the
+two conditions, so it could only be published as a pair of Fréchet bounds, and its
+optimistic bound turned out to equal the phone figure in all 23 regions because
+women's literacy exceeds women's phone ownership everywhere.
 
 ## Licence
 

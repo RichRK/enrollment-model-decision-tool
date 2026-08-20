@@ -47,8 +47,6 @@ DHS_INDICATORS = {
     "mobile_money_m": "CO_MOBB_M_SPT",      # Men who used a mobile phone for financial transactions
     "bank_account_f": "CO_MOBB_W_BNK",      # Women who have a bank account
     "bank_account_m": "CO_MOBB_M_BNK",      # Men who have a bank account
-    "internet_f": "CO_INUS_W_U12",          # Women who used the internet in the past 12 months
-    "internet_m": "CO_INUS_M_U12",          # Men who used the internet in the past 12 months
 }
 
 # The /data endpoint returns a hierarchy: 6 former provinces, 22 regions nested

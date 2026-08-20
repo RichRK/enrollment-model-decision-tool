@@ -50,18 +50,6 @@
    "source": "DHS Program API, MD2021DHS",
    "vintage": "2021"
   },
-  "internet_f": {
-   "label": "Women who used the internet in the past 12 months",
-   "note": "Self-reported.",
-   "source": "DHS Program API, MD2021DHS",
-   "vintage": "2021"
-  },
-  "internet_m": {
-   "label": "Men who used the internet in the past 12 months",
-   "note": "Self-reported.",
-   "source": "DHS Program API, MD2021DHS",
-   "vintage": "2021"
-  },
   "literacy_f": {
    "label": "Women's literacy",
    "note": "Kept separate from the male figure throughout; never averaged.",
@@ -105,7 +93,7 @@
    "vintage": "2025 (modelled)"
   }
  },
- "generated": "2026-08-07",
+ "generated": "2026-08-19",
  "national": {
   "findex": {
    "account_ownership": {
@@ -343,57 +331,6 @@
     "indicator_id": "HC_HEFF_H_MPH",
     "targeting_distortion": 0.27382831874369407,
     "top_group_rate": 71.99698899371069
-   },
-   "internet_m": {
-    "bottom_group_rate": 1.6067238912732478,
-    "bottom_quintile_pool_share": 0.008110564709721026,
-    "bottom_quintile_population_share": 0.15896349819359662,
-    "by_quintile": [
-     {
-      "cases_unweighted": 1466,
-      "denominator_weighted": 1276,
-      "pool_share": 0.008110564709721026,
-      "population_share": 0.15896349819359662,
-      "quintile": "Lowest",
-      "value": 0.9
-     },
-     {
-      "cases_unweighted": 1571,
-      "denominator_weighted": 1520,
-      "pool_share": 0.02361697003596927,
-      "population_share": 0.18936090693908061,
-      "quintile": "Second",
-      "value": 2.2
-     },
-     {
-      "cases_unweighted": 1535,
-      "denominator_weighted": 1639,
-      "pool_share": 0.061349740912516215,
-      "population_share": 0.204185872679706,
-      "quintile": "Middle",
-      "value": 5.3
-     },
-     {
-      "cases_unweighted": 1634,
-      "denominator_weighted": 1796,
-      "pool_share": 0.20675301268211516,
-      "population_share": 0.2237448610938084,
-      "quintile": "Fourth",
-      "value": 16.3
-     },
-     {
-      "cases_unweighted": 1813,
-      "denominator_weighted": 1796,
-      "pool_share": 0.7001697116596783,
-      "population_share": 0.2237448610938084,
-      "quintile": "Highest",
-      "value": 55.2
-     }
-    ],
-    "exclusion_gap": -24.602547758506912,
-    "indicator_id": "CO_INUS_M_U12",
-    "targeting_distortion": 0.05102155401640335,
-    "top_group_rate": 26.20927164978016
    },
    "literacy_f": {
     "bottom_group_rate": 53.56679920477138,
@@ -702,9 +639,7 @@
     "top_group_rate": 58.47121009367233
    }
   },
-  "wealth_gradient_withheld": {
-   "internet_f": "no unweighted case count for Fourth, Highest, Lowest, Middle, Second (API returned '')"
-  }
+  "wealth_gradient_withheld": {}
  },
  "pending": {},
  "regions": [
@@ -714,7 +649,6 @@
    "dhs_denominator_households": 915,
    "feasibility_bases": {
     "hh_mobile_phone": 54.6,
-    "phone_and_literacy_f": 33.1,
     "phone_own_f": 33.1
    },
    "geometry": {
@@ -3992,14 +3926,11 @@
    },
    "hh_electricity": 37.0,
    "hh_mobile_phone": 54.6,
-   "internet_f": 9.7,
-   "internet_m": 19.3,
    "literacy_f": 84.2,
    "literacy_m": 86.2,
    "mobile_money_f": 21.1,
    "mobile_money_m": 23.0,
    "name": "Alaotra Mangoro",
-   "phone_and_literacy_f_lower": 17.300000000000004,
    "phone_own_f": 33.1,
    "phone_own_m": 50.0,
    "pop_total": 1544484,
@@ -4333,7 +4264,6 @@
    "dhs_denominator_households": 2063,
    "feasibility_bases": {
     "hh_mobile_phone": 67.5,
-    "phone_and_literacy_f": 46.9,
     "phone_own_f": 46.9
    },
    "geometry": {
@@ -6205,14 +6135,11 @@
    },
    "hh_electricity": 59.5,
    "hh_mobile_phone": 67.5,
-   "internet_f": 22.6,
-   "internet_m": 31.3,
    "literacy_f": 95.2,
    "literacy_m": 92.0,
    "mobile_money_f": 24.8,
    "mobile_money_m": 23.2,
    "name": "Analamanga excluding capital",
-   "phone_and_literacy_f_lower": 42.1,
    "phone_own_f": 46.9,
    "phone_own_m": 54.8,
    "pop_total": 3060480,
@@ -6438,7 +6365,6 @@
    "dhs_denominator_households": 1041,
    "feasibility_bases": {
     "hh_mobile_phone": 57.8,
-    "phone_and_literacy_f": 40.9,
     "phone_own_f": 40.9
    },
    "geometry": {
@@ -9994,14 +9920,11 @@
    },
    "hh_electricity": 45.3,
    "hh_mobile_phone": 57.8,
-   "internet_f": 11.3,
-   "internet_m": 20.8,
    "literacy_f": 82.0,
    "literacy_m": 89.2,
    "mobile_money_f": 23.0,
    "mobile_money_m": 22.6,
    "name": "Analanjirofo",
-   "phone_and_literacy_f_lower": 22.899999999999988,
    "phone_own_f": 40.9,
    "phone_own_m": 57.3,
    "pop_total": 1377995,
@@ -10227,7 +10150,6 @@
    "dhs_denominator_households": 576,
    "feasibility_bases": {
     "hh_mobile_phone": 55.7,
-    "phone_and_literacy_f": 23.1,
     "phone_own_f": 23.1
    },
    "geometry": {
@@ -12605,14 +12527,11 @@
    },
    "hh_electricity": 25.8,
    "hh_mobile_phone": 55.7,
-   "internet_f": 6.5,
-   "internet_m": 9.8,
    "literacy_f": 81.3,
    "literacy_m": 82.5,
    "mobile_money_f": 14.7,
    "mobile_money_m": 21.4,
    "name": "Anamoroni'i Mania",
-   "phone_and_literacy_f_lower": 4.400000000000004,
    "phone_own_f": 23.1,
    "phone_own_m": 37.9,
    "pop_total": 1075154,
@@ -12942,7 +12861,6 @@
    "dhs_denominator_households": 737,
    "feasibility_bases": {
     "hh_mobile_phone": 28.3,
-    "phone_and_literacy_f": 18.1,
     "phone_own_f": 18.1
    },
    "geometry": {
@@ -14604,14 +14522,11 @@
    },
    "hh_electricity": 2.8,
    "hh_mobile_phone": 28.3,
-   "internet_f": 2.3,
-   "internet_m": 2.9,
    "literacy_f": 48.4,
    "literacy_m": 45.2,
    "mobile_money_f": 8.7,
    "mobile_money_m": 16.0,
    "name": "Androy",
-   "phone_and_literacy_f_lower": 0.0,
    "phone_own_f": 18.1,
    "phone_own_m": 32.6,
    "pop_total": 1191172,
@@ -14837,7 +14752,6 @@
    "dhs_denominator_households": 666,
    "feasibility_bases": {
     "hh_mobile_phone": 31.8,
-    "phone_and_literacy_f": 15.2,
     "phone_own_f": 15.2
    },
    "geometry": {
@@ -18139,14 +18053,11 @@
    },
    "hh_electricity": 10.0,
    "hh_mobile_phone": 31.8,
-   "internet_f": 4.9,
-   "internet_m": 7.2,
    "literacy_f": 42.8,
    "literacy_m": 44.7,
    "mobile_money_f": 9.0,
    "mobile_money_m": 9.5,
    "name": "Anosy",
-   "phone_and_literacy_f_lower": 0.0,
    "phone_own_f": 15.2,
    "phone_own_m": 23.8,
    "pop_total": 1004387,
@@ -18476,7 +18387,6 @@
    "dhs_denominator_households": 1053,
    "feasibility_bases": {
     "hh_mobile_phone": 82.1,
-    "phone_and_literacy_f": 63.3,
     "phone_own_f": 63.3
    },
    "geometry": {
@@ -18596,14 +18506,11 @@
    },
    "hh_electricity": 86.9,
    "hh_mobile_phone": 82.1,
-   "internet_f": 42.6,
-   "internet_m": 55.4,
    "literacy_f": 91.3,
    "literacy_m": 96.9,
    "mobile_money_f": 34.4,
    "mobile_money_m": 42.3,
    "name": "Antananarivo capital",
-   "phone_and_literacy_f_lower": 54.59999999999998,
    "phone_own_f": 63.3,
    "phone_own_m": 73.2,
    "pop_total": 1423872,
@@ -18629,7 +18536,6 @@
    "dhs_denominator_households": 1371,
    "feasibility_bases": {
     "hh_mobile_phone": 46.3,
-    "phone_and_literacy_f": 32.9,
     "phone_own_f": 32.9
    },
    "geometry": {
@@ -24195,14 +24101,11 @@
    },
    "hh_electricity": 22.9,
    "hh_mobile_phone": 46.3,
-   "internet_f": 11.5,
-   "internet_m": 16.8,
    "literacy_f": 64.1,
    "literacy_m": 54.7,
    "mobile_money_f": 25.1,
    "mobile_money_m": 23.9,
    "name": "Atsimo Andrefana",
-   "phone_and_literacy_f_lower": 0.0,
    "phone_own_f": 32.9,
    "phone_own_m": 39.7,
    "pop_total": 2188985,
@@ -24532,7 +24435,6 @@
    "dhs_denominator_households": 611,
    "feasibility_bases": {
     "hh_mobile_phone": 26.2,
-    "phone_and_literacy_f": 11.2,
     "phone_own_f": 11.2
    },
    "geometry": {
@@ -26742,14 +26644,11 @@
    },
    "hh_electricity": 8.4,
    "hh_mobile_phone": 26.2,
-   "internet_f": 4.1,
-   "internet_m": 7.6,
    "literacy_f": 46.0,
    "literacy_m": 60.7,
    "mobile_money_f": 8.0,
    "mobile_money_m": 11.0,
    "name": "Atsimo Atsinanana",
-   "phone_and_literacy_f_lower": 0.0,
    "phone_own_f": 11.2,
    "phone_own_m": 25.3,
    "pop_total": 1299666,
@@ -27091,7 +26990,6 @@
    "dhs_denominator_households": 1208,
    "feasibility_bases": {
     "hh_mobile_phone": 46.3,
-    "phone_and_literacy_f": 37.4,
     "phone_own_f": 37.4
    },
    "geometry": {
@@ -30137,14 +30035,11 @@
    },
    "hh_electricity": 34.6,
    "hh_mobile_phone": 46.3,
-   "internet_f": 20.3,
-   "internet_m": 18.7,
    "literacy_f": 82.4,
    "literacy_m": 78.6,
    "mobile_money_f": 23.8,
    "mobile_money_m": 26.5,
    "name": "Atsinanana",
-   "phone_and_literacy_f_lower": 19.799999999999997,
    "phone_own_f": 37.4,
    "phone_own_m": 41.7,
    "pop_total": 1844025,
@@ -30474,7 +30369,6 @@
    "dhs_denominator_households": 296,
    "feasibility_bases": {
     "hh_mobile_phone": 47.5,
-    "phone_and_literacy_f": 21.6,
     "phone_own_f": 21.6
    },
    "geometry": {
@@ -33180,14 +33074,11 @@
    },
    "hh_electricity": 30.3,
    "hh_mobile_phone": 47.5,
-   "internet_f": 4.0,
-   "internet_m": 6.6,
    "literacy_f": 64.5,
    "literacy_m": 66.5,
    "mobile_money_f": 11.5,
    "mobile_money_m": 12.7,
    "name": "Betsiboka",
-   "phone_and_literacy_f_lower": 0.0,
    "phone_own_f": 21.6,
    "phone_own_m": 42.1,
    "pop_total": 506093,
@@ -33517,7 +33408,6 @@
    "dhs_denominator_households": 744,
    "feasibility_bases": {
     "hh_mobile_phone": 62.6,
-    "phone_and_literacy_f": 44.4,
     "phone_own_f": 44.4
    },
    "geometry": {
@@ -38139,14 +38029,11 @@
    },
    "hh_electricity": 37.1,
    "hh_mobile_phone": 62.6,
-   "internet_f": 18.5,
-   "internet_m": 19.4,
    "literacy_f": 78.6,
    "literacy_m": 82.7,
    "mobile_money_f": 32.1,
    "mobile_money_m": 25.6,
    "name": "Boeny",
-   "phone_and_literacy_f_lower": 23.0,
    "phone_own_f": 44.4,
    "phone_own_m": 47.5,
    "pop_total": 1093135,
@@ -38476,7 +38363,6 @@
    "dhs_denominator_households": 472,
    "feasibility_bases": {
     "hh_mobile_phone": 49.8,
-    "phone_and_literacy_f": 26.8,
     "phone_own_f": 26.8
    },
    "geometry": {
@@ -40610,14 +40496,11 @@
    },
    "hh_electricity": 19.5,
    "hh_mobile_phone": 49.8,
-   "internet_f": 8.3,
-   "internet_m": 8.0,
    "literacy_f": 84.5,
    "literacy_m": 79.7,
    "mobile_money_f": 10.3,
    "mobile_money_m": 16.2,
    "name": "Bongolava",
-   "phone_and_literacy_f_lower": 11.299999999999999,
    "phone_own_f": 26.8,
    "phone_own_m": 44.4,
    "pop_total": 822429,
@@ -40947,7 +40830,6 @@
    "dhs_denominator_households": 775,
    "feasibility_bases": {
     "hh_mobile_phone": 70.2,
-    "phone_and_literacy_f": 60.4,
     "phone_own_f": 60.4
    },
    "geometry": {
@@ -47695,14 +47577,11 @@
    },
    "hh_electricity": 52.1,
    "hh_mobile_phone": 70.2,
-   "internet_f": 28.5,
-   "internet_m": 28.8,
    "literacy_f": 83.4,
    "literacy_m": 83.2,
    "mobile_money_f": 32.6,
    "mobile_money_m": 34.1,
    "name": "Diana",
-   "phone_and_literacy_f_lower": 43.80000000000002,
    "phone_own_f": 60.4,
    "phone_own_m": 64.2,
    "pop_total": 1097518,
@@ -47984,7 +47863,6 @@
    "dhs_denominator_households": 1021,
    "feasibility_bases": {
     "hh_mobile_phone": 56.5,
-    "phone_and_literacy_f": 31.6,
     "phone_own_f": 31.6
    },
    "geometry": {
@@ -49976,14 +49854,11 @@
    },
    "hh_electricity": 15.7,
    "hh_mobile_phone": 56.5,
-   "internet_f": 9.7,
-   "internet_m": 10.8,
    "literacy_f": 84.5,
    "literacy_m": 81.2,
    "mobile_money_f": 18.8,
    "mobile_money_m": 18.3,
    "name": "Haute Matsiatra",
-   "phone_and_literacy_f_lower": 16.1,
    "phone_own_f": 31.6,
    "phone_own_m": 46.6,
    "pop_total": 1779580,
@@ -50313,7 +50188,6 @@
    "dhs_denominator_households": 354,
    "feasibility_bases": {
     "hh_mobile_phone": 51.8,
-    "phone_and_literacy_f": 25.2,
     "phone_own_f": 25.2
    },
    "geometry": {
@@ -53225,14 +53099,11 @@
    },
    "hh_electricity": 14.7,
    "hh_mobile_phone": 51.8,
-   "internet_f": 7.8,
-   "internet_m": 10.5,
    "literacy_f": 53.1,
    "literacy_m": 61.9,
    "mobile_money_f": 15.9,
    "mobile_money_m": 18.5,
    "name": "Ihorombe",
-   "phone_and_literacy_f_lower": 0.0,
    "phone_own_f": 25.2,
    "phone_own_m": 37.8,
    "pop_total": 539567,
@@ -53562,7 +53433,6 @@
    "dhs_denominator_households": 664,
    "feasibility_bases": {
     "hh_mobile_phone": 48.6,
-    "phone_and_literacy_f": 23.2,
     "phone_own_f": 23.2
    },
    "geometry": {
@@ -54968,14 +54838,11 @@
    },
    "hh_electricity": 28.0,
    "hh_mobile_phone": 48.6,
-   "internet_f": 7.5,
-   "internet_m": 8.4,
    "literacy_f": 85.1,
    "literacy_m": 80.8,
    "mobile_money_f": 9.7,
    "mobile_money_m": 10.8,
    "name": "Itasy",
-   "phone_and_literacy_f_lower": 8.299999999999997,
    "phone_own_f": 23.2,
    "phone_own_m": 37.3,
    "pop_total": 1142458,
@@ -55305,7 +55172,6 @@
    "dhs_denominator_households": 209,
    "feasibility_bases": {
     "hh_mobile_phone": 59.6,
-    "phone_and_literacy_f": 37.2,
     "phone_own_f": 37.2
    },
    "geometry": {
@@ -59049,14 +58915,11 @@
    },
    "hh_electricity": 30.1,
    "hh_mobile_phone": 59.6,
-   "internet_f": 9.3,
-   "internet_m": 17.0,
    "literacy_f": 57.0,
    "literacy_m": 63.6,
    "mobile_money_f": 21.3,
    "mobile_money_m": 20.4,
    "name": "Melaky",
-   "phone_and_literacy_f_lower": 0.0,
    "phone_own_f": 37.2,
    "phone_own_m": 53.9,
    "pop_total": 405409,
@@ -59386,7 +59249,6 @@
    "dhs_denominator_households": 622,
    "feasibility_bases": {
     "hh_mobile_phone": 56.7,
-    "phone_and_literacy_f": 21.1,
     "phone_own_f": 21.1
    },
    "geometry": {
@@ -64348,14 +64210,11 @@
    },
    "hh_electricity": 14.3,
    "hh_mobile_phone": 56.7,
-   "internet_f": 3.2,
-   "internet_m": 7.1,
    "literacy_f": 44.1,
    "literacy_m": 73.1,
    "mobile_money_f": 9.8,
    "mobile_money_m": 21.4,
    "name": "Menabe",
-   "phone_and_literacy_f_lower": 0.0,
    "phone_own_f": 21.1,
    "phone_own_m": 51.7,
    "pop_total": 852079,
@@ -64685,7 +64544,6 @@
    "dhs_denominator_households": 1246,
    "feasibility_bases": {
     "hh_mobile_phone": 63.8,
-    "phone_and_literacy_f": 48.5,
     "phone_own_f": 48.5
    },
    "geometry": {
@@ -67413,14 +67271,11 @@
    },
    "hh_electricity": 40.4,
    "hh_mobile_phone": 63.8,
-   "internet_f": 11.7,
-   "internet_m": 15.9,
    "literacy_f": 73.3,
    "literacy_m": 81.7,
    "mobile_money_f": 21.6,
    "mobile_money_m": 15.3,
    "name": "Sava",
-   "phone_and_literacy_f_lower": 21.799999999999997,
    "phone_own_f": 48.5,
    "phone_own_m": 50.8,
    "pop_total": 1462230,
@@ -67758,7 +67613,6 @@
    "dhs_denominator_households": 1336,
    "feasibility_bases": {
     "hh_mobile_phone": 48.7,
-    "phone_and_literacy_f": 28.000000000000004,
     "phone_own_f": 28.0
    },
    "geometry": {
@@ -72758,14 +72612,11 @@
    },
    "hh_electricity": 24.0,
    "hh_mobile_phone": 48.7,
-   "internet_f": 4.2,
-   "internet_m": 6.4,
    "literacy_f": 75.0,
    "literacy_m": 82.8,
    "mobile_money_f": 12.3,
    "mobile_money_m": 13.0,
    "name": "Sofia",
-   "phone_and_literacy_f_lower": 3.0000000000000027,
    "phone_own_f": 28.0,
    "phone_own_m": 43.8,
    "pop_total": 1962565,
@@ -73095,7 +72946,6 @@
    "dhs_denominator_households": 1572,
    "feasibility_bases": {
     "hh_mobile_phone": 50.2,
-    "phone_and_literacy_f": 26.200000000000003,
     "phone_own_f": 26.2
    },
    "geometry": {
@@ -75441,14 +75291,11 @@
    },
    "hh_electricity": 28.8,
    "hh_mobile_phone": 50.2,
-   "internet_f": 9.1,
-   "internet_m": 15.2,
    "literacy_f": 85.1,
    "literacy_m": 87.5,
    "mobile_money_f": 14.1,
    "mobile_money_m": 21.0,
    "name": "Vakinankarata",
-   "phone_and_literacy_f_lower": 11.299999999999999,
    "phone_own_f": 26.2,
    "phone_own_m": 46.8,
    "pop_total": 2627834,
@@ -75778,7 +75625,6 @@
    "dhs_denominator_households": 956,
    "feasibility_bases": {
     "hh_mobile_phone": 39.4,
-    "phone_and_literacy_f": 24.0,
     "phone_own_f": 24.0
    },
    "geometry": {
@@ -77924,14 +77770,11 @@
    },
    "hh_electricity": 19.6,
    "hh_mobile_phone": 39.4,
-   "internet_f": 7.1,
-   "internet_m": 8.1,
    "literacy_f": 67.4,
    "literacy_m": 74.9,
    "mobile_money_f": 13.6,
    "mobile_money_m": 20.1,
    "name": "Vatovavy Fitovinany",
-   "phone_and_literacy_f_lower": 0.0,
    "phone_own_f": 24.0,
    "phone_own_m": 34.2,
    "pop_total": 1855285,
@@ -78265,8 +78108,6 @@
     "bank_account_m": "CO_MOBB_M_BNK",
     "hh_electricity": "HC_ELEC_H_ELC",
     "hh_mobile_phone": "HC_HEFF_H_MPH",
-    "internet_f": "CO_INUS_W_U12",
-    "internet_m": "CO_INUS_M_U12",
     "literacy_f": "ED_LITR_W_LIT",
     "literacy_m": "ED_LITR_M_LIT",
     "mobile_money_f": "CO_MOBB_W_SPT",

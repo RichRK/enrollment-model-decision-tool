@@ -1,0 +1,50 @@
+---
+/* The sticky right-hand column: summary line, layer chips, the map (or two of
+ * them), legends, hover readout.
+ *
+ * Both maps are always in the markup. `data-mode` on the column decides whether
+ * the second one is displayed and whether the captions show -- one attribute
+ * drives the whole compare layout in CSS, so nothing has to be rebuilt when the
+ * layer changes. */
+interface Props {
+  surveyYear: number;
+  regionCount: number;
+}
+// Kept on the interface so index.astro's call site stays explicit about what the
+// column is describing, even though the caption text now lives in the figures.
+const { surveyYear: _surveyYear, regionCount: _regionCount } = Astro.props;
+---
+
+<div class="mapcol" data-bind="mapcol" data-mode="verdict">
+  <p class="sumline" data-bind="summary"></p>
+
+  <!-- Above the maps, not over them. These used to be absolutely positioned on
+       top of the single map and become a flow row in compare, which meant they
+       jumped as you switched layer -- the one control whose position must not
+       move, because you are clicking along it. -->
+  <div class="maplayers" data-bind="mode" role="group" aria-label="Map layer"></div>
+
+  <div class="maps">
+    <figure class="mapfig">
+      <figcaption>
+        Where remote is cheaper
+        <span class="sub">your costs, your basis</span>
+      </figcaption>
+      <div class="mapbox"><div data-bind="map"></div></div>
+      <div class="legendbox" data-bind="legend"></div>
+    </figure>
+
+    <figure class="mapfig mapfig--second">
+      <figcaption>
+        Who it excludes
+        <span class="sub">targeting distortion, household phone</span>
+      </figcaption>
+      <div class="mapbox"><div data-bind="map2"></div></div>
+      <div class="legendbox" data-bind="legend2"></div>
+    </figure>
+  </div>
+
+  <!-- Empty until a region is hovered. It reserves its line in the layout so the
+       column does not jump when a readout appears. -->
+  <p class="hoverline" data-bind="hoverinfo"></p>
+</div>

@@ -34,8 +34,9 @@ Three sources, all CC BY 4.0 or equivalent.
     which is gitignored.
   - **Cell suppression is mandatory, not configurable**: cells under 50 unweighted
     cases are flagged, under 25 suppressed. A cell whose unweighted count cannot be
-    produced is not published at all — this already applies to women's internet use
-    (`CO_INUS_W_U12`), which the API returns without one.
+    produced is not published at all — the rule was established on women's internet
+    use (`CO_INUS_W_U12`), which the API returns without one, and still applies to
+    any indicator that comes back the same way.
   - **Nothing is output at cluster or enumeration-area level**, and no attempt is
     made to identify any individual, household or enumeration area.
   - **The files are not shared with anyone.** Outputs, code and write-ups are free

@@ -288,31 +288,25 @@ def build_region_metrics(regions, dhs, denominators, raster_src, regional_quinti
 def add_feasibility_bases(metrics):
     """The candidate readings of 'share who could complete a remote enrollment'.
 
-    Each is a measured DHS value or a stated combination of two of them. None is a
-    modelled index and none carries invented weights -- the user picks which
-    constraint they think binds, and the map answers for that reading.
+    Each is a measured DHS value. None is a modelled index and none carries
+    invented weights -- the user picks which constraint they think binds, and the
+    map answers for that reading.
 
-    For the conjunction, both bounds are emitted. min(a, b) assumes the two
-    conditions coincide as far as they can; max(0, a + b - 1) assumes they overlap
-    as little as they can. The truth is somewhere between, and the survey does not
-    say where.
+    A third basis, "woman owns a phone AND is literate", was offered and is gone.
+    It could only ever be a range: the survey reports the two conditions
+    separately and never crosses them, so the joint share lies somewhere between
+    max(0, a + b - 1) and min(a, b), and both Frechet bounds had to be published
+    rather than a point estimate. But the optimistic bound is min(phone,
+    literacy), and women's literacy exceeds women's phone ownership in all 23
+    regions -- so it was always just the phone figure, literacy never bound
+    first, and the map never moved when it was selected. It contributed a wide
+    interval around a number the phone basis already gave.
     """
     for m in metrics.values():
-        phone_hh = m["hh_mobile_phone"]
-        phone_f = m["phone_own_f"]
-        literacy_f = m["literacy_f"]
-
-        bases = {"hh_mobile_phone": phone_hh, "phone_own_f": phone_f}
-
-        if phone_f is not None and literacy_f is not None:
-            a, b = phone_f / 100.0, literacy_f / 100.0
-            bases["phone_and_literacy_f"] = min(a, b) * 100.0
-            m["phone_and_literacy_f_lower"] = max(0.0, a + b - 1.0) * 100.0
-        else:
-            bases["phone_and_literacy_f"] = None
-            m["phone_and_literacy_f_lower"] = None
-
-        m["feasibility_bases"] = bases
+        m["feasibility_bases"] = {
+            "hh_mobile_phone": m["hh_mobile_phone"],
+            "phone_own_f": m["phone_own_f"],
+        }
 
 
 # ---------------------------------------------------------------------------
@@ -362,8 +356,6 @@ DHS_FIELD_NOTES = {
                        SELF_REPORTED),
     "bank_account_f": ("Women with a bank account", SELF_REPORTED),
     "bank_account_m": ("Men with a bank account", SELF_REPORTED),
-    "internet_f": ("Women who used the internet in the past 12 months", SELF_REPORTED),
-    "internet_m": ("Men who used the internet in the past 12 months", SELF_REPORTED),
 }
 
 

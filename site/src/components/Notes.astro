@@ -1,0 +1,201 @@
+---
+/* Notes and caveats, full width below the article, as collapsed accordions.
+ *
+ * Everything here is static: none of it depends on what the user types, so all
+ * of it is derived at build time and rendered into the HTML rather than by the
+ * client script. The one exception is the all-regions table, whose rows carry
+ * the cost verdict and so are built by scripts/table.ts.*/
+import type { Data, Region } from "../scripts/state";
+
+interface Props {
+  data: Data;
+}
+const { data } = Astro.props;
+
+const constants = data.constants;
+const headline = constants.headline_indicator;
+const surveyYear = data.sources.dhs.survey_year;
+const regionCount = data.regions.length;
+
+const gradientOf = (region: Region) => (region.quintiles || {})[headline] || null;
+
+// The regions with no targeting distortion, and why each one has none. Computed,
+// never counted by hand -- an earlier version of this page stated the number in
+// prose and recomputed it in script, four paragraphs apart, and the two agreed
+// only by luck.
+const noAnswer = data.regions
+  .filter((region) => (gradientOf(region)?.targeting_distortion ?? null) === null)
+  .map((region) => ({
+    name: region.name,
+    reason: gradientOf(region)?.pending_reason || "no regional breakdown",
+  }));
+const withAnswer = regionCount - noAnswer.length;
+
+// Years elapsed since the survey, as of this build.
+const surveyAge = Number(data.generated.slice(0, 4)) - surveyYear;
+
+// The household-vs-personal spread quoted in the caveats.
+const spread = (key: string) => {
+  const q = data.national.wealth_gradient[key].by_quintile;
+  const poorest = q[0].value ?? 0;
+  const richest = q[4].value ?? 0;
+  return { poorest, richest, fold: richest / poorest };
+};
+const womanPhone = spread("phone_own_f");
+const householdPhone = spread(headline);
+
+const NUMBER_WORD = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
+  "Eight", "Nine", "Ten"];
+const inWords = (n: number) => NUMBER_WORD[n] ?? String(n);
+const pct1 = (v: number) => v.toFixed(1) + "%";
+
+const findex = data.national.findex as {
+  account_ownership: {
+    indicator_name: string;
+    latest_year: number;
+    observations: { year: number; value: number }[];
+  };
+};
+const accounts = findex.account_ownership;
+
+---
+
+<section class="notes-sect">
+  <h2>Notes &amp; caveats</h2>
+  <p class="lede">
+    How this page can be wrong, the full table, and where every number comes from.
+  </p>
+
+  <details>
+    <summary>
+      {inWords(noAnswer.length)} region{noAnswer.length === 1 ? "" : "s"} have no
+      distortion answer &mdash; and they are not random
+    </summary>
+    <p>
+      <strong>{withAnswer} of {regionCount}</strong> regions have a usable targeting
+      distortion. The other <strong>{noAnswer.length}</strong> do not, and are shown as
+      unavailable rather than estimated. Wealth quintiles are defined <em>nationally</em>,
+      so a wealthy region holds almost no bottom-quintile households and a poor one almost
+      no top-quintile households. The cells that vanish are at both ends of the
+      distribution &mdash; including Antananarivo capital, which the survey records with no
+      bottom-quintile households at all. Those are exactly the regions where a targeted
+      programme most wants an answer. Nothing is estimated in their place.
+    </p>
+    <ul>
+      {noAnswer.map((row) => <li><strong>{row.name}</strong> &mdash; {row.reason}</li>)}
+    </ul>
+    <p>
+      Suppression follows DHS&rsquo;s own conventions, not this project&rsquo;s, and is not
+      configurable: every region &times; quintile cell carries its unweighted case count,
+      cells below <strong>{constants.min_cases_flag}</strong> cases are flagged &#9888; and
+      shown, cells below <strong>{constants.min_cases_suppress}</strong> are suppressed and
+      show &ldquo;&mdash;&rdquo;. Where any cell in a region is suppressed, the distortion
+      for that region is withheld too: it is a share of a total, and a total missing one of
+      its five parts would understate the denominator and flatter the result.
+    </p>
+  </details>
+
+  <details>
+    <summary>Distortion is computed on one survey&rsquo;s sample, not measured</summary>
+    <p>
+      A regional targeting distortion rests on five cells of a few hundred households each.
+      Cells between {constants.min_cases_suppress} and {constants.min_cases_flag} unweighted
+      cases are shown but flagged, and they are noisy: a handful of households moving
+      between quintiles would shift the figure materially. Treat the ranking as informative
+      and the second decimal place as not.
+    </p>
+  </details>
+
+  <details>
+    <summary>The DHS figures are self-reported, and are from {surveyYear}</summary>
+    <p>
+      Respondents were asked whether their household owns a mobile telephone; nobody
+      checked. {inWords(surveyAge)} years have passed and ownership has almost certainly
+      risen. The direction of that error is knowable; the size is not. Whether the
+      <em>gradient</em> has flattened over those years is not knowable at all from this
+      data.
+    </p>
+  </details>
+
+  <details>
+    <summary>Household ownership is not personal access</summary>
+    <p>
+      The headline DHS indicator counts households containing a phone. Individual ownership
+      among women is far lower &mdash; nationally {pct1(womanPhone.poorest)} in the poorest
+      quintile against {pct1(womanPhone.richest)} in the richest, a
+      {" "}{womanPhone.fold.toFixed(1)}-fold spread against
+      {" "}{householdPhone.fold.toFixed(1)}-fold for households. The household figure hides
+      an intra-household gap that runs the same way as everything else here.
+    </p>
+  </details>
+
+  <details>
+    <summary>The cost model treats all excluded households as alike</summary>
+    <p>
+      The arithmetic behind the cost line assumes one in-person cost per enrollment
+      regardless of who is being reached. In practice the households remote enrollment
+      excludes are disproportionately the remote, dispersed and poor ones &mdash; the
+      expensive ones. A single flat in-person cost therefore understates the cost of the
+      residual, and understates it most in exactly the regions where the distortion is
+      worst. Modelling travel time and settlement dispersion would fix this and is not yet
+      built.
+    </p>
+  </details>
+
+  <details>
+    <summary>These are survey regions, and the population is modelled</summary>
+    <p>
+      DHS {surveyYear} survey regions will not match your districts or catchment areas, and
+      Madagascar&rsquo;s administrative divisions have changed since the survey. Analamanga
+      appears split into the capital and everything else, which is a DHS artefact.
+    </p>
+    <p>
+      Population figures use WorldPop&rsquo;s constrained {data.sources.worldpop.year}
+      {" "}raster, which is a model. Madagascar&rsquo;s last census was 2018.
+    </p>
+  </details>
+
+  <details>
+    <summary>What is not measured here at all</summary>
+    <p>
+      Whether people hold the identity documents a remote process would ask them to
+      photograph. Whether they would trust one. Whether a household that owns a phone would
+      let the eligible member use it. Network coverage. These decide
+      whether remote enrollment is <em>appropriate</em>; this page addresses only whether it
+      is <em>arithmetically possible</em>.
+    </p>
+  </details>
+
+  <details>
+    <summary>All {regionCount} regions &mdash; the full table</summary>
+    <p class="table-hint">
+      Column headers sort. &ldquo;&mdash;&rdquo; means no value exists &mdash; never zero,
+      never imputed. Selecting a row opens that region&rsquo;s detail.
+    </p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr data-bind="table-head"></tr></thead>
+        <tbody data-bind="table-body"></tbody>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>National reference &mdash; Global Findex</summary>
+    <p>
+      A sanity check on whether the regional picture aggregates to something plausible.
+      {accounts.indicator_name}.
+    </p>
+    <ul class="findex-series">
+      {accounts.observations.slice().reverse().map((obs) => (
+        <li><span class="yr">{obs.year}</span><span class="val">{obs.value.toFixed(1)}%</span></li>
+      ))}
+    </ul>
+    <p>
+      Findex is a periodic survey, so the years between these are genuinely absent rather
+      than flat, and are not drawn. The fall between {accounts.observations[1].year} and
+      {" "}{accounts.observations[0].year} is as published and has not been smoothed.
+      Every source behind this page is listed in full at the foot of it.
+    </p>
+  </details>
+</section>

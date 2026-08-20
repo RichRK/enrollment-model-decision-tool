@@ -1,850 +1,545 @@
 /* An analytical instrument, not a dashboard. Restraint is the design.
  *
- * Colour rules followed throughout:
+ * The v2 skin is cartographic: warm paper, a serif for display type, and a map
+ * that stays pinned beside the argument instead of sitting under it.
+ *
+ * Colour rules followed throughout, unchanged from v1 because they are not
+ * decoration:
  *  - The two recommendation categories differ in LIGHTNESS as well as hue, so the
  *    map reads correctly in greyscale and under protanopia/deuteranopia/tritanopia.
  *  - Category is never signalled by hue alone: regions near the cost line carry a
  *    dashed edge rather than a third fill, and every fill also has a text label
  *    in the table.
  *  - Nothing is red/green.
+ *
+ * map.ts reads --m-remote, --m-inperson, --m-missing, --seq-lo and --seq-hi back
+ * out of this file at runtime, so the palette has exactly one definition and the
+ * script has no copy of it.
  */
 
 :root {
-  --ink:        #16191c;
-  --ink-soft:   #4a5158;
-  --ink-faint:  #6d757d;
-  --rule:       #d9dde1;
-  --rule-soft:  #eaedf0;
-  --paper:      #ffffff;
-  --paper-tint: #f6f7f9;
+  --paper:      #f4f2ea;
+  --panel:      #fdfcf7;
+  --ink:        #22281f;
+  --muted:      #6a7260;
+  --line:       #d9d4c2;
+  --accent:     #0f6b57;
 
-  /* Dark blue vs pale amber: ~4.2:1 apart in relative luminance, so they stay
-     distinguishable when printed in greyscale. */
-  --remote:     #1f4e79;
-  --remote-ink: #ffffff;
-  --inperson:   #edc373;
-  --inperson-ink: #3d2f14;
-  --tipping:    #b4bcc3;
-  --missing:    #ffffff;
+  /* Deep green vs pale amber: far enough apart in relative luminance that they
+     stay distinguishable when printed in greyscale. */
+  --m-remote:   #0f6b57;
+  --m-inperson: #eac36b;
+  --m-missing:  #fdfcf7;
 
-  /* The targeting-distortion severity ramp. One enum, four consumers
-     (.hero-num--*, .distortion-num--*, .dist-chip--*, .bar-cases--flagged), all
-     driven by app.js's distortionClass(). Declared once here because the three
-     colours used to be written out at each consumer and had already drifted.
+  /* The sequential ramp for the "who it excludes" layer. One hue, pale to deep:
+     targeting distortion is an ordered magnitude, so a sequential ramp rather
+     than categorical hues. Missing is NOT the pale end -- it is --m-missing,
+     because "no answer" must never read as "nearly fine". */
+  --seq-lo:     #ece5cf;
+  --seq-hi:     #0f6b57;
+
+  /* The targeting-distortion severity ramp. One enum, several consumers (the
+     gradient hero numbers, the drawer hero, the table chips), all driven by
+     classify.ts's distortionClass(). Declared once here because the three colours
+     used to be written out at each consumer and had already drifted.
      Not red/green as a pair: the amber and green differ in lightness too. */
-  --sev-bad:    #b3261e;
-  --sev-warn:   #8a5a00;
-  --sev-ok:     #1a6b34;
+  --sev-ok:     #2e7d4f;
+  --sev-warn:   #8f6400;
+  --sev-bad:    #ab392e;
 
-  --accent:     #1f4e79;
+  /* Quintile ramp, poorest to richest. Ordered magnitude again, one hue. The
+     light end clears 2:1 against the panel, so the poorest bar never dissolves. */
+  --q0: #b9dacf;
+  --q1: #8cc3b2;
+  --q2: #5ba78f;
+  --q3: #30886e;
+  --q4: #0f6b57;
+
   --warn-bg:    #fdf6e6;
-  --warn-rule:  #d6b45f;
 
-  --measure: 68ch;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 * { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; }
-
 body {
   margin: 0;
-  padding: 0 1.5rem 6rem;
   background: var(--paper);
   color: var(--ink);
-  font: 400 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-        "Helvetica Neue", Arial, sans-serif;
-  font-feature-settings: "tnum" 0;
+  font: 400 15px/1.55 var(--sans);
 }
 
-/* ---------------------------------------------------------------- masthead */
+h1, h2, h3, .glabel { font-family: var(--serif); }
+strong { font-weight: 650; }
+code { font-size: 0.9em; background: var(--panel); padding: 0.05em 0.3em;
+       border: 1px solid var(--line); border-radius: 3px; }
 
-.masthead {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 3.5rem 0 2rem;
-  border-bottom: 2px solid var(--ink);
-}
+/* A missing value is greyed as well as dashed, so "—" never reads as a number
+   somebody forgot to format. */
+.miss { color: var(--muted); font-weight: 400; }
 
-.eyebrow {
-  margin: 0 0 1rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
+/* --------------------------------------------------------------- masthead */
 
-.masthead h1 {
-  margin: 0 0 1.25rem;
-  max-width: 22ch;
-  font-size: clamp(1.75rem, 4.2vw, 2.75rem);
-  font-weight: 650;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-}
+.mast { max-width: 1240px; margin: 0 auto; padding: 2.25rem 1.5rem 1.5rem; }
+.eyebrow { margin: 0 0 .5rem; font-size: .7rem; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.mast h1 { margin: 0 0 .5rem; max-width: 26ch; font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+  font-weight: 600; line-height: 1.12; letter-spacing: -.01em; text-wrap: balance; }
+.standfirst { margin: 0 0 .6rem; max-width: 62ch; font-size: 1rem; color: var(--muted); }
+.provenance { margin: 0; font-size: .75rem; color: var(--muted); }
 
-.standfirst {
-  margin: 0 0 1.25rem;
-  max-width: var(--measure);
-  font-size: 1.0625rem;
-  color: var(--ink-soft);
-}
+/* ------------------------------------------------------------ warn panels */
 
-.provenance {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: var(--ink-faint);
-}
+.panel.warn { max-width: 1240px; margin: 0 auto 1.5rem; padding: 1rem 1.25rem;
+  background: var(--warn-bg); border: 1px solid var(--line); border-radius: 6px; }
+.panel.warn h2 { margin: 0 0 .4rem; font-size: 1.05rem; }
+.panel.warn p { margin: 0; max-width: 68ch; font-size: .88rem; color: var(--muted); }
 
-/* ------------------------------------------------------------------ panels */
+/* ------------------------------------------------------------ two columns */
 
-main { max-width: 1120px; margin: 0 auto; }
+/* Left column scrolls, right column is sticky. The sticky context ends where
+   .article ends, so the map releases just above the notes -- no scroll listener
+   is involved in that, and none should be. */
+.article { display: grid; grid-template-columns: minmax(26rem, 34rem) 1fr;
+  gap: 3rem; max-width: 1240px; margin: 0 auto; padding: .5rem 1.5rem 0;
+  align-items: start; }
+.copy > * + * { margin-top: 1.6rem; }
+.copy h2 { margin: 2.2rem 0 .5rem; font-size: 1.45rem; font-weight: 600; }
+.copy p { margin: 0 0 .8rem; max-width: 62ch; }
+.copy p:last-child { margin-bottom: 0; }
+.copy .small { font-size: .85rem; color: var(--muted); }
 
-.panel {
-  padding: 2.75rem 0;
-  border-bottom: 1px solid var(--rule);
-}
+/* min-width: 0 overrides the automatic minimum size a grid item otherwise gets.
+   Without it the column is at least as wide as its widest min-content, and the
+   hover readout below the map is `white-space: nowrap` -- so at narrow widths the
+   untruncated string (406px) stretched the whole column past the viewport and the
+   page picked up a horizontal scrollbar the moment the pointer touched a region.
+   `overflow: hidden` on the readout clips its painting but does not stop it
+   contributing that width to an ancestor. */
+.mapcol { position: sticky; top: .75rem; min-width: 0; }
+.sumline { margin: 0 0 .5rem; font-size: .82rem; color: var(--muted); min-height: 1.2em; }
+.sumline strong { color: var(--ink); font-variant-numeric: tabular-nums; }
 
-.panel h2 {
-  margin: 0 0 0.875rem;
-  font-size: 1.0625rem;
-  font-weight: 650;
-  letter-spacing: -0.01em;
-}
+/* ------------------------------------------------------------------- maps */
 
-.panel h3 {
-  margin: 2rem 0 0.5rem;
-  font-size: 0.9375rem;
-  font-weight: 650;
-}
+/* The layer chips sit in normal flow above the maps, in every mode, so switching
+   layer never moves the control you are clicking. */
+.maps { display: grid; grid-template-columns: 1fr; gap: 1.2rem; }
+.maplayers { display: flex; flex-wrap: wrap; gap: .3rem; margin: 0 0 .6rem; }
+.modebtn { border: 1px solid var(--line); background: var(--panel);
+  color: var(--muted); border-radius: 999px; padding: .28rem .7rem;
+  font: inherit; font-size: .74rem; font-weight: 600; cursor: pointer; }
+.modebtn:hover { color: var(--ink); }
+.modebtn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.modebtn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
-.lede {
-  margin: 0 0 1.5rem;
-  max-width: var(--measure);
-  color: var(--ink-soft);
-}
+.mapfig { margin: 0; }
+/* The captions name what each map shows. Outside compare mode the layer chips
+   already say it, and one label is enough. */
+.mapfig figcaption { display: none; margin: 0 0 .4rem; font-family: var(--serif);
+  font-size: .95rem; font-weight: 600; }
+.mapfig figcaption .sub { display: block; font-family: var(--sans);
+  font-size: .72rem; font-weight: 400; color: var(--muted); }
+.mapcol:not([data-mode="compare"]) .mapfig--second { display: none; }
 
-.footnote {
-  margin: 1rem 0 0;
-  max-width: var(--measure);
-  font-size: 0.8125rem;
-  line-height: 1.55;
-  color: var(--ink-faint);
-}
+.mapbox { position: relative;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 79px, rgba(15,107,87,.06) 79px 80px),
+    repeating-linear-gradient(90deg, transparent 0 79px, rgba(15,107,87,.06) 79px 80px); }
 
-.panel.warn {
-  margin: 2rem 0;
-  padding: 1.5rem;
-  background: var(--warn-bg);
-  border: 1px solid var(--warn-rule);
-  border-radius: 3px;
-}
+[data-bind="map"] svg, [data-bind="map2"] svg { display: block;
+  height: min(78vh, 760px); width: auto; max-width: 100%; margin: 0 auto;
+  filter: drop-shadow(0 8px 22px rgba(34, 40, 31, .14)); }
 
-.panel.warn h2 { margin-top: 0; }
-.panel.warn p { max-width: var(--measure); margin-bottom: 0; }
+/* The SVG root carries tabindex="-1" (see map.ts) to keep itself out of the tab
+   order. That also makes it focusable by CLICK, and a click on empty space
+   inside the map focused it and let Chromium paint its default `outline: auto
+   5px` as a box around the whole map. It is the same UA-outline trap documented
+   for the region paths below, one level up -- and it must be scoped to :focus,
+   not :focus-visible, because a mouse click matches only the former. */
+[data-bind="map"] svg:focus, [data-bind="map2"] svg:focus { outline: none; }
 
-code {
-  padding: 0.1em 0.35em;
-  background: var(--paper-tint);
-  border: 1px solid var(--rule-soft);
-  border-radius: 2px;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 0.875em;
-}
-
-/* ------------------------------------------------- wealth gradient cards */
-
-.gradient-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
-  gap: 1.25rem;
-}
-
-.gradient-card {
-  margin: 0;
-  padding: 1.25rem 1.375rem 1rem;
-  border: 1px solid var(--rule);
-  border-radius: 3px;
-  background: var(--paper);
-}
-
-.gradient-title {
-  margin-bottom: 0.875rem;
-  font-size: 0.875rem;
-  font-weight: 650;
-  line-height: 1.35;
-}
-
-.gradient-hero {
-  display: flex;
-  gap: 0.625rem;
-  align-items: baseline;
-  margin-bottom: 1rem;
-  padding-bottom: 0.875rem;
-  border-bottom: 1px solid var(--rule-soft);
-}
-
-/* The hero figure uses proportional figures: it stands alone rather than
-   aligning in a column, so tabular-nums would only make it look mechanical. */
-.hero-num {
-  font-size: 2.5rem;
-  font-weight: 650;
-  line-height: 1;
-  letter-spacing: -0.03em;
-}
-
-/* Status is carried by a word in the caption as well as the colour — the number
-   alone never signals severity. */
-.hero-num--bad     { color: var(--sev-bad); }
-.hero-num--warn    { color: var(--sev-warn); }
-.hero-num--ok      { color: var(--sev-ok); }
-.hero-num--neutral { color: var(--ink-faint); }
-
-.hero-cap {
-  font-size: 0.6875rem;
-  line-height: 1.25;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
-
-.bars { display: flex; flex-direction: column; gap: 2px; }
-
-.bar-row {
-  display: grid;
-  grid-template-columns: 4.25rem 1fr 3rem;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.bar-label { font-size: 0.75rem; color: var(--ink-faint); }
-
-.bar-track { height: 0.875rem; background: var(--paper-tint); border-radius: 2px; }
-
-.bar-fill {
-  height: 100%;
-  /* Rounded data-end only, anchored flat against the baseline. */
-  border-radius: 0 3px 3px 0;
-  min-width: 2px;
-}
-
-.bar-value {
-  font-size: 0.75rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-  color: var(--ink-soft);
-}
-
-.withheld-detail {
-  display: block;
-  margin-top: 0.375rem;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 0.75rem;
-  color: var(--ink-faint);
-}
-
-.gradient-foot {
-  margin-top: 0.875rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--rule-soft);
-  font-size: 0.75rem;
-  line-height: 1.5;
-  color: var(--ink-faint);
-}
-
-/* ------------------------------------------------------------- pending */
-
-.panel--pending { background: linear-gradient(var(--paper-tint), var(--paper-tint))
-                              no-repeat center / calc(100% + 3rem) 100%; }
-
-.pending-box {
-  max-width: var(--measure);
-  padding: 1.25rem 1.5rem;
-  background: var(--paper);
-  border: 1px solid var(--warn-rule);
-  border-left-width: 3px;
-  border-radius: 3px;
-}
-
-.pending-box h3 { margin: 0 0 0.5rem; font-size: 0.9375rem; }
-.pending-box p { margin: 0 0 0.75rem; font-size: 0.9375rem; color: var(--ink-soft); }
-.pending-sub { margin-top: 1rem !important; margin-bottom: 0.375rem !important;
-               font-size: 0.8125rem !important; font-weight: 600; }
-
-.pending-list { margin: 0; padding-left: 1.125rem; }
-.pending-list li { font-size: 0.8125rem; line-height: 1.7; color: var(--ink-soft); }
-
-/* ------------------------------------------------------------- cost inputs */
-
-.cost-inputs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
-  margin-bottom: 2rem;
-}
-
-.cost-inputs label { display: block; }
-
-.label-text {
-  display: block;
-  margin-bottom: 0.375rem;
-  font-size: 0.875rem;
-  font-weight: 550;
-}
-
-.cost-inputs input {
-  display: block;
-  width: 9rem;
-  padding: 0.5rem 0.625rem;
-  border: 1px solid var(--ink-soft);
-  border-radius: 2px;
-  background: var(--paper);
-  color: var(--ink);
-  font: inherit;
-  font-variant-numeric: tabular-nums;
-}
-
-.cost-inputs input:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-}
-
-.hint {
-  display: block;
-  margin-top: 0.375rem;
-  font-size: 0.75rem;
-  color: var(--ink-faint);
-}
-
-.derivation {
-  max-width: var(--measure);
-  padding: 1.25rem 1.5rem;
-  background: var(--paper-tint);
-  border-left: 3px solid var(--rule);
-}
-
-.derivation p { margin: 0 0 0.75rem; font-size: 0.9375rem; color: var(--ink-soft); }
-.derivation p:last-child { margin-bottom: 0; }
-
-.formula {
-  font-variant-numeric: tabular-nums;
-  color: var(--ink) !important;
-}
-
-.formula strong { font-variant-numeric: tabular-nums; }
-
-/* ------------------------------------------------------------------- basis */
-
-.basis-options {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  max-width: var(--measure);
-}
-
-.basis-option {
-  display: flex;
-  gap: 0.75rem;
-  align-items: flex-start;
-  padding: 0.875rem 1rem;
-  border: 1px solid var(--rule);
-  border-radius: 3px;
-  cursor: pointer;
-}
-
-.basis-option:hover { border-color: var(--ink-soft); }
-
-.basis-option:has(input:checked) {
-  border-color: var(--accent);
-  box-shadow: inset 3px 0 0 var(--accent);
-}
-
-.basis-option input { margin-top: 0.3rem; accent-color: var(--accent); }
-.basis-option .name { display: block; font-weight: 550; font-size: 0.9375rem; }
-.basis-option .desc { display: block; margin-top: 0.125rem; font-size: 0.8125rem;
-                      color: var(--ink-faint); line-height: 1.5; }
-
-/* --------------------------------------------------------------- result/map */
-
-.summary {
-  max-width: var(--measure);
-  margin: 0 0 2rem;
-  padding: 1rem 1.25rem;
-  border-left: 3px solid var(--accent);
-  font-size: 1rem;
-}
-
-.summary strong { font-variant-numeric: tabular-nums; }
-
-/* The map column is sized to the map rather than stretched to the page. With the
-   SVG at its natural ~360 px the old 1fr track left the key stranded far to the
-   right across a field of white. */
-.map-and-key {
-  display: grid;
-  grid-template-columns: auto minmax(14rem, 20rem);
-  gap: 2.5rem;
-  align-items: start;
-  max-width: 46rem;
-}
-
-.map-figure { margin: 0; }
-
-/* Madagascar's bounding box is about twice as tall as it is wide. Setting both
-   width and height on the SVG made the element 840x680 while the drawing only
-   filled 358 px of it -- a sliver marooned in 240 px of dead space either side.
-   Drive the height and let the width come from the viewBox's intrinsic aspect
-   ratio, so the element is exactly the size of the map. */
-.map-figure svg {
-  display: block;
-  height: min(680px, 78vh);
-  width: auto;
-  max-width: 100%;
-  margin: 0 auto;
-}
-
-.map-figure figcaption {
-  margin-top: 0.75rem;
-  font-size: 0.8125rem;
-  color: var(--ink-faint);
-}
+/* Compare: both maps, side by side, synced. The left one is the cost verdict and
+   moves with the cost inputs; the right one is targeting distortion and does not. */
+.mapcol[data-mode="compare"] .maps { grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+.mapcol[data-mode="compare"] .mapfig figcaption { display: block; }
+.mapcol[data-mode="compare"] [data-bind="map"] svg,
+.mapcol[data-mode="compare"] [data-bind="map2"] svg { height: min(62vh, 620px); }
 
 /* vector-effect is load-bearing, not decoration.
  *
- * Stroke widths on an SVG path are in USER units, and this viewBox is only ~7.5
- * units wide against ~360 rendered pixels — one unit is 48 px. A stroke-width of
- * 0.7 therefore painted a 34 px white band around every region, and the dashed
- * "near the line" outline painted 67 px dashes. Antananarivo capital is 4.8 px
- * across; it was entirely consumed by its own border.
+ * Stroke widths on an SVG path are in USER units, and this viewBox is only ~7
+ * units wide against a few hundred rendered pixels -- one unit is tens of pixels.
+ * A stroke-width of 0.7 therefore painted a 34 px white band around every region,
+ * and the dashed "near the line" outline painted 67 px dashes. Antananarivo
+ * capital is a few pixels across; it was entirely consumed by its own border.
  *
  * non-scaling-stroke makes these widths evaluate in screen pixels regardless of
  * the viewBox scale, which is what the numbers below assume. Do not remove it
  * without converting every width and dash length back to user units. */
-.region-shape {
-  stroke: var(--paper);
-  stroke-width: 0.75px;
-  vector-effect: non-scaling-stroke;
-  stroke-linejoin: round;
-  cursor: pointer;
-  transition: opacity 90ms ease-out;
-}
+.rg { stroke: var(--paper); stroke-width: 1px; vector-effect: non-scaling-stroke;
+  stroke-linejoin: round; cursor: pointer; transition: opacity 140ms ease-out; }
+.rg:hover { opacity: .8; }
 
-.region-shape:hover { opacity: 0.78; }
-
-/* "Near the line" is signalled by outline, not fill — see the note in app.js.
+/* "Near the line" is signalled by outline, not fill -- see the note in map.ts.
    A dashed edge reads identically in colour, in greyscale and under any colour
    vision deficiency. */
-.region-shape[data-tipping="true"] {
-  stroke: var(--ink);
-  stroke-width: 1.5px;
-  stroke-dasharray: 3px 2.25px;
-}
+.rg[data-tipping="true"] { stroke: var(--ink); stroke-width: 1.5px;
+  stroke-dasharray: 4px 3px; }
+.rg[data-sel="true"] { stroke: var(--ink); stroke-width: 2.5px; }
 
-/* `outline` is unusable on these paths — it must be off in every focus state.
+/* `outline` is unusable on these paths -- it must be off in every focus state.
  *
  * The paths carry tabindex="0", so a mouse click focuses them. A click matches
  * :focus but NOT :focus-visible, so an `outline: none` scoped to :focus-visible
  * never fired and Chromium drew its default `outline: auto 5px`. On an SVG path
- * Chromium traces outline along the SHAPE GEOMETRY in user units — at ~48 px per
- * unit that rendered as a black halo swallowing a third of the map on every click.
+ * Chromium traces outline along the SHAPE GEOMETRY in user units -- at tens of
+ * pixels per unit that rendered as a black halo swallowing a third of the map on
+ * every click.
  *
  * An explicit `outline: 2px solid` is no better: Chromium resolves outline width
  * on SVG children in user units too, so 2px became ~96 screen px. Same trap as
  * stroke-width, and there is no `vector-effect` equivalent for outline.
  *
- * Keyboard focus therefore gets a drawn ring instead — two overlay paths appended
- * last in the SVG so they sit above every region, in `site/app.js`. Their widths
- * use vector-effect and so are honestly in screen pixels. */
-.region-shape:focus,
-.region-shape:focus-visible { outline: none; }
-
-.region-shape:focus-visible { stroke: var(--ink); stroke-width: 2.5px; }
-
-.region-shape[data-selected="true"] { stroke: var(--ink); stroke-width: 2.5px; }
+ * Keyboard focus therefore gets a drawn ring instead -- two overlay paths appended
+ * last in each SVG, in scripts/map.ts, so they sit above every region. Their
+ * widths use vector-effect and so are honestly in screen pixels. */
+.rg:focus, .rg:focus-visible { outline: none; }
+.rg:focus-visible { stroke: var(--ink); stroke-width: 2.5px; }
 
 /* Keyboard focus ring: white halo under a dark ring, so it reads against both the
    dark and the light fill. Hidden until a region takes visible focus. */
-.focus-ring {
-  fill: none;
-  pointer-events: none;
-  vector-effect: non-scaling-stroke;
-  stroke-linejoin: round;
-  visibility: hidden;
-}
-
+.focus-ring { fill: none; pointer-events: none; vector-effect: non-scaling-stroke;
+  stroke-linejoin: round; visibility: hidden; }
 .focus-ring--halo { stroke: #ffffff; stroke-width: 6px; }
 .focus-ring--edge { stroke: var(--ink); stroke-width: 2.5px; }
 .focus-ring[data-shown="true"] { visibility: visible; }
 
-.key h3 { margin-top: 0; }
+/* Empty until a region is hovered, and exactly one line tall whether or not it
+   has anything in it.
+   Both halves are load-bearing. min-height has to exceed a real line box, not sit
+   under it: at 1.25em the empty line measured 15.6px against 19.3px once filled,
+   so the readout grew by 3.7px on hover -- and because the column is a fixed
+   height with the map absorbing the slack, the map shrank by the same amount
+   every time the pointer crossed a region. nowrap stops the same thing happening
+   by wrapping: at narrow widths the readout ran to two lines and pushed the
+   layout down instead. The tail is worth an ellipsis; the map moving is not. */
+.hoverline { margin: .45rem 0 0; font-size: .78rem; color: var(--muted);
+  min-height: 1.6em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hoverline strong { color: var(--ink); }
 
-.swatches { margin: 0; padding: 0; list-style: none; }
+/* ----------------------------------------------------------------- legend */
 
-.swatches li {
-  display: flex;
-  gap: 0.625rem;
-  align-items: center;
-  margin-bottom: 0.5rem;
-  font-size: 0.8125rem;
-  color: var(--ink-soft);
-}
+.legendbox { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; margin-top: .6rem; }
+.lg { display: flex; align-items: center; gap: .5rem; font-size: .76rem;
+  color: var(--muted); }
+.sw { flex: 0 0 auto; width: 1.15rem; height: .8rem; border: 1px solid var(--muted);
+  border-radius: 2px; }
+.sw-remote { background: var(--m-remote); }
+.sw-inperson { background: var(--m-inperson); }
+.sw-missing { background: var(--m-missing); }
+.sw-tipping { background: var(--panel); border: 2px dashed var(--ink); }
+.sw-seq { width: 4.5rem; background: linear-gradient(90deg, var(--seq-lo), var(--seq-hi)); }
 
-.swatch {
-  flex: 0 0 auto;
-  width: 1.5rem;
-  height: 1rem;
-  border: 1px solid var(--ink-faint);
-  border-radius: 1px;
-}
+/* --------------------------------------------------------- scenario card */
 
-.swatch--remote   { background: var(--remote); }
-.swatch--inperson { background: var(--inperson); }
-.swatch--missing  { background: var(--missing); }
-.swatch--dashed {
-  background: var(--paper);
-  border: 2px dashed var(--ink);
-  border-radius: 1px;
-}
-/* ------------------------------- per-region targeting distortion (headline) */
+.ctrl { padding: 1.1rem 1.2rem 1.2rem; background: var(--panel);
+  border: 1px solid var(--line); border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(34,40,31,.10); }
+.ctrl h2 { margin: 0 0 .6rem !important; font-size: 1.05rem; font-weight: 600; }
+.ctrl .sect { padding: .8rem 0 0; margin-top: .8rem; border-top: 1px solid var(--line); }
+.ctrl .sect:first-of-type { border-top: 0; margin-top: 0; padding-top: 0; }
+.slabel { display: block; margin: 0 0 .45rem; font-size: .68rem; font-weight: 650;
+  letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+.costrow { display: flex; gap: .6rem; }
+.costrow label { flex: 1; font-size: .72rem; color: var(--muted); }
+.costrow input { width: 100%; margin-top: .2rem; padding: .4rem .5rem;
+  border: 1px solid var(--line); border-radius: 4px; background: #fff;
+  font: inherit; font-variant-numeric: tabular-nums; color: var(--ink); }
+.costrow input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.linehint { margin: .5rem 0 0; font-size: .78rem; color: var(--muted); }
+.linehint strong { color: var(--ink); font-variant-numeric: tabular-nums; }
 
-.distortion-block {
-  max-width: var(--measure);
-  margin: 0 0 1.75rem;
-  padding: 1.25rem 1.5rem;
-  background: var(--paper-tint);
-  border-left: 3px solid var(--accent);
-  border-radius: 0 3px 3px 0;
-}
+.derivation { margin-top: .6rem; }
+.derivation summary { font-size: .75rem; font-weight: 600; color: var(--muted);
+  cursor: pointer; }
+.derivation summary:hover { color: var(--accent); }
+.derivation p { margin: .5rem 0 0; font-size: .78rem; color: var(--muted); }
+.formula { font-family: var(--serif); font-size: .9rem !important; color: var(--ink) !important; }
 
-.distortion-head {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  margin-bottom: 0.875rem;
-}
+[data-bind="basis"] { display: flex; flex-direction: column; gap: .4rem; }
+.opt { display: block; position: relative; padding: .5rem .6rem;
+  border: 1px solid var(--line); border-radius: 4px; cursor: pointer; background: #fff; }
+.opt.on { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.opt:focus-within { outline: 2px solid var(--accent); outline-offset: 1px; }
+.opt input { position: absolute; opacity: 0; }
+.opt-name { display: block; font-size: .82rem; font-weight: 600; }
+.opt-desc { display: block; font-size: .72rem; color: var(--muted); line-height: 1.4; }
 
-/* Proportional figures: this stands alone rather than aligning in a column. */
-.distortion-num {
-  font-size: 3.25rem;
-  font-weight: 650;
-  line-height: 1;
-  letter-spacing: -0.035em;
-}
+/* --------------------------------------------------------- gradient cards */
 
-.distortion-num--bad     { color: var(--sev-bad); }
-.distortion-num--warn    { color: var(--sev-warn); }
-.distortion-num--ok      { color: var(--sev-ok); }
-.distortion-num--neutral { color: var(--ink-faint); }
+[data-bind="grad"] { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+.gcard { margin: 0; padding: 1rem 1.1rem; background: var(--panel);
+  border: 1px solid var(--line); border-radius: 6px; }
+.glabel { font-size: .85rem; font-weight: 600; margin-bottom: .55rem; min-height: 2.6em; }
+.ghero { display: flex; gap: .5rem; align-items: baseline; margin-bottom: .6rem;
+  padding-bottom: .55rem; border-bottom: 1px solid var(--line); }
+.gnum { font-family: var(--serif); font-size: 1.9rem; font-weight: 600; line-height: 1; }
+.gcap { font-size: .6rem; letter-spacing: .05em; text-transform: uppercase;
+  color: var(--muted); line-height: 1.25; }
+.gfoot { margin-top: .6rem; font-size: .68rem; color: var(--muted); }
+[data-bind="grad-intro"] { margin: 0 0 1rem; max-width: 62ch; }
 
-.distortion-label {
-  font-size: 0.75rem;
-  font-weight: 650;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
+.sev-ok { color: var(--sev-ok); }
+.sev-warn { color: var(--sev-warn); }
+.sev-bad { color: var(--sev-bad); }
+.sev-na { color: var(--muted); }
 
-.distortion-verdict { margin-top: 0.25rem; font-size: 0.9375rem; line-height: 1.45; }
+/* ---------------------------------------------------------- quintile bars */
 
-.distortion-sentence {
-  margin: 0 0 1.25rem;
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  color: var(--ink-soft);
-}
+.qbars { display: flex; flex-direction: column; gap: 3px; }
+.qrow { display: grid; grid-template-columns: 3.6rem 1fr 2.9rem auto; gap: .5rem;
+  align-items: center; }
+.ql { font-size: .7rem; color: var(--muted); }
+.qtrack { height: .7rem; background: var(--paper); border-radius: 2px; }
+/* A suppressed cell is hatched, not empty: empty would be indistinguishable from
+   a rate of zero, and zero is not what a suppressed cell means. */
+.qtrack.sup { background: repeating-linear-gradient(45deg, var(--paper) 0 4px,
+  var(--line) 4px 5px); }
+.qfill { height: 100%; border-radius: 0 4px 4px 0; min-width: 2px; }
+.q0 { background: var(--q0); }
+.q1 { background: var(--q1); }
+.q2 { background: var(--q2); }
+.q3 { background: var(--q3); }
+.q4 { background: var(--q4); }
+.qv { font-size: .7rem; font-weight: 600; text-align: right;
+  font-variant-numeric: tabular-nums; }
+.qn { font-size: .64rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.qn.flag { color: var(--sev-warn); font-weight: 650; }
 
-.distortion-block--absent { border-left-color: var(--warn-rule); }
+/* ----------------------------------------------------------------- drawer */
 
-.distortion-absent-head {
-  font-size: 0.9375rem;
-  font-weight: 650;
-  margin-bottom: 0.375rem;
-}
+/* While the drawer is open the document stops scrolling, so the drawer's is the
+   only scrollbar on screen. The padding replaces the width the document's
+   scrollbar was occupying -- see setDrawerOpen() in scripts/drawer.ts, which
+   measures it. */
+html.drawer-open { overflow: hidden; }
+html.drawer-open body { padding-right: var(--scrollbar-width, 0px); }
 
-.distortion-absent-why {
-  margin: 0 0 1rem;
-  font-size: 0.875rem;
-  line-height: 1.55;
-  color: var(--ink-soft);
-}
+.sheet { position: fixed; top: 0; right: 0; bottom: 0; z-index: 30; width: 400px;
+  max-width: 94vw; background: var(--panel); border-left: 1px solid var(--line);
+  box-shadow: -14px 0 40px rgba(34,40,31,.18); transform: translateX(102%);
+  transition: transform 200ms ease-out; overflow-y: auto; padding: 1.2rem 1.4rem 2rem; }
+.sheet.open { transform: translateX(0); }
+.sheet-close { position: sticky; top: 0; float: right; margin: -.4rem -.5rem 0 0;
+  border: 0; background: transparent; font-size: 1.4rem; line-height: 1;
+  color: var(--muted); cursor: pointer; padding: .4rem .5rem; }
+.sheet-close:hover { color: var(--ink); }
+.sheet-close:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
-.region-quintiles h4 {
-  margin: 0 0 0.625rem;
-  font-size: 0.75rem;
-  font-weight: 650;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
+.sh-head { display: flex; align-items: baseline; gap: .7rem; flex-wrap: wrap;
+  margin-bottom: .8rem; }
+.sh-head h3 { margin: 0; font-family: var(--serif); font-size: 1.35rem; font-weight: 600; }
 
-.region-quintiles .bar-row {
-  grid-template-columns: 4.25rem 1fr 3.25rem 3.5rem;
-}
+.pill { display: inline-block; padding: .12rem .5rem; border-radius: 3px;
+  font-size: .68rem; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; }
+.pill-remote { background: var(--m-remote); color: #fff; }
+.pill-inperson { background: var(--m-inperson); color: #3d2f10; }
+.pill-tipping { background: #cfcaba; color: var(--ink); }
+.pill-missing { background: transparent; color: var(--muted); border: 1px solid var(--line); }
 
-.bar-cases {
-  font-size: 0.6875rem;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-  color: var(--ink-faint);
-}
+/* Targeting distortion sits at the top of the drawer, above the cost verdict,
+   because it is the figure that answers the question this tool exists for. */
+.sh-dist { padding: .9rem 1rem; margin-bottom: 1rem; background: #fff;
+  border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 4px; }
+.sh-dist-head { display: flex; gap: .8rem; align-items: center; margin-bottom: .5rem; }
+.sh-dnum { font-family: var(--serif); font-size: 2.9rem; font-weight: 600; line-height: 1; }
+.sh-dcap { font-size: .68rem; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--muted); }
+.sh-dcap em { display: block; margin-top: .15rem; font-style: normal;
+  text-transform: none; letter-spacing: 0; font-size: .78rem; color: var(--ink); }
+.sh-dist-none { font-size: .85rem; color: var(--muted); }
+.sh-sentence, .sh-why { font-size: .85rem; color: var(--ink); margin: 0 0 .8rem; }
+.sh-sub { margin: .9rem 0 .4rem; font-size: .68rem; font-weight: 650;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+  font-family: var(--sans); }
+.sh-note { margin: .5rem 0 0; font-size: .72rem; color: var(--muted); }
 
-.bar-cases--flagged { color: var(--sev-warn); font-weight: 600; }
+.sh-stats { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-top: 1rem; }
+.sh-stat { padding: .5rem .6rem; background: #fff; border: 1px solid var(--line);
+  border-radius: 4px; }
+.sh-sv { display: block; font-size: 1.05rem; font-weight: 650;
+  font-variant-numeric: tabular-nums; }
+.sh-sl { font-size: .68rem; color: var(--muted); }
 
-.bar-track--suppressed {
-  background: repeating-linear-gradient(45deg,
-    var(--paper-tint) 0 4px, var(--rule) 4px 5px);
-}
+/* Two figures of the same thing, with a line underneath saying why they differ. */
+.cmp { margin: 1rem 0; padding: .8rem .9rem; background: #fff;
+  border: 1px solid var(--line); border-radius: 4px; }
+.cmp-head { font-size: .75rem; font-weight: 650; letter-spacing: .03em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: .5rem; }
+.cmp-body { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+.cmp-cell + .cmp-cell { border-left: 1px solid var(--line); padding-left: .6rem; }
+.cmp-cell .num { display: block; font-family: var(--serif); font-size: 1.4rem;
+  font-weight: 600; font-variant-numeric: tabular-nums; }
+.cmp-cell .cap { display: block; font-size: .68rem; color: var(--muted); line-height: 1.35; }
+.cmp-foot { margin-top: .6rem; font-size: .75rem; color: var(--muted); }
 
-.bar-value.is-missing { color: var(--ink-faint); font-weight: 400; }
+/* Every indicator with its provenance, folded away: the six-stat grid answers the
+   question, this answers "where did that come from". */
+.sh-fields { margin-top: 1rem; border-top: 1px solid var(--line); padding-top: .6rem; }
+.sh-fields summary { font-size: .75rem; font-weight: 600; color: var(--muted);
+  cursor: pointer; }
+.sh-fields summary:hover { color: var(--accent); }
+.detail-group { margin-top: .8rem; }
+.detail-group h5 { margin: 0 0 .4rem; font-size: .68rem; font-weight: 650;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.field { padding: .35rem 0; border-bottom: 1px solid var(--line); }
+.field-row { display: flex; justify-content: space-between; gap: .6rem; align-items: baseline; }
+.field-label { font-size: .78rem; }
+.field-value { font-size: .85rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+.field-meta { font-size: .65rem; color: var(--muted); line-height: 1.4; }
 
-.dist-chip {
-  display: inline-block;
-  min-width: 2.75rem;
-  padding: 0.1rem 0.4rem;
-  border-radius: 2px;
-  font-weight: 650;
-  font-variant-numeric: tabular-nums;
-  text-align: center;
-}
+/* ------------------------------------------------------------------ notes */
 
-.dist-chip--bad  { background: #fbe9e7; color: #8c1d16; }
-.dist-chip--warn { background: #fdf3e0; color: #6d4700; }
-.dist-chip--ok   { background: #e6f4ea; color: #14522a; }
+.notes-sect { max-width: 1240px; margin: 0 auto; padding: 3rem 1.5rem 0; }
+.notes-sect h2 { margin: 0 0 .4rem; font-size: 1.45rem; font-weight: 600; }
+.lede { margin: 0 0 1.4rem; max-width: 68ch; color: var(--muted); font-size: .92rem; }
+.notes-sect details { border-bottom: 1px solid var(--line); }
+.notes-sect summary { padding: .8rem 0; font-size: .92rem; font-weight: 600;
+  cursor: pointer; }
+.notes-sect summary:hover { color: var(--accent); }
+.notes-sect details p, .notes-sect details ul { max-width: 68ch; font-size: .87rem;
+  color: var(--muted); margin: 0 0 .9rem; }
+.notes-sect details ul { padding-left: 1.1rem; }
+.notes-sect details li { margin-bottom: .3rem; }
+.sub-head { font-family: var(--serif); font-weight: 600; color: var(--ink) !important;
+  font-size: .95rem !important; margin-bottom: .3rem !important; }
+.table-hint { font-size: .78rem !important; }
 
-/* ------------------------------------------------------------------ detail */
+/* The source list lives in the footer now, so it carries its own layout rather
+   than inheriting the notes section's list rules. */
+.source-list { list-style: none; padding-left: 0; margin: 0 0 1.2rem;
+  display: grid; gap: .7rem; max-width: 78ch; }
+.source-list li { font-size: .78rem; color: var(--muted); line-height: 1.5; }
+.source-list .what { font-weight: 650; color: var(--ink); }
+.source-list .meta { font-size: .95em; }
+.findex-series { display: flex; gap: 1.4rem; flex-wrap: wrap; list-style: none;
+  padding-left: 0 !important; }
+.findex-series .yr { display: block; font-size: .75rem; }
+.findex-series .val { font-size: 1.05rem; font-weight: 650; color: var(--ink);
+  font-variant-numeric: tabular-nums; }
 
-.detail-head {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem 1rem;
-  align-items: baseline;
-  margin-bottom: 0.5rem;
-}
+/* ------------------------------------------------------------------ table */
 
-.detail-head h3 { margin: 0; font-size: 1.25rem; font-weight: 650; }
+.tablewrap { overflow-x: auto; margin-bottom: 1rem; }
+table { border-collapse: collapse; font-size: .8rem; min-width: 52rem; width: 100%;
+  font-variant-numeric: tabular-nums; background: var(--panel); }
+th, td { padding: .4rem .6rem; text-align: right; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+thead th { border-bottom: 2px solid var(--ink); cursor: pointer; user-select: none;
+  font-size: .7rem; }
+tbody tr { border-bottom: 1px solid var(--line); cursor: pointer; }
+tbody tr:hover { background: #fff; }
+tbody tr[data-sel="true"] { background: #fff; box-shadow: inset 3px 0 0 var(--accent); }
+.chip { display: inline-block; min-width: 2.4rem; padding: .05rem .3rem;
+  border-radius: 3px; font-weight: 650; text-align: center; background: var(--paper); }
+.arrow { color: var(--muted); }
 
-.verdict {
-  padding: 0.2rem 0.6rem;
-  border-radius: 2px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
+/* ----------------------------------------------------------------- footer */
 
-.verdict--remote   { background: var(--remote);   color: var(--remote-ink); }
-.verdict--inperson { background: var(--inperson); color: var(--inperson-ink); }
-.verdict--tipping  { background: var(--tipping);  color: var(--ink); }
-.verdict--missing  { background: var(--paper-tint); color: var(--ink-soft);
-                     border: 1px solid var(--rule); }
-
-.detail-reason {
-  max-width: var(--measure);
-  margin: 0 0 1.75rem;
-  color: var(--ink-soft);
-}
-
-.detail-groups {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
-  gap: 2rem;
-}
-
-.detail-group h4 {
-  margin: 0 0 0.625rem;
-  padding-bottom: 0.375rem;
-  border-bottom: 1px solid var(--rule);
-  font-size: 0.75rem;
-  font-weight: 650;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
-
-.field { padding: 0.625rem 0; border-bottom: 1px solid var(--rule-soft); }
-
-.field-row {
-  display: flex;
-  gap: 1rem;
-  justify-content: space-between;
-  align-items: baseline;
-}
-
-.field-label { font-size: 0.875rem; }
-
-.field-value {
-  flex: 0 0 auto;
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  font-size: 0.9375rem;
-}
-
-.field-value.is-missing { color: var(--ink-faint); font-weight: 400; }
-
-.field-meta {
-  margin-top: 0.25rem;
-  font-size: 0.75rem;
-  line-height: 1.5;
-  color: var(--ink-faint);
-}
-
-.field-meta .vintage {
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-/* Side-by-side comparison where two sources speak to the same thing. */
-.compare {
-  margin: 0 0 1rem;
-  border: 1px solid var(--rule);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.compare-head {
-  padding: 0.5rem 0.875rem;
-  background: var(--paper-tint);
-  border-bottom: 1px solid var(--rule);
-  font-size: 0.75rem;
-  font-weight: 650;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
-
-.compare-body { display: grid; grid-template-columns: 1fr 1fr; }
-
-.compare-cell { padding: 0.875rem; }
-.compare-cell + .compare-cell { border-left: 1px solid var(--rule); }
-.compare-cell .num { display: block; font-size: 1.375rem; font-weight: 650;
-                     font-variant-numeric: tabular-nums; line-height: 1.2; }
-.compare-cell .cap { display: block; margin-top: 0.25rem; font-size: 0.75rem;
-                     line-height: 1.45; color: var(--ink-faint); }
-
-.compare-foot {
-  padding: 0.75rem 0.875rem;
-  border-top: 1px solid var(--rule);
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  color: var(--ink-soft);
-}
-
-/* ------------------------------------------------------------------- table */
-
-.table-scroll { overflow-x: auto; }
-
-table {
-  width: 100%;
-  min-width: 54rem;
-  border-collapse: collapse;
-  font-size: 0.875rem;
-  font-variant-numeric: tabular-nums;
-}
-
-th, td { padding: 0.5rem 0.75rem; text-align: right; white-space: nowrap; }
-
-/* Region names wrap, but give them enough room that "Analamanga excluding
-   capital" takes two lines rather than three and every row grows to match. */
-th:first-child, td:first-child {
-  text-align: left;
-  white-space: normal;
-  min-width: 11rem;
-}
-
-thead th {
-  position: sticky;
-  top: 0;
-  background: var(--paper);
-  border-bottom: 2px solid var(--ink);
-  font-size: 0.75rem;
-  font-weight: 650;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  user-select: none;
-}
-
-thead th:hover { color: var(--accent); }
-thead th .arrow { color: var(--ink-faint); font-weight: 400; }
-
-tbody tr { border-bottom: 1px solid var(--rule-soft); cursor: pointer; }
-tbody tr:hover { background: var(--paper-tint); }
-tbody tr[data-selected="true"] { background: var(--paper-tint);
-                                 box-shadow: inset 3px 0 0 var(--accent); }
-
-td.is-missing { color: var(--ink-faint); }
-
-.pill {
-  display: inline-block;
-  padding: 0.1rem 0.45rem;
-  border-radius: 2px;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-
-.pill--remote   { background: var(--remote);   color: var(--remote-ink); }
-.pill--inperson { background: var(--inperson); color: var(--inperson-ink); }
-.pill--tipping  { background: var(--tipping);  color: var(--ink); }
-.pill--missing  { background: var(--paper-tint); color: var(--ink-soft);
-                  border: 1px solid var(--rule); }
-
-/* ---------------------------------------------------------------- caveats */
-
-.panel--caveat { border-bottom: none; }
-
-.caveat {
-  padding: 1.25rem 0;
-  border-top: 1px solid var(--rule-soft);
-}
-
-.caveat:first-of-type { border-top: 1px solid var(--rule); }
-.caveat h3 { margin: 0 0 0.375rem; font-size: 0.9375rem; font-weight: 650; }
-.caveat p { margin: 0; max-width: var(--measure); font-size: 0.9375rem;
-            color: var(--ink-soft); }
-
-/* ---------------------------------------------------------------- sources */
-
-.source-list { margin: 0 0 1rem; padding: 0; list-style: none; }
-
-.source-list li {
-  padding: 0.625rem 0;
-  border-bottom: 1px solid var(--rule-soft);
-  font-size: 0.875rem;
-}
-
-.source-list .what { font-weight: 550; }
-.source-list .meta { color: var(--ink-faint); }
-
-.findex-series { display: flex; flex-wrap: wrap; gap: 1.5rem; margin: 0.5rem 0 0;
-                 padding: 0; list-style: none; }
-.findex-series li { font-size: 0.875rem; }
-.findex-series .yr { display: block; font-size: 0.75rem; color: var(--ink-faint); }
-.findex-series .val { font-size: 1.125rem; font-weight: 650;
-                      font-variant-numeric: tabular-nums; }
+.attr { max-width: 1240px; margin: 2.5rem auto 0; padding: 1.6rem 1.5rem 3rem;
+  border-top: 1px solid var(--line); }
+.attr h2 { margin: 0 0 .8rem; font-size: 1.45rem; font-weight: 600; }
+.attr p { max-width: 78ch; font-size: .75rem; color: var(--muted); margin: 0 0 .6rem; }
 
 /* ------------------------------------------------------------- responsive */
 
-@media (max-width: 860px) {
-  .map-and-key { grid-template-columns: 1fr; gap: 1.5rem; }
-  .compare-body { grid-template-columns: 1fr; }
-  .compare-cell + .compare-cell { border-left: none; border-top: 1px solid var(--rule); }
+/* The sticky column is one viewport tall in every layer, and the map absorbs any
+   difference in the chrome around it.
+   Without this the column's height varied by layer -- the sequential ramp's
+   legend wraps to two lines where the verdict swatches fit one, and compare adds
+   captions -- and a sticky element that has reached the end of its container is
+   positioned from its BOTTOM. So once you had scrolled far enough for the column
+   to start releasing, a taller layer sat higher, and the layer chips moved under
+   the pointer as you clicked along them. Fixing the height fixes the release
+   point, so nothing in the column moves when the layer changes.
+   Desktop only: below 940px the column is static and stacks above the copy. */
+@media (min-width: 941px) {
+  .mapcol { display: flex; flex-direction: column; height: calc(100vh - 1.5rem); }
+  /* Only the map absorbs the slack. Everything else keeps its natural height:
+     with the default flex-shrink these were being squeezed by however much the
+     map's intrinsic height overflowed, by a different amount per layer, which
+     moved the chips 4.6px when compare's captions appeared. */
+  .mapcol > .sumline, .mapcol > .maplayers, .mapcol > .hoverline { flex: 0 0 auto; }
+  .mapfig figcaption, .legendbox { flex: 0 0 auto; }
+  .maps { flex: 1 1 auto; min-height: 0; }
+  /* Specificity note: the rule that hides the second figure outside compare is
+     written as `.mapcol:not([data-mode="compare"]) .mapfig--second` precisely so
+     it outranks this `display: flex`. At bare-class specificity this rule wins on
+     source order instead, the second map stays visible in every layer, and it
+     sits on top of the first one swallowing every click. */
+  .mapfig { display: flex; flex-direction: column; min-height: 0; }
+  .mapbox { flex: 1 1 auto; min-height: 0; }
+  /* The map fills its box absolutely rather than by percentage height. A
+     percentage height on the SVG does not resolve against a box whose own height
+     came from `flex: 1 1 auto`: it falls back to auto, the SVG takes the full
+     column width, and at this aspect ratio that is roughly twice the available
+     height -- the map overflowed the column and covered the legend. inset:0
+     gives it a definite box, and the viewBox's default preserveAspectRatio
+     letterboxes the drawing inside it. */
+  [data-bind="map"], [data-bind="map2"] { position: absolute; inset: 0; }
+  [data-bind="map"] svg, [data-bind="map2"] svg {
+    width: 100%; height: 100%; max-width: none; margin: 0; }
+}
+
+@media (max-width: 940px) {
+  .article { grid-template-columns: 1fr; gap: 1.5rem; }
+  /* The map goes first on a narrow screen and stops being sticky: there is no
+     second column for it to stay beside. */
+  .mapcol { position: static; order: -1; }
+  [data-bind="map"] svg, [data-bind="map2"] svg { height: 62vh; }
+  .mapcol[data-mode="compare"] [data-bind="map"] svg,
+  .mapcol[data-mode="compare"] [data-bind="map2"] svg { height: 44vh; }
+  .mapcol[data-mode="compare"] .maps { gap: .6rem; }
+  [data-bind="grad"] { grid-template-columns: 1fr; }
+
+  /* The drawer becomes a bottom sheet. */
+  .sheet { top: auto; left: 0; width: 100%; max-width: none; height: 78vh;
+    border-left: 0; border-top: 1px solid var(--line); border-radius: 12px 12px 0 0;
+    transform: translateY(103%); }
+  .sheet.open { transform: translateY(0); }
 }
 
 @media (max-width: 560px) {
-  body { padding: 0 1rem 4rem; }
-  .cost-inputs { gap: 1.25rem; }
+  .mast { padding: 1.5rem 1rem 1rem; }
+  .article { padding: .5rem 1rem 0; }
+  .notes-sect { padding: 2rem 1rem 0; }
+  .attr { padding: 2rem 1rem 2.5rem; }
+  /* One legend entry per line: inside the compare view each legend sits in a
+     half-width column, and two entries side by side there wrap to single words. */
+  .legendbox { flex-direction: column; gap: .3rem; }
+  .cmp-body { grid-template-columns: 1fr; }
+  .cmp-cell + .cmp-cell { border-left: none; padding-left: 0;
+    border-top: 1px solid var(--line); padding-top: .5rem; }
+  .sh-stats { grid-template-columns: 1fr; }
 }
 
-/* Printed greyscale is a supported output. Keep fills, drop interaction affordances. */
+/* Printed greyscale is a supported output. Keep fills, drop interaction
+   affordances -- and the drawer, which is an overlay on a screen and would print
+   as a slab over the page. */
 @media print {
-  body { padding: 0; }
-  .panel { break-inside: avoid; border-bottom: 1px solid #999; }
-  .region-shape { cursor: default; }
+  body { background: #fff; }
+  .mapcol { position: static; }
+  .sheet { display: none; }
+  .maplayers { display: none; }
+  .rg { cursor: default; }
   thead th { cursor: default; }
-  table { min-width: 0; font-size: 0.75rem; }
+  table { min-width: 0; font-size: .75rem; }
+  .notes-sect details { break-inside: avoid; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .region-shape { transition: none; }
+  .sheet, .rg { transition: none; }
 }

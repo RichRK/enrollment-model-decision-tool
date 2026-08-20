@@ -1,0 +1,13 @@
+---
+/* Region detail, as an overlay rather than a section further down the page.
+ *
+ * Starts closed: off-screen by transform, aria-hidden, and inert so Tab cannot
+ * walk into it. drawer.ts owns all three together -- see setDrawerOpen(). */
+---
+
+<aside class="sheet" data-bind="drawer" role="dialog" aria-label="Region detail"
+       aria-hidden="true" inert>
+  <button class="sheet-close" type="button" data-bind="drawer-close"
+          aria-label="Close region detail">&times;</button>
+  <div data-bind="drawer-body"></div>
+</aside>

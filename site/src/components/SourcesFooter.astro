@@ -1,0 +1,72 @@
+---
+/* Sources and attribution -- the only place either appears.
+ *
+ * There used to be two: a "Sources" accordion in the notes and a shorter
+ * attribution footer, which restated the same three sources in different words
+ * and could drift apart. This is the consolidation. It stays in the footer
+ * rather than in the notes because The DHS Program has to be credited by name,
+ * with the survey and its year, on every published output -- a term of the data
+ * agreement, which site/tests/check-data.test.js enforces -- and attribution
+ * folded inside a collapsed <details> is a poor way to honour that.
+ *
+ * The Findex figures moved the other way, into a notes accordion: those are a
+ * reading of the data, not a credit.
+ *
+ * Plain text and no external links: the audit fails on any outbound URL. */
+import type { Data } from "../scripts/state";
+
+interface Props {
+  data: Data;
+}
+const { data } = Astro.props;
+
+const dhs = data.sources.dhs;
+const worldpop = data.sources.worldpop;
+const constants = data.constants;
+
+const findex = data.national.findex as {
+  account_ownership: { latest_year: number };
+};
+
+const sources: [string, string, string][] = [
+  ["The DHS Program",
+    data.country + " Demographic and Health Survey " + dhs.survey_year + " (" +
+      dhs.survey_id + ") — " + Object.keys(dhs.indicators).length +
+      " indicators: subnational values, the national wealth-quintile breakdown, and region geometry",
+    dhs.survey_year + " · Terms of use, attribution required"],
+  ["WorldPop",
+    "Constrained population raster, " + worldpop.resolution + ", " + worldpop.type,
+    worldpop.year + " (modelled) · CC BY 4.0"],
+  ["Global Findex",
+    "National account ownership, via the World Bank Indicators API",
+    "latest " + findex.account_ownership.latest_year + " · CC BY 4.0"],
+];
+---
+
+<footer class="attr">
+  <h2>Sources</h2>
+
+  <ul class="source-list">
+    {sources.map(([what, detail, meta]) => (
+      <li>
+        <span class="what">{what}</span> &mdash; {detail}
+        <br><span class="meta">{meta}</span>
+      </li>
+    ))}
+  </ul>
+
+  <p>
+    Published as aggregates only, by region and wealth quintile. Every cell carries its
+    unweighted case count; cells under {constants.min_cases_flag} cases are flagged
+    &#9888; and cells under {constants.min_cases_suppress} are suppressed. No record-level
+    data is published, here or anywhere in this repository.
+  </p>
+  <p>
+    Full licence terms are in <code>LICENSES.md</code>. Every source used here is CC BY 4.0
+    or equivalent; the published data carries no NonCommercial or ShareAlike obligation.
+  </p>
+  <p>
+    Non-commercial. No analytics, no tracking, no third-party requests of any kind. A proof
+    of concept, not a published decision tool.
+  </p>
+</footer>
