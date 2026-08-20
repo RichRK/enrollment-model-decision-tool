@@ -12,7 +12,8 @@ import { classifyAll, costRatio } from "./classify";
 import { buildMaps, paintMaps, rememberClassified, renderMode } from "./map";
 import { renderGradient } from "./gradient";
 import { renderBasis, renderLine } from "./scenario";
-import { renderLegends, renderSummary } from "./summary";
+import { renderDistortionCaption, renderLegends, renderSummary } from "./summary";
+import { renderNoAnswer } from "./notes";
 import { renderTable } from "./table";
 import { renderDrawer, setDrawerOpen, setScrollLock } from "./drawer";
 import { scrollMapIntoView, setMapFocus } from "./focus";
@@ -27,6 +28,10 @@ function render(): void {
   renderLine(r);
   renderSummary(classified, r);
   renderLegends();
+  // Both of these name the channel rather than count regions by cost, so they
+  // move when the basis changes rather than when the cost inputs do.
+  renderDistortionCaption();
+  renderNoAnswer();
   paintMaps(classified);
   renderTable(classified);
   if (state.sel !== null) renderDrawer();

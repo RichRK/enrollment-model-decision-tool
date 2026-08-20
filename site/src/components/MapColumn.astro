@@ -37,7 +37,7 @@ const { surveyYear: _surveyYear, regionCount: _regionCount } = Astro.props;
     <figure class="mapfig mapfig--second">
       <figcaption>
         Who it excludes
-        <span class="sub">targeting distortion, household phone</span>
+        <span class="sub" data-bind="dist-caption">targeting distortion, household phone</span>
       </figcaption>
       <div class="mapbox"><div data-bind="map2"></div></div>
       <div class="legendbox" data-bind="legend2"></div>

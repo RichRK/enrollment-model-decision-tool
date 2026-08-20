@@ -31,6 +31,15 @@ export interface Basis {
   key: string;
   name: string;
   desc: string;
+  /* Every label that describes the targeting distortion travels with the basis.
+     The distortion is computed per channel -- there is a separate wealth
+     breakdown behind each of these keys -- so a label written out at the point
+     of use goes wrong the moment the reader changes the selector. They were
+     written out, and the drawer went on saying "household phone" while the
+     verdict sentence beside it had already switched to women's ownership. */
+  heading: string;   // over the quintile bars in the drawer
+  reaches: string;   // "...of everyone <reaches>"
+  captionSub: string;  // under "Who it excludes" on the map
 }
 
 export const BASES: Basis[] = [
@@ -39,14 +48,26 @@ export const BASES: Basis[] = [
     name: "Household owns a mobile phone",
     desc: "The most generous reading, and an upper bound. It counts households " +
       "containing a phone, not people who can use one.",
+    heading: "Household phone ownership by wealth quintile",
+    reaches: "a household phone reaches",
+    captionSub: "targeting distortion, household phone",
   },
   {
     key: "phone_own_f",
     name: "Woman personally owns a mobile phone",
     desc: "The binding constraint if the people being enrolled are women. " +
       "Substantially lower than the household figure in every region.",
+    heading: "Women's own phone ownership by wealth quintile",
+    reaches: "a woman's own phone reaches",
+    captionSub: "targeting distortion, woman's own phone",
   },
 ];
+
+/* The selected basis, never null: an unrecognised key falls back to the first
+   entry rather than throwing, because a stale key must not take the page down. */
+export function currentBasis(): Basis {
+  return BASES.find((b) => b.key === state.basis) || BASES[0];
+}
 
 /* "Woman owns a phone and is literate" was offered as a third basis and is gone.
    It never moved the map: women's literacy exceeds women's phone ownership in

@@ -6,9 +6,9 @@
  * verdict swatches, because that is what its map is painting.
  */
 
-import { $, el } from "./format";
+import { $, $opt, el, text } from "./format";
 import { constant, state } from "./state";
-import type { Classified, VerdictKind } from "./classify";
+import { currentBasis, type Classified, type VerdictKind } from "./classify";
 
 export function renderSummary(classified: Classified[], r: number | null): void {
   const host = $("summary");
@@ -44,6 +44,14 @@ function sequentialRamp(host: HTMLElement): void {
     "selects against the poor → mirrors the population"));
   host.appendChild(el("span", "lg",
     '<i class="sw sw-missing"></i>No value — suppressed, or no bottom-quintile households'));
+}
+
+/* The "who it excludes" map says which channel it is shading. Server-rendered
+   with the default basis so the caption is right without JavaScript, and
+   rewritten here whenever the basis changes. $opt because it is a caption: the
+   article must not fail to load over a missing one. */
+export function renderDistortionCaption(): void {
+  text($opt("dist-caption"), currentBasis().captionSub);
 }
 
 export function renderLegends(): void {

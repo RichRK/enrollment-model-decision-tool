@@ -60,7 +60,7 @@ fast path when you want the audit without a full rebuild.
 ## What this project is
 
 A static page scoring each of Madagascar's 23 DHS survey regions on whether
-enrollment can be done remotely, and — the v2 reframe — on *who* remote enrollment
+enrollment can be done remotely, and on *who* remote enrollment
 would exclude. The headline metric is `targeting_distortion`: the poorest
 quintile's share of everyone a channel reaches, divided by their share of the
 population. Below 1.0 means the channel selects against the poor.
@@ -160,3 +160,6 @@ script beats the CLI — `page.$('#result')` then `el.screenshot({path})`. Check
   education clause. Neither was findable by reading the code.
 - **Look at the page.** See *Verifying the site* above. The same principle as the
   rule before it: check the output, not your reasoning about the output.
+- **Keep comments succinct.** Evaluate whether the comments you're leaving are overly
+  verbose, or unnecessarily document previous history that no longer reflects the
+  current state of the repo.

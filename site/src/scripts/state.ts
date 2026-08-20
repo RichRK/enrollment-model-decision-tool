@@ -181,9 +181,12 @@ export function regionGradient(region: Region, key: string): RegionGradient | nu
   return (region.quintiles || {})[key] || null;
 }
 
-/** A region's headline (household phone) breakdown. */
-export function headlineGradient(region: Region): RegionGradient | null {
-  return regionGradient(region, constant("headline_indicator"));
+/* A region's wealth breakdown for the basis the reader has selected.
+   Every region-level view of the targeting distortion goes through here -- the
+   map's "who it excludes" layer, the table's two columns and the drawer card --
+   so the three cannot disagree about which channel they are describing. */
+export function basisGradient(region: Region): RegionGradient | null {
+  return regionGradient(region, state.basis);
 }
 
 /* The flat indicator fields on a region are addressed by key from the table, the

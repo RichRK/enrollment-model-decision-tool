@@ -1,10 +1,17 @@
 ---
 /* Notes and caveats, full width below the article, as collapsed accordions.
  *
- * Everything here is static: none of it depends on what the user types, so all
- * of it is derived at build time and rendered into the HTML rather than by the
- * client script. The one exception is the all-regions table, whose rows carry
- * the cost verdict and so are built by scripts/table.ts.*/
+ * Almost everything here is static, derived at build time rather than by the
+ * client script. Two exceptions, both of which depend on what the reader has
+ * chosen: the all-regions table, whose rows carry the cost verdict and are
+ * built by scripts/table.ts, and the counts and list in "no distortion answer",
+ * which are per-basis -- 19 of 23 regions have an answer on household phone
+ * ownership, 18 on women's -- and are rewritten by scripts/notes.ts.
+ *
+ * Both are still rendered here at build time, with the default basis, rather
+ * than left as empty hooks. The noscript panel promises these notes are
+ * readable without JavaScript, and that promise is kept: the script overwrites
+ * this markup, it does not supply it. */
 import type { Data, Region } from "../scripts/state";
 
 interface Props {
@@ -68,12 +75,12 @@ const accounts = findex.account_ownership;
 
   <details>
     <summary>
-      {inWords(noAnswer.length)} region{noAnswer.length === 1 ? "" : "s"} have no
+      <span data-bind="noanswer-count">{inWords(noAnswer.length)} region{noAnswer.length === 1 ? "" : "s"}</span> have no
       distortion answer &mdash; and they are not random
     </summary>
     <p>
-      <strong>{withAnswer} of {regionCount}</strong> regions have a usable targeting
-      distortion. The other <strong>{noAnswer.length}</strong> do not, and are shown as
+      <strong data-bind="noanswer-have">{withAnswer} of {regionCount}</strong> regions have a usable targeting
+      distortion. The other <strong data-bind="noanswer-lack">{noAnswer.length}</strong> do not, and are shown as
       unavailable rather than estimated. Wealth quintiles are defined <em>nationally</em>,
       so a wealthy region holds almost no bottom-quintile households and a poor one almost
       no top-quintile households. The cells that vanish are at both ends of the
@@ -81,7 +88,7 @@ const accounts = findex.account_ownership;
       bottom-quintile households at all. Those are exactly the regions where a targeted
       programme most wants an answer. Nothing is estimated in their place.
     </p>
-    <ul>
+    <ul data-bind="noanswer-list">
       {noAnswer.map((row) => <li><strong>{row.name}</strong> &mdash; {row.reason}</li>)}
     </ul>
     <p>

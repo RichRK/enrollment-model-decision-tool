@@ -11,7 +11,7 @@
 import { $, absent, el, MISSING, share } from "./format";
 import { LABEL, type Classified } from "./classify";
 import {
-  actions, data, headlineGradient, state,
+  actions, basisGradient, data, state,
   type Geometry, type Region, type Ring,
 } from "./state";
 
@@ -224,14 +224,14 @@ function verdictFill(kind: string, margin: number | null): string {
    stays white rather than taking the pale end of the ramp, which would read as
    "nearly fine" for a region that has no answer at all. */
 function distortionFill(region: Region): string {
-  const g = headlineGradient(region);
+  const g = basisGradient(region);
   const d = g ? g.targeting_distortion : null;
   const f = fills();
   return absent(d) ? f.missing : lerpHex(f.seqLo, f.seqHi, Math.max(0, Math.min(1, d)));
 }
 
 function distortionLabel(region: Region): string {
-  const g = headlineGradient(region);
+  const g = basisGradient(region);
   const d = g ? g.targeting_distortion : null;
   return region.name + ": " + (absent(d)
     ? "no targeting distortion value"
@@ -295,7 +295,7 @@ function hover(id: string | null): void {
   }
   const row = lastClassified.find((r) => r.region.region_id === id);
   if (!row) return;
-  const g = headlineGradient(row.region);
+  const g = basisGradient(row.region);
   const d = g ? g.targeting_distortion : null;
   host.innerHTML = "<strong>" + row.region.name + "</strong> · " + LABEL[row.verdict.kind] +
     (row.verdict.share === null ? "" : " · " + share(row.verdict.share) + " reachable") +

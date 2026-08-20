@@ -9,8 +9,8 @@
  */
 
 import { $, absent, el, MISSING, num, pct, share, signed } from "./format";
-import { classify, costRatio, groupWord, LABEL, type Verdict } from "./classify";
-import { constant, data, headlineGradient, stat, state, type Region, type RegionGradient } from "./state";
+import { classify, costRatio, currentBasis, groupWord, LABEL, type Verdict } from "./classify";
+import { constant, data, basisGradient, stat, state, type Region, type RegionGradient } from "./state";
 import { regionBars } from "./bars";
 import { distortionClass } from "./classify";
 
@@ -33,9 +33,14 @@ function comparison(head: string, leftNum: string, leftCap: string,
     '<div class="cmp-foot">' + foot + "</div>");
 }
 
-/* The headline number for a region, given visual primacy over everything else. */
+/* The headline number for a region, given visual primacy over everything else.
+   Computed on the basis the reader selected, not on a fixed one: the two
+   channels have separate wealth breakdowns behind them, and the women's figure
+   is the worse of the two in every region that has both. Every label below
+   comes from the basis for the same reason. */
 function distortionBlock(region: Region): HTMLElement {
-  const g: RegionGradient | null = headlineGradient(region);
+  const g: RegionGradient | null = basisGradient(region);
+  const basis = currentBasis();
   const wrap = el("div", "sh-dist");
 
   if (!g || absent(g.targeting_distortion)) {
@@ -43,7 +48,7 @@ function distortionBlock(region: Region): HTMLElement {
       "<strong>Targeting distortion unavailable</strong><br>" +
       ((g && g.pending_reason) || "the regional wealth breakdown has not been computed")));
     if (g && g.ownership_by_quintile && g.ownership_by_quintile.length) {
-      wrap.appendChild(el("h4", "sh-sub", "Household phone ownership by wealth quintile"));
+      wrap.appendChild(el("h4", "sh-sub", basis.heading));
       wrap.appendChild(regionBars(g));
     }
     return wrap;
@@ -63,7 +68,7 @@ function distortionBlock(region: Region): HTMLElement {
     wrap.appendChild(el("p", "sh-sentence",
       "The poorest fifth is <strong>" + share(pool.population_share) +
       "</strong> of this region's population but <strong>" + share(pool.pool_share) +
-      "</strong> of everyone a household phone reaches. Ownership runs " +
+      "</strong> of everyone " + basis.reaches + ". Ownership runs " +
       pct(g.bottom_group_rate) + " in the bottom " + groupWord("bottom_group") +
       " quintiles against " + pct(g.top_group_rate) + " in the top " +
       groupWord("top_group") + " — a gap of <strong>" +
@@ -71,7 +76,7 @@ function distortionBlock(region: Region): HTMLElement {
       "</strong>."));
   }
 
-  wrap.appendChild(el("h4", "sh-sub", "Household phone ownership by wealth quintile"));
+  wrap.appendChild(el("h4", "sh-sub", basis.heading));
   wrap.appendChild(regionBars(g));
 
   if (!absent(g.targeting_distortion_bottom2)) {

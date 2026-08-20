@@ -6,7 +6,7 @@
 import { absent, el, MISSING, num, pct, share, signedPts } from "./format";
 import { $ } from "./format";
 import { distortionClass, LABEL, type Classified, type Verdict } from "./classify";
-import { actions, headlineGradient, stat, state, type Region } from "./state";
+import { actions, basisGradient, stat, state, type Region } from "./state";
 
 const COLUMNS: { key: string; label: string }[] = [
   { key: "name", label: "Region" },
@@ -23,7 +23,7 @@ const COLUMNS: { key: string; label: string }[] = [
 ];
 
 function sortValue(region: Region, verdict: Verdict, key: string): string | number | null {
-  const g = headlineGradient(region);
+  const g = basisGradient(region);
   switch (key) {
     case "name": return region.name;
     case "verdict": return ["missing", "inperson", "tipping", "remote"].indexOf(verdict.kind);
@@ -91,7 +91,7 @@ export function renderTable(classified: Classified[]): void {
     nameCell.textContent = region.name;
     tr.appendChild(nameCell);
 
-    const g = headlineGradient(region);
+    const g = basisGradient(region);
     const d = g ? g.targeting_distortion : null;
     cell(tr, absent(d) ? MISSING
       : '<span class="chip sev-' + distortionClass(d) + '">' + d.toFixed(2) + "</span>",

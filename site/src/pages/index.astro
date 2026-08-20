@@ -51,6 +51,13 @@ const defaultLine = defaultCostRemote / defaultCostInPerson;
 // default cost line on average -- so the sentence's "would often clear the line"
 // is true of it -- the one with the worst targeting distortion. Picked by the
 // data, not from memory.
+//
+// Computed on the headline (household) indicator, which is what the prose says it
+// is. That has to stay explicit: the map, the table and the drawer now follow the
+// basis selector, so an unqualified "its targeting distortion is 0.23" here would
+// contradict the 0.15 the table shows for the same region under the women's
+// basis. This sentence is build-time prose and cannot follow a runtime choice --
+// so it names the reading it quotes instead.
 const worked = data.regions
   .filter((region) => region[headline as "hh_mobile_phone"] !== null &&
     (region[headline as "hh_mobile_phone"] as number) / 100 >= defaultLine &&
@@ -112,8 +119,8 @@ const workedRate = worked[headline as "hh_mobile_phone"] as number;
         The map shades each region by <em>average</em> &mdash; and the average is not the
         decision. A region shaded for remote enrollment may still exclude nearly all of its
         poorest households: {worked.name} averages {workedRate.toFixed(1)}% household phone
-        ownership and would often clear the line, yet its targeting distortion is
-        {" "}{workedDistortion.toFixed(2)}.
+        ownership and would often clear the line, yet its targeting distortion on that same
+        household reading is{" "}{workedDistortion.toFixed(2)}.
       </p>
       <p>
         The <strong>Who it excludes</strong> layer shows that directly, and
