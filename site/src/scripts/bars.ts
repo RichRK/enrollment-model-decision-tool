@@ -77,7 +77,10 @@ export function regionBars(g: RegionGradient): HTMLElement {
     bars.appendChild(barRow(i, c.value, {
       cases: c.cases_unweighted,
       flagged: c.flagged,
-      title: QUINTILE_LABEL[i] + ": " + (absent(c.value)
+      title: QUINTILE_LABEL[i] + ": " + (c.absent === true
+        ? "the survey sampled no households in this region at this quintile — nothing " +
+          "is suppressed here, there is nothing to suppress"
+        : absent(c.value)
         ? "suppressed — only " + c.cases_unweighted + " unweighted cases, below the " +
           "floor of " + constant("min_cases_suppress")
         : pct(c.value) + " on " + c.cases_unweighted + " unweighted cases" +
@@ -86,10 +89,15 @@ export function regionBars(g: RegionGradient): HTMLElement {
   });
   wrap.appendChild(bars);
 
+  const empty = (g.absent_quintiles || []).length;
   const suppressed = (g.suppressed_quintiles || []).length;
   const flagged = (g.flagged_quintiles || []).length;
-  if (suppressed || flagged) {
+  if (empty || suppressed || flagged) {
     wrap.appendChild(el("p", "sh-note",
+      (empty
+        ? "<strong>" + empty + " quintile(s) hold no households here at all</strong> — " +
+          "the survey sampled none, so there is no rate to suppress and none to show. "
+        : "") +
       (suppressed
         ? "<strong>" + suppressed + " cell(s) suppressed</strong> — under " +
           constant("min_cases_suppress") + " unweighted cases, so the rate reads " +

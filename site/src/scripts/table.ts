@@ -85,7 +85,7 @@ export function renderTable(classified: Classified[]): void {
     // rows are rebuilt on every render and are already detached by the time the
     // click reaches the document.
     tr.setAttribute("data-selects-region", "");
-    tr.addEventListener("click", () => actions.select(region.region_id));
+    tr.addEventListener("click", () => actions.select(region.region_id, "table"));
 
     const nameCell = el("td");
     nameCell.textContent = region.name;

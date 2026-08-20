@@ -205,12 +205,7 @@ export function renderDrawer(): void {
 
 /* --------------------------------------------------------- open and close */
 
-/* `inert` rather than `hidden`: the drawer is moved off-screen by a transform,
-   so without it a closed drawer stays in the tab order and Tab walks into a
-   panel nobody can see. It is toggled together with the class so the two can
-   never disagree.
-
-   Opening also stops the page behind from scrolling. The drawer is a fixed,
+/* An open drawer stops the page behind it from scrolling. The drawer is a fixed,
    independently scrolling panel, so with the document still scrollable there are
    two scroll containers on screen at once and Windows draws a scrollbar for each
    -- the drawer's, and the page's immediately to its right.
@@ -219,23 +214,36 @@ export function renderDrawer(): void {
    that scrollbar's width and shift the whole page. The width is therefore
    measured BEFORE the lock goes on and handed to CSS, which gives it straight
    back as padding on <body>. Centred content lands in exactly the same place; on
-   platforms with overlay scrollbars the measurement is 0 and nothing moves. */
-export function setDrawerOpen(open: boolean): void {
-  const drawer = $("drawer");
+   platforms with overlay scrollbars the measurement is 0 and nothing moves.
+
+   Separate from setDrawerOpen() because the two no longer always happen at the
+   same moment: selecting a region on the map scrolls the column fully into view
+   first, and a smooth scroll cannot run against `html { overflow: hidden }`. So
+   for a map-origin selection the drawer opens now and the lock lands when the
+   scroll has settled -- see select() in app.ts, which also owns the case where
+   the reader closes the drawer while the page is still moving. */
+export function setScrollLock(on: boolean): void {
   const root = document.documentElement;
 
-  /* Measure only on the closed -> open transition. Selecting a second region
+  /* Measure only on the unlocked -> locked transition. Selecting a second region
      while the drawer is already open calls this again, and by then the document
      scrollbar is gone -- so the measurement reads 0, the padding compensating
      for it is dropped, and the centred layout jumps sideways by half the
      scrollbar's width on every region after the first. */
   const wasOpen = root.classList.contains("drawer-open");
-  if (open && !wasOpen) {
+  if (on && !wasOpen) {
     const scrollbar = window.innerWidth - root.clientWidth;
     root.style.setProperty("--scrollbar-width", scrollbar + "px");
   }
-  root.classList.toggle("drawer-open", open);
+  root.classList.toggle("drawer-open", on);
+}
 
+/* `inert` rather than `hidden`: the drawer is moved off-screen by a transform,
+   so without it a closed drawer stays in the tab order and Tab walks into a
+   panel nobody can see. It is toggled together with the class so the two can
+   never disagree. */
+export function setDrawerOpen(open: boolean): void {
+  const drawer = $("drawer");
   drawer.classList.toggle("open", open);
   drawer.setAttribute("aria-hidden", String(!open));
   if (open) drawer.removeAttribute("inert");

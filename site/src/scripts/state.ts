@@ -23,9 +23,17 @@ export interface QuintileCell {
   quintile: string;
   value: number | null;
   cases_unweighted: number;
-  denominator_weighted: number;
+  // Null on any cell carrying no value -- suppressed or absent alike.
+  denominator_weighted: number | null;
   flagged: boolean;
   suppressed: boolean;
+  /* Present and true only where the survey sampled NOBODY in this region x
+     quintile, so cases_unweighted is a true 0 rather than a thin count. A
+     different thing from `suppressed`, and rendered differently: suppressed
+     means the households exist and are too few to publish, absent means the
+     survey holds none at all. Wealth quintiles are national, so the capital has
+     no bottom-quintile households to measure. */
+  absent?: boolean;
 }
 
 export interface PoolCell {
@@ -43,6 +51,7 @@ export interface RegionGradient {
   exclusion_gap: number | null;
   ownership_by_quintile: QuintileCell[];
   reachable_pool_composition: PoolCell[] | null;
+  absent_quintiles: string[];
   suppressed_quintiles: string[];
   flagged_quintiles: string[];
   pending_reason: string | null;
@@ -185,11 +194,18 @@ export function stat(region: Region, key: string): number | null {
   return (region as unknown as Record<string, number | null>)[key] ?? null;
 }
 
+/** Where a selection came from. The two origins mean different things to the
+    page: a click on the map hands the width to the map (see focus.ts), a click
+    on the all-regions table opens the drawer and moves nothing, because that
+    table sits far below the map and shifting the page under a reader looking at
+    it is the exact failure the drawer was introduced to avoid. */
+export type Origin = "map" | "table";
+
 /* Actions the leaf renderers need but must not import from app.ts -- map.ts and
    table.ts both raise selection, and app.ts owns what selection does. Importing
    app.ts from them would close a module cycle; app.ts fills these in at start-up
    instead. */
 export const actions = {
-  select(_id: string): void {},
+  select(_id: string, _origin: Origin): void {},
   render(): void {},
 };

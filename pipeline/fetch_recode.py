@@ -256,35 +256,70 @@ def apply_suppression(cell):
     }
 
 
+def absent_cell(quintile):
+    """A quintile the survey sampled nobody in, as a cell rather than a gap.
+
+    NOT the same thing as a suppressed cell, and the two must never render alike.
+    Suppressed means "households were sampled here, too few to publish a rate".
+    Absent means the survey holds none at all: wealth quintiles are national, so
+    Antananarivo capital -- the wealthiest place in the country -- contains no
+    bottom-quintile households whatsoever. Conflating the two would tell a reader
+    that the poorest fifth of the capital is unmeasured, when the truth is that
+    by this survey's own definition there isn't one.
+
+    The count is a real zero, not a missing count, which is why it is safe to
+    publish: nothing is suppressed here because there was nothing to suppress.
+    """
+    return {"quintile": quintile, "value": None, "cases_unweighted": 0,
+            "denominator_weighted": None, "suppressed": False, "flagged": False,
+            "absent": True}
+
+
 def region_summary(region_id, per_quintile):
     """Composition and distortion for one region, or nulls with a reason."""
     ordered = [per_quintile.get(q) for q in DHS_QUINTILES]
-    if any(c is None for c in ordered):
-        return {"pending_reason": "the survey has no households in at least one "
-                                  "quintile for this region"}
 
-    suppressed = [DHS_QUINTILES[i] for i, c in enumerate(ordered) if c["suppressed"]]
-    flagged = [DHS_QUINTILES[i] for i, c in enumerate(ordered) if c["flagged"]]
+    absent = [DHS_QUINTILES[i] for i, c in enumerate(ordered) if c is None]
+    suppressed = [DHS_QUINTILES[i] for i, c in enumerate(ordered)
+                  if c is not None and c["suppressed"]]
+    flagged = [DHS_QUINTILES[i] for i, c in enumerate(ordered)
+               if c is not None and c["flagged"]]
 
+    # The cells that DO exist are real published figures and the card shows them,
+    # even when one of the five is missing entirely. Withholding the whole
+    # breakdown because one quintile is empty threw away four good measurements
+    # and left the reader with nothing at all for the one region where the
+    # national-quintile effect is starkest.
     result = {
         "ownership_by_quintile": [
-            dict(quintile=DHS_QUINTILES[i], **ordered[i]) for i in range(5)
+            absent_cell(DHS_QUINTILES[i]) if ordered[i] is None
+            else dict(quintile=DHS_QUINTILES[i], **ordered[i])
+            for i in range(5)
         ],
+        "absent_quintiles": absent,
         "suppressed_quintiles": suppressed,
         "flagged_quintiles": flagged,
     }
 
-    if suppressed:
+    if absent or suppressed:
         # The reachable pool is a sum across all five cells. With one missing, the
         # denominator is understated and every share built on it is wrong in a
         # direction that flatters the result. Do not publish a distortion here.
+        # An absent quintile withholds it for exactly the same reason a suppressed
+        # one does -- the sum is short a term either way.
+        reasons = []
+        if absent:
+            reasons.append("quintile(s) with no households sampled at all: %s"
+                           % ", ".join(absent))
+        if suppressed:
+            reasons.append("quintile cell(s) below %d unweighted cases: %s"
+                           % (MIN_CASES_SUPPRESS, ", ".join(suppressed)))
         result.update({
             "reachable_pool_composition": None,
             "exclusion_gap": None,
             "targeting_distortion": None,
             "targeting_distortion_bottom2": None,
-            "pending_reason": "quintile cell(s) below %d unweighted cases: %s"
-                              % (MIN_CASES_SUPPRESS, ", ".join(suppressed)),
+            "pending_reason": "; ".join(reasons),
         })
         return result
 

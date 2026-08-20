@@ -57,6 +57,13 @@
 
   --warn-bg:    #fdf6e6;
 
+  /* The region-focus transition. 500ms on a decelerating curve: long enough to
+     read as one object travelling rather than a cut, short enough that a second
+     region can be clicked without waiting for the first. Settled by eye in a
+     prototype against the real page, not derived. */
+  --focus-dur:  500ms;
+  --focus-ease: cubic-bezier(.22,.61,.36,1);
+
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
@@ -118,6 +125,19 @@ code { font-size: 0.9em; background: var(--panel); padding: 0.05em 0.3em;
    `overflow: hidden` on the readout clips its painting but does not stop it
    contributing that width to an ancestor. */
 .mapcol { position: sticky; top: .75rem; min-width: 0; }
+
+/* Selecting a region on the map hands the page's width to the map: the prose
+   fades out where it stands and the map travels left into the column it
+   vacates. The distance is computed rather than authored -- it centres the map
+   in what is left beside the drawer -- so focus.ts hands it in as
+   --focus-shift. Both transitions are declared at rest so the return journey
+   animates too, and the class is the only thing that toggles.
+   Selection from the table sets neither: see select() in app.ts. */
+.copy  { transition: opacity var(--focus-dur) var(--focus-ease); }
+.mapcol { transition: transform var(--focus-dur) var(--focus-ease); }
+.article.map-focus .copy   { opacity: 0; pointer-events: none; }
+.article.map-focus .mapcol { transform: translateX(var(--focus-shift, 0px)); }
+
 .sumline { margin: 0 0 .5rem; font-size: .82rem; color: var(--muted); min-height: 1.2em; }
 .sumline strong { color: var(--ink); font-variant-numeric: tabular-nums; }
 
@@ -505,6 +525,13 @@ tbody tr[data-sel="true"] { background: #fff; box-shadow: inset 3px 0 0 var(--ac
   .mapcol[data-mode="compare"] .maps { gap: .6rem; }
   [data-bind="grad"] { grid-template-columns: 1fr; }
 
+  /* Nothing shifts or fades below the breakpoint: there is no second column to
+     hand the width to, and the drawer is a bottom sheet. Belt and braces --
+     setMapFocus() already refuses below 941px -- so that a stale class from a
+     window drag can never leave the copy invisible. */
+  .article.map-focus .copy   { opacity: 1; pointer-events: auto; }
+  .article.map-focus .mapcol { transform: none; }
+
   /* The drawer becomes a bottom sheet. */
   .sheet { top: auto; left: 0; width: 100%; max-width: none; height: 78vh;
     border-left: 0; border-top: 1px solid var(--line); border-radius: 12px 12px 0 0;
@@ -533,6 +560,10 @@ tbody tr[data-sel="true"] { background: #fff; box-shadow: inset 3px 0 0 var(--ac
   body { background: #fff; }
   .mapcol { position: static; }
   .sheet { display: none; }
+  /* The drawer is not on the plate, so there is no space beside it to centre in
+     -- a shifted map would print half off the page, and the copy not at all. */
+  .article.map-focus .copy   { opacity: 1; pointer-events: auto; }
+  .article.map-focus .mapcol { transform: none; }
   .maplayers { display: none; }
   .rg { cursor: default; }
   thead th { cursor: default; }
@@ -541,5 +572,5 @@ tbody tr[data-sel="true"] { background: #fff; box-shadow: inset 3px 0 0 var(--ac
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sheet, .rg { transition: none; }
+  .sheet, .rg, .copy, .mapcol { transition: none; }
 }

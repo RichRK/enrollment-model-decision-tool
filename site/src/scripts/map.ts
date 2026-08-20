@@ -99,11 +99,11 @@ function buildMapInto(host: HTMLElement, projection: Projection, label: string):
     // life of the page, and closing over the whole record would pin every
     // region's geometry -- the bulk of the payload -- in memory for no reason.
     const id = region.region_id;
-    path.addEventListener("click", () => actions.select(id));
+    path.addEventListener("click", () => actions.select(id, "map"));
     path.addEventListener("keydown", (e: KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        actions.select(id);
+        actions.select(id, "map");
       }
     });
     path.addEventListener("mouseenter", () => hover(id));

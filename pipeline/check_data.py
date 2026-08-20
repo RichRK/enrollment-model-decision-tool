@@ -144,8 +144,19 @@ def run():
             n = cell.get("cases_unweighted")
             return n if isinstance(n, int) and n > 0 else None
 
+        # A cell explicitly marked absent is the one legitimate zero: the survey
+        # sampled nobody in that region x quintile, so 0 is the true count rather
+        # than a count that went missing. It carries no value and cannot leak one.
+        # Everything else must still have a real positive integer -- this
+        # narrowing does not admit null, "" or an unmarked zero.
+        def truly_absent(cell):
+            return (cell.get("absent") is True
+                    and cell.get("cases_unweighted") == 0
+                    and cell.get("value") is None)
+
         countless = ["%s/%s (%r)" % (where, c.get("quintile"), c.get("cases_unweighted"))
-                     for where, c in cells if usable_count(c) is None]
+                     for where, c in cells
+                     if usable_count(c) is None and not truly_absent(c)]
         check("Every rendered quintile cell carries a usable unweighted case count",
               not countless,
               "; ".join(countless[:5]) if countless else "%d cells checked" % len(cells))

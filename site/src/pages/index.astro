@@ -99,7 +99,9 @@ const workedRate = worked[headline as "hh_mobile_phone"] as number;
 <!-- Left column scrolls, right column stays pinned. The sticky map releases
      naturally where .article ends, which is above the notes. -->
 <div class="article" data-bind="app" hidden>
-  <div class="copy">
+  <!-- data-bind="copy" so focus.ts can make the pane inert while it is faded
+       out; see setMapFocus(). -->
+  <div class="copy" data-bind="copy">
     <Scenario costRemote={defaultCostRemote} costInPerson={defaultCostInPerson} />
 
     <GradientSection />

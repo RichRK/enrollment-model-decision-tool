@@ -7,14 +7,15 @@
  */
 
 import { $, $opt, text } from "./format";
-import { actions, setData, state, type Data } from "./state";
+import { actions, setData, state, type Data, type Origin } from "./state";
 import { classifyAll, costRatio } from "./classify";
 import { buildMaps, paintMaps, rememberClassified, renderMode } from "./map";
 import { renderGradient } from "./gradient";
 import { renderBasis, renderLine } from "./scenario";
 import { renderLegends, renderSummary } from "./summary";
 import { renderTable } from "./table";
-import { renderDrawer, setDrawerOpen } from "./drawer";
+import { renderDrawer, setDrawerOpen, setScrollLock } from "./drawer";
+import { scrollMapIntoView, setMapFocus } from "./focus";
 
 function render(): void {
   const r = costRatio();
@@ -31,17 +32,87 @@ function render(): void {
   if (state.sel !== null) renderDrawer();
 }
 
-function select(regionId: string): void {
+/* Bumped on every selection and every close. The scroll a map-origin selection
+   starts is asynchronous, and whatever it was going to do when it finishes is
+   only still wanted if nothing has happened in the meantime. */
+let focusToken = 0;
+
+/* Where keyboard focus was when the drawer opened, so Escape and the close
+   button can put it back. Region shapes carry tabindex="0", so this is the shape
+   that was clicked. */
+let returnFocus: HTMLElement | null = null;
+
+/* preventScroll because this page does its own scrolling, deliberately and on
+   its own terms: the drawer is fixed, so focusing it has nothing to reveal, and
+   an implicit scroll here would fight scrollMapIntoView() below. */
+function focusDrawer(): void {
+  $("drawer-close").focus({ preventScroll: true });
+}
+
+/* Only if it is still in the document and still focusable -- render() rebuilds
+   the table's rows, so a row that raised a selection is detached by now. */
+function restoreFocus(): void {
+  const target = returnFocus;
+  returnFocus = null;
+  if (target && target.isConnected) target.focus({ preventScroll: true });
+}
+
+/* Selection, and everything it does to the page besides the drawer.
+ *
+ * From the map, the page hands its width to the map: the copy fades out, the map
+ * column travels left, and the page scrolls first if the column is not already
+ * whole on screen. From the table it opens the drawer and moves nothing -- the
+ * table sits below the map, and shifting the page under a reader looking at it
+ * is the failure the drawer exists to avoid. */
+function select(regionId: string, origin: Origin): void {
+  const opening = state.sel !== regionId;
+  if (opening) {
+    const from = document.activeElement as HTMLElement | null;
+    /* Never the drawer's own controls. Selecting a second region while one is
+       already open would otherwise record the close button -- which is about to
+       be made inert -- and closing would drop focus to <body> instead of back to
+       whatever opened the drawer in the first place. */
+    if (!from || !from.closest('[data-bind="drawer"]')) returnFocus = from;
+  }
+
   state.sel = state.sel === regionId ? null : regionId;
   render();
   setDrawerOpen(state.sel !== null);
   if (state.sel !== null) renderDrawer();
+
+  focusToken++;                       // cancels any lock still pending
+
+  if (state.sel === null) {
+    setMapFocus(false);
+    setScrollLock(false);
+    restoreFocus();
+    return;
+  }
+
+  // Before setMapFocus(), which makes .copy inert: the cost inputs live in there
+  // and focus may be sitting on one of them, and a browser dropping focus to
+  // <body> would lose the Tab position entirely.
+  focusDrawer();
+
+  if (origin !== "map") { setScrollLock(true); return; }   // table: drawer only
+
+  setMapFocus(true);
+  const token = focusToken;
+  void scrollMapIntoView().then(() => {
+    // The reader may have closed the drawer or picked another region while the
+    // page was still moving. Locking then would lock a closed drawer.
+    if (token === focusToken && state.sel !== null) setScrollLock(true);
+  });
 }
 
 function close(): void {
+  focusToken++;
   state.sel = null;
   setDrawerOpen(false);
+  setScrollLock(false);
+  setMapFocus(false);
   render();
+  restoreFocus();
 }
 
 /* A click that must NOT dismiss the drawer.
@@ -104,6 +175,7 @@ try {
   renderBasis();
   renderGradient();
   setDrawerOpen(false);
+  setScrollLock(false);
 
   ["cost-remote", "cost-inperson"].forEach((name) => {
     $(name).addEventListener("input", render);
