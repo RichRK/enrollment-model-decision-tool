@@ -1,4 +1,4 @@
-.PHONY: build fetch rebuild clean venv serve check-data site-install
+.PHONY: build fetch rebuild clean venv serve check-data site-install test-e2e browsers
 
 ## Audit the working tree against the DHS data agreement, without rebuilding
 ## either side. Needs `build` to have run at least once -- it audits
@@ -63,3 +63,17 @@ venv:
 ## request rather than needing a rebuild, but serves from source, not dist/.
 serve:
 	@cd site && bun run preview
+
+## Browser tests (site/e2e/), against the production build in site/dist. Needs
+## `make build` to have run, and `make browsers` once per machine. Deliberately
+## NOT part of `build`: it needs a browser binary and a running server, and the
+## build has to stay the fast, hermetic path. It guards interaction behaviour
+## and data rendering only -- it is not a substitute for looking at a rendered
+## image, which `serve` above is for.
+test-e2e:
+	@cd site && bun run test:e2e
+
+## Install the Chromium build Playwright drives. A per-machine provisioning
+## step, in the same spirit as `venv` and `site-install`.
+browsers:
+	@cd site && bunx playwright install chromium

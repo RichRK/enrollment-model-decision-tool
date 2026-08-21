@@ -111,6 +111,11 @@ code { font-size: 0.9em; background: var(--panel); padding: 0.05em 0.3em;
 .article { display: grid; grid-template-columns: minmax(26rem, 34rem) 1fr;
   gap: 3rem; max-width: 1240px; margin: 0 auto; padding: .5rem 1.5rem 0;
   align-items: start; }
+
+/* The rule above beats the UA stylesheet's `[hidden] { display: none }` on
+   specificity, so app.ts's `hidden` attribute -- the whole no-JavaScript path --
+   did nothing until the script unhid it. Restore it explicitly. */
+.article[hidden] { display: none; }
 .copy > * + * { margin-top: 1.6rem; }
 .copy h2 { margin: 2.2rem 0 .5rem; font-size: 1.45rem; font-weight: 600; }
 .copy p { margin: 0 0 .8rem; max-width: 62ch; }

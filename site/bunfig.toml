@@ -1,0 +1,8 @@
+# `bun test` owns tests/ -- the data-agreement audit against dist/. Playwright
+# owns e2e/. Without this root, a bare `bun test` collects e2e/*.spec.ts too
+# (bun's runner takes *.spec.ts as well as *.test.ts) and reports four
+# Playwright bootstrap errors that say nothing about this project. Every wired
+# path names tests/check-data.test.js explicitly and never hit that; a human
+# typing `bun test` did.
+[test]
+root = "tests"

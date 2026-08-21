@@ -85,6 +85,9 @@ frontend isn't just templated inside the Python pipeline.
   carried over from the pre-Astro version essentially unchanged.
   `site/tests/check-data.test.js` (`bun test`) is this side's own audit —
   attribution and no tracking/external-resources in the built output.
+  `site/e2e/` (`make test-e2e`) is a Playwright suite over the built site — behaviour
+  and data rendering, run on demand, never part of the build. Two runners, two
+  directories: see `site/README.md` for why they must not see each other's files.
 
 `make build` runs both, in order: the pipeline first (it produces the input the
 Astro build needs), then `cd site && bun run build`. `make rebuild` discards the

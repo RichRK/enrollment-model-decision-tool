@@ -8,9 +8,13 @@
     "build": "astro build && bun test tests/check-data.test.js",
     "preview": "astro preview",
     "astro": "astro",
-    "check-data": "bun test tests/check-data.test.js"
+    "check-data": "bun test tests/check-data.test.js",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "astro": "^7.2.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
   }
 }
