@@ -36,10 +36,8 @@ import fetch_findex                      # noqa: E402
 import fetch_recode                      # noqa: E402
 import fetch_worldpop                    # noqa: E402
 
-# There is deliberately no Ookla step. It was removed in v2; attic/README.md says
-# why at length, and the short version is that a crowdsourced demand-side measure of
-# digital activity is biased along the same axis as the exclusion this tool exists
-# to detect.
+# There is deliberately no connectivity step: a crowdsourced demand-side measure of
+# digital activity is biased along the same axis as the exclusion this tool detects.
 STEPS = [
     ("fetch: DHS", fetch_dhs.run),
     ("fetch: WorldPop", fetch_worldpop.run),

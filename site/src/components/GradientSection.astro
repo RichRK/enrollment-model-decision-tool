@@ -6,11 +6,8 @@
 
 <section class="gradient-sect">
   <h2>What remote enrollment depends on</h2>
-  <!-- Intro and cards are both rendered by scripts/gradient.ts: the intro quotes
-       figures from the first card and makes a claim about all of them, so it has
-       to be built from the same list that decides which cards exist. Two copies
-       of that list is how the prose starts describing a set of cards the page no
-       longer shows. -->
+  <!-- Intro and cards are both rendered by scripts/gradient.ts, from the one list
+       that decides which cards exist. -->
   <p data-bind="grad-intro"></p>
   <div data-bind="grad"></div>
 </section>

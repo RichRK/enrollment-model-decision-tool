@@ -1,8 +1,8 @@
 /* The region drawer: a panel that slides in from the right on desktop and up
- * from the bottom on mobile. It replaces the old click-then-scroll detail
- * section, so selecting a region no longer moves the page under the reader.
+ * from the bottom on mobile, so selecting a region never moves the page under
+ * the reader.
  *
- * Content order is deliberate and is the v2 reframe: targeting distortion comes
+ * Content order is deliberate: targeting distortion comes
  * first, above everything the cost model says, because it is the one figure that
  * answers the question the tool exists for -- not how many people a channel
  * misses, but which people.

@@ -13,15 +13,12 @@ Design decisions worth knowing before reading the code:
 *   Missing means missing. A null from a source stays null all the way to the UI.
     Nothing is interpolated and no national figure is substituted for a regional one.
 
-*   There is no connectivity layer. Ookla was removed in v2 -- see attic/README.md
-    for why, at some length. Nothing here should reintroduce a demand-side measure
-    of digital access.
+*   There is no connectivity layer. Nothing here should reintroduce a demand-side
+    measure of digital access.
 
-*   The wealth-gradient work (v2 Part 2) is national-only until the household
-    recode microdata is available. The aggregate API cannot cross region with
-    wealth quintile; that was verified rather than assumed, and the evidence is in
-    docs/02-crosstab.md. Regional quintile fields are emitted as explicitly pending
-    rather than estimated.
+*   The aggregate API cannot cross region with wealth quintile, so the regional
+    wealth gradient comes from the recode microdata. Without it, regional quintile
+    fields are emitted as explicitly pending rather than estimated.
 """
 
 import datetime as dt
@@ -30,7 +27,6 @@ import warnings
 import numpy as np
 import rasterio
 import rasterio.mask
-import rasterio.windows
 from shapely import wkt
 from shapely.geometry import mapping
 
@@ -135,14 +131,13 @@ def load_dhs_values(rows, regions):
 
 
 # ---------------------------------------------------------------------------
-# The wealth gradient -- national only, for now
+# The wealth gradient
 # ---------------------------------------------------------------------------
 
 def build_national_gradient():
     """Ownership by wealth quintile, nationally, with the targeting metrics.
 
-    This is the v2 headline calculation. It runs at national level because that is
-    the only level the aggregate API can serve it at. The arithmetic itself lives in
+    The national version, from the aggregate API. The arithmetic itself lives in
     gradient.py, shared with the per-region version in fetch_recode.py -- the two are
     the same calculation and differ only in how they shape the result and in what
     they do when it cannot be computed. Here, it cannot be computed means stop.
@@ -191,7 +186,7 @@ def build_national_gradient():
 def load_regional_gradient(regions):
     """Region x quintile aggregates from the recodes, if they have been computed.
 
-    The aggregate API cannot produce these (docs/02-crosstab.md); they come from
+    The aggregate API cannot produce these; they come from
     the household and individual recodes via fetch_recode.py. When that step has
     not run -- a clean checkout without the restricted microdata, which is the
     normal case for anyone else -- every region carries an explicit null and a
@@ -291,16 +286,6 @@ def add_feasibility_bases(metrics):
     Each is a measured DHS value. None is a modelled index and none carries
     invented weights -- the user picks which constraint they think binds, and the
     map answers for that reading.
-
-    A third basis, "woman owns a phone AND is literate", was offered and is gone.
-    It could only ever be a range: the survey reports the two conditions
-    separately and never crosses them, so the joint share lies somewhere between
-    max(0, a + b - 1) and min(a, b), and both Frechet bounds had to be published
-    rather than a point estimate. But the optimistic bound is min(phone,
-    literacy), and women's literacy exceeds women's phone ownership in all 23
-    regions -- so it was always just the phone figure, literacy never bound
-    first, and the map never moved when it was selected. It contributed a wide
-    interval around a number the phone basis already gave.
     """
     for m in metrics.values():
         m["feasibility_bases"] = {
@@ -436,9 +421,7 @@ def run():
             "wealth_gradient_withheld": national_gradient["dropped"],
         },
         # Every judgement call the browser needs travels here rather than being
-        # restated as a literal in app.js. The thresholds below used to be mirrored
-        # by hand on the JS side, with a comment saying so -- a comment that only
-        # existed because the mechanism to ship them did.
+        # restated as a literal in the site's scripts.
         "constants": {
             "quintiles": DHS_QUINTILES,
             "bottom_group": BOTTOM_GROUP,
@@ -456,7 +439,7 @@ def run():
                 "blocked_on": "DHS microdata: Madagascar 2021 household recode",
                 "why": "The aggregate API returns the union of its breakdowns, not their "
                        "cross product, so region x wealth quintile is not retrievable "
-                       "from it. Verified 2026-08-05; see docs/02-crosstab.md.",
+                       "from it. Verified 2026-08-05.",
                 "unblocks": ["ownership_by_quintile", "reachable_pool_composition",
                              "exclusion_gap", "targeting_distortion"],
             },

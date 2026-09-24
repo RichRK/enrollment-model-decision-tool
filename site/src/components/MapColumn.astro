@@ -6,22 +6,13 @@
  * the second one is displayed and whether the captions show -- one attribute
  * drives the whole compare layout in CSS, so nothing has to be rebuilt when the
  * layer changes. */
-interface Props {
-  surveyYear: number;
-  regionCount: number;
-}
-// Kept on the interface so index.astro's call site stays explicit about what the
-// column is describing, even though the caption text now lives in the figures.
-const { surveyYear: _surveyYear, regionCount: _regionCount } = Astro.props;
 ---
 
 <div class="mapcol" data-bind="mapcol" data-mode="verdict">
   <p class="sumline" data-bind="summary"></p>
 
-  <!-- Above the maps, not over them. These used to be absolutely positioned on
-       top of the single map and become a flow row in compare, which meant they
-       jumped as you switched layer -- the one control whose position must not
-       move, because you are clicking along it. -->
+  <!-- Above the maps, not over them, so the chips never move as you switch
+       layer: you are clicking along them. -->
   <div class="maplayers" data-bind="mode" role="group" aria-label="Map layer"></div>
 
   <div class="maps">

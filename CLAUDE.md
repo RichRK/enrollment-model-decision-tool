@@ -45,15 +45,8 @@ It runs two independent audits: `pipeline/check_data.py` checks that
 that `pipeline/data/regions.json` carries an unweighted case count on every
 published cell with nothing below the suppression floor; `site/tests/check-data.test.js`
 (`bun test`) checks the built site for DHS attribution and for any tracking or
-external resource. Neither needs to see the other's tree.
-
-Both audits are also wired into the builds themselves, not just this manual
-command: `run_all.py` runs `check_data.run()` as its last step, so `make
-build`'s pipeline half fails if the audit fails even though nothing raised an
-exception building the file; `site/package.json`'s `build` script is `astro
-build && bun test tests/check-data.test.js`, so `bun run build` fails the
-same way. `make check-data` still exists as a standalone command — it's the
-fast path when you want the audit without a full rebuild.
+external resource. Neither needs to see the other's tree. Both also run as the
+last step of their half of `make build`, so a build that fails the audit fails.
 
 ---
 
@@ -80,9 +73,9 @@ frontend isn't just templated inside the Python pipeline.
   is its own data-agreement audit, self-contained to this directory.
 - **Site** (`site/`): Astro, managed via [bun](https://bun.sh) rather than npm.
   Astro reads `pipeline/data/regions.json` off disk at build time and inlines
-  it into the page — no copy of the file, no runtime fetch. `site/src/scripts/app.js`
-  is the interactive part (the cost calculator, map, sortable table); it's
-  carried over from the pre-Astro version essentially unchanged.
+  it into the page — no copy of the file, no runtime fetch. `site/src/scripts/`
+  is the interactive part (the cost calculator, map, sortable table), with
+  `app.ts` as the entry point.
   `site/tests/check-data.test.js` (`bun test`) is this side's own audit —
   attribution and no tracking/external-resources in the built output.
   `site/e2e/` (`make test-e2e`) is a Playwright suite over the built site — behaviour
@@ -116,17 +109,6 @@ npx --yes playwright install chromium
 npx --yes playwright screenshot --viewport-size "1280,900" --wait-for-timeout 2000 http://localhost:4321/ "$TEMP/page.png"
 ```
 
-Screenshot diffing across two separate browser launches has a real false-positive
-rate even on genuinely identical output — full-page capture stitches tall pages
-together, and text can rasterize a subpixel differently between runs with nothing
-in the DOM actually different. If a diff looks suspicious but a crop looks
-identical by eye, corroborate with the DOM before concluding it's a real
-regression: compare `getBoundingClientRect()`/`getComputedStyle()` on the
-affected element between the two pages (the Claude Browser tools' `javascript_tool`
-can do this directly), and diff before-vs-before (same page, two loads) as a
-noise-floor control. This is what settled it the one time it came up — the pixel
-diff turned out to come from the screenshot tool, not the page.
-
 Write the image **outside the repo** — `$TEMP` on Windows, `/tmp` elsewhere. A
 stray PNG in the working tree is not a data-agreement problem, but it is noise in
 `git status`, and `git status` is the thing that has to stay readable here.
@@ -145,12 +127,12 @@ script beats the CLI — `page.$('#result')` then `el.screenshot({path})`. Check
   the survey, every indicator id, the region count, and that no indicator returns
   the same value for all regions. That last check exists because `ED_LITR_W_TOT`
   ("Women's literacy: Total") is the total row of a distribution table and returns
-  `100.0` everywhere — it resolves, returns data, and is inert. See
-  `pipeline/docs/01-verification.md` §2.
+  `100.0` everywhere — it resolves, returns data, and is inert.
 - **The DHS geometry endpoint needs `f=json`, not `f=geojson`.** The geojson
   variant returns valid GeoJSON with empty coordinate arrays; it fails silently.
-- **No connectivity layer.** Ookla was removed in v2 and must not be reintroduced;
-  `attic/README.md` explains why at length. Any replacement must be supply-side.
+- **No connectivity layer.** Ookla must not be reintroduced: a crowdsourced,
+  demand-side measure of digital activity is biased along the same axis as the
+  exclusion this tool detects. Any replacement must be supply-side.
 - **No invented numbers.** No weighted composite indices, no cost estimates. Costs
   are user-supplied placeholders. Where two conditions must be combined and the
   survey never crosses them, show both Fréchet bounds rather than a point estimate.

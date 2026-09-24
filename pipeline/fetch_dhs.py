@@ -107,9 +107,8 @@ def fetch_quintiles():
     This is the only level at which the aggregate API can serve the wealth
     dimension. `breakdown=all` returns the UNION of the breakdowns -- one total row,
     two residence rows, five quintile rows and thirty region rows -- never their
-    cross product, and ByVariableId is empty on every row. Verified 2026-08-05; the
-    evidence is in docs/02-crosstab.md. Regional quintile figures need the household
-    recode microdata.
+    cross product, and ByVariableId is empty on every row. Verified 2026-08-05.
+    Regional quintile figures need the household recode microdata.
 
     The unweighted denominators are carried through, because the suppression rules
     for the eventual regional version are defined on unweighted case counts and the
@@ -204,13 +203,12 @@ def fetch_geometry():
 
 def run():
     survey = verify_survey()
-    catalogue = verify_indicators()
+    verify_indicators()
     values = fetch_values()
     quintiles = fetch_quintiles()
     geometry = fetch_geometry()
 
     write_json(RAW / "dhs_survey.json", survey)
-    write_json(RAW / "dhs_indicator_catalogue.json", catalogue)
     write_json(RAW / "dhs_values.json", values)
     write_json(RAW / "dhs_quintiles.json", quintiles)
     write_json(RAW / "dhs_geometry.json", geometry)

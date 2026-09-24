@@ -3,8 +3,7 @@
  * cards depends on what the user types.
  *
  * Not "per channel": two of the four cards are literacy, which is not a route to
- * anyone but a condition for using one. The pipeline draws the same distinction
- * (build.py groups these as access versus ability). */
+ * anyone but a condition for using one. */
 
 import { $, el, MISSING, share, signedPts } from "./format";
 import { distortionClass, groupWord } from "./classify";

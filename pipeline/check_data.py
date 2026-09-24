@@ -115,11 +115,8 @@ def run():
                 cells.append(("national/" + key, cell))
 
         # Regional cells are keyed by indicator: regions[].quintiles[indicator].
-        # Walk every indicator rather than one hardcoded key -- an earlier
-        # version of this script looked for a single ownership_by_quintile
-        # directly under `quintiles`, found nothing after the structure
-        # changed, and reported PASS while auditing only the national third
-        # of the output.
+        # Walk every indicator rather than one hardcoded key, so a structure
+        # change cannot silently shrink what is audited.
         regional_cells = 0
         for region in payload.get("regions", []):
             per_indicator = region.get("quintiles") or {}

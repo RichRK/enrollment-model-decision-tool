@@ -1,5 +1,5 @@
-/* The all-regions table, now inside the notes accordion rather than a panel of
- * its own. Every column sorts; missing values sort last in either direction,
+/* The all-regions table, inside the notes accordion. Every column sorts;
+ * missing values sort last in either direction,
  * because "no value" is not a small value.
  */
 

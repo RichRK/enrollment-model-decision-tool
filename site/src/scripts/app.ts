@@ -6,7 +6,7 @@
  * there is nothing left to fetch here.
  */
 
-import { $, $opt, text } from "./format";
+import { $ } from "./format";
 import { actions, setData, state, type Data, type Origin } from "./state";
 import { classifyAll, costRatio } from "./classify";
 import { buildMaps, paintMaps, rememberClassified, renderMode } from "./map";
@@ -20,8 +20,7 @@ import { scrollMapIntoView, setMapFocus } from "./focus";
 
 function render(): void {
   const r = costRatio();
-  // Classified once, then handed to all its consumers. Each of them used to
-  // recompute the same verdict for the same 23 regions.
+  // Classified once, then handed to all its consumers.
   const classified = classifyAll(r);
   rememberClassified(classified);
 
@@ -167,11 +166,6 @@ try {
 
   actions.select = select;
   actions.render = render;
-
-  // Optional chrome: text() already tolerates a null node, and $opt() will not
-  // take the article down if the masthead stops carrying these.
-  text($opt("generated"), parsed.generated);
-  text($opt("verified"), parsed.verified_on);
 
   $("app").hidden = false;
 

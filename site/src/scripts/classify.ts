@@ -34,9 +34,7 @@ export interface Basis {
   /* Every label that describes the targeting distortion travels with the basis.
      The distortion is computed per channel -- there is a separate wealth
      breakdown behind each of these keys -- so a label written out at the point
-     of use goes wrong the moment the reader changes the selector. They were
-     written out, and the drawer went on saying "household phone" while the
-     verdict sentence beside it had already switched to women's ownership. */
+     of use goes wrong the moment the reader changes the selector. */
   heading: string;   // over the quintile bars in the drawer
   reaches: string;   // "...of everyone <reaches>"
   captionSub: string;  // under "Who it excludes" on the map
@@ -69,13 +67,6 @@ export function currentBasis(): Basis {
   return BASES.find((b) => b.key === state.basis) || BASES[0];
 }
 
-/* "Woman owns a phone and is literate" was offered as a third basis and is gone.
-   It never moved the map: women's literacy exceeds women's phone ownership in
-   every one of the 23 regions, so min(phone, literacy) is always just the phone
-   figure and literacy never binds first. All it contributed was a wide pair of
-   Frechet bounds around a number the phone basis already gave. The pipeline no
-   longer computes it either -- see add_feasibility_bases() in pipeline/build.py. */
-
 export function costRatio(): number | null {
   const remote = parseFloat((document.querySelector('[data-bind="cost-remote"]') as HTMLInputElement).value);
   const inperson = parseFloat((document.querySelector('[data-bind="cost-inperson"]') as HTMLInputElement).value);
@@ -101,9 +92,8 @@ export function classify(region: Region, r: number | null): Verdict {
   return { kind: margin > 0 ? "remote" : "inperson", share: s, margin: margin };
 }
 
-/* One verdict per region, computed once per render and handed to every consumer.
-   The summary, the maps, the table and the drawer all need the same answer; they
-   used to each recompute it, so classify() ran four times per region. */
+/* One verdict per region, computed once per render and handed to every consumer:
+   the summary, the maps, the table and the drawer all need the same answer. */
 export function classifyAll(r: number | null): Classified[] {
   return data().regions.map((region) => ({ region: region, verdict: classify(region, r) }));
 }
@@ -119,9 +109,7 @@ export function distortionClass(d: number | null | undefined): "ok" | "warn" | "
 }
 
 /* The quintile split is a judgement call recorded in pipeline/config.py and
-   shipped in `constants`; the page used to restate its size as the English words
-   "two" and "three" in four places, which would quietly become wrong if the split
-   ever moved. */
+   shipped in `constants`, so its size is never written out as a literal word. */
 const COUNT_WORD = ["zero", "one", "two", "three", "four", "five"];
 
 export function groupWord(which: "bottom_group" | "top_group"): string {

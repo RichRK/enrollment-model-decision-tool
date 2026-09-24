@@ -1,9 +1,8 @@
 ﻿"""Verified source identifiers and documented model constants.
 
 Everything in this file was checked against the live API or bucket on 2026-07-31.
-See docs/01-verification.md for the evidence. Nothing here is a guess; if a lookup
-against these values returns nothing, the fetch scripts fail loudly rather than
-carrying on with a hole in the data.
+Nothing here is a guess; if a lookup against these values returns nothing, the
+fetch scripts fail loudly rather than carrying on with a hole in the data.
 """
 
 from pathlib import Path
@@ -57,7 +56,7 @@ DHS_INDICATORS = {
 DHS_EXPECTED_REGIONS = 23
 
 # Wealth quintile is the second dimension the tool needs, and the aggregate API
-# cannot cross it with region -- verified 2026-08-05, see docs/02-crosstab.md.
+# cannot cross it with region -- verified 2026-08-05.
 # `breakdown=all` returns the UNION of the breakdowns (1 total + 2 residence +
 # 5 quintile + 30 region = 38 rows), never their cross product, and ByVariableId is
 # empty on every row of every indicator tested. The regional quintile figures
@@ -83,7 +82,7 @@ RECODE_HOUSEHOLD = RAW / "MDHR81DT" / "MDHR81FL.DTA"
 RECODE_INDIVIDUAL = RAW / "MDIR81DT" / "MDIR81FL.DTA"
 
 # Variable names verified against the survey's own .DTA metadata on 2026-08-05,
-# not carried over from another country's survey. See docs/03-recode.md.
+# not carried over from another country's survey.
 RECODE_VARS = {
     "household": {
         "region": "hv024",      # region (23 categories -- includes the capital split)
@@ -206,22 +205,8 @@ FINDEX_INDICATORS = {
     "account_ownership": "FX.OWN.TOTL.ZS",
 }
 
-# The spec also asked for a national mobile-money-account figure and a national
-# mobile-phone-ownership figure. Neither is retrievable:
-#
-#  * FX.OWN.TOTL.MO.ZS and FX.OWN.TOTL.PE.ZS are not real indicator ids.
-#  * The Findex source (source 87) in the World Bank API is the 2017 vintage and
-#    has no mobile-money series with Madagascar values.
-#  * Data360, the spec's suggested alternative, returned 403 or 405 depending on
-#    headers and method. It is not a dependency this tool should acquire.
-#  * IT.CEL.SETS.P2 (mobile subscriptions) and IT.NET.USER.ZS (internet use) do
-#    carry Madagascar values, but both are ITU-sourced series, and spec section
-#    4.5 rules ITU out. They are deliberately not used.
-#
-# Per the "do not substitute a proxy without labelling it" rule, nothing stands in
-# for them. Account ownership is the only national reference line. The subnational
-# DHS data already carries mobile money use and phone ownership, sex-disaggregated,
-# which is the more decision-relevant cut anyway.
+# Account ownership is the only national reference line: no Findex mobile-money or
+# phone-ownership series has Madagascar values, and the ITU series that do are not used.
 
 # ---------------------------------------------------------------------------
 # Model constants -- each of these is a judgement call, so each carries its reasoning
@@ -238,9 +223,7 @@ TOP_GROUP = ["Middle", "Fourth", "Highest"]
 
 # The indicator the region-level view leads on. Household phone ownership is the
 # most generous reading of "reachable", so the distortion computed on it is the
-# most favourable one available -- which is the point of leading with it. Named
-# rather than repeated as a string literal: it was written out at eleven sites
-# across Python and JavaScript, and nothing tied them together.
+# most favourable one available -- which is the point of leading with it.
 HEADLINE_INDICATOR = "hh_mobile_phone"
 
 # Threshold on `targeting_distortion` below which remote enrollment is treated as
@@ -272,66 +255,3 @@ TIPPING_BAND = 0.05
 # about 14 degrees of latitude, so this is well below one pixel and invisible.
 SIMPLIFY_TOLERANCE = 0.004
 COORD_PRECISION = 4  # ~11 m; more digits would only inflate the committed file
-
-# ---------------------------------------------------------------------------
-# STAGED, NOT WIRED UP -- nothing below this line is read by any code today.
-#
-# These are the constants for the travel-time and settlement-dispersion model:
-# converting geography into a cost per enrollment, so that the residual left by a
-# remote-first channel can be priced by how expensive its households actually are
-# to reach rather than at one flat rate. The site names that as the weakest
-# assumption on the page and says the fix is not yet built; this block is what it
-# would be built from.
-#
-# Kept rather than deleted because the reasoning is the expensive part -- why 150
-# households, why a cell-population floor exists at all, why walking rather than
-# motorised is the default. Deleting the constants would mean re-deriving that.
-#
-# If you are looking for a live constant, it is above this line.
-# ---------------------------------------------------------------------------
-
-# Used to window the global rasters. Deliberately a little larger than the country.
-# Note: fetch_worldpop.py currently asserts the raster's extent with its own
-# literals rather than reading these.
-MADAGASCAR_BBOX = {"lon_min": 43.0, "lon_max": 50.7, "lat_min": -25.8, "lat_max": -11.7}
-
-# Malaria Atlas Project friction surfaces, 2020, ~1 km. Both variants are computed:
-# in rural Madagascar the motorised assumption flatters the result badly, so walking
-# is what the UI shows by default.
-MAP_WCS = "https://data.malariaatlas.org/geoserver/Accessibility/ows"
-MAP_COVERAGES = {
-    "walking": "Accessibility__202001_Global_Walking_Only_Friction_Surface",
-    "motorised": "Accessibility__202001_Global_Motorized_Friction_Surface",
-}
-
-# A populated cluster has to reach this many households before it is worth siting an
-# enrollment point at. Below it, a team is walking between homesteads rather than
-# working a queue.
-#
-# Why 150: at the DHS-reported mean household size this is roughly a village of
-# 600-750 people, which is about the smallest settlement where a fixed enrollment
-# point holds a full day's queue. It is a judgement call, it drives
-# `dispersion_index` directly, and it is exposed in the UI for that reason.
-CLUSTER_MIN_HOUSEHOLDS = 150
-
-# Population per 100 m cell below which a cell is treated as unpopulated when
-# growing clusters. WorldPop's constrained surface still spreads small fractional
-# values over cells with almost nobody in them; without a floor, clusters bleed
-# across the whole country through chains of near-empty cells.
-CLUSTER_MIN_CELL_POP = 1.0
-
-# --- households_per_field_day: the assumptions, all exposed in the UI -------
-#
-# This is the number that converts geography into cost, so every input to it is
-# stated here rather than buried, and the two that matter most are user-adjustable.
-
-# Hours an enrollment team works in the field per day, travel included.
-FIELD_DAY_HOURS = 8.0
-
-# Minutes of actual enrollment work per household, once a team is in front of one.
-MINUTES_PER_HOUSEHOLD = 25.0
-
-# A team travels to a cluster and back once per day. Travel time is the
-# population-weighted walking time from households to their nearest qualifying
-# cluster, doubled for the return leg.
-RETURN_TRIP = True

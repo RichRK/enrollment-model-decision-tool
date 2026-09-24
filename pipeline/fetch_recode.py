@@ -60,9 +60,7 @@ def recodes_present():
 
 def indicator_columns(kind):
     """The recode variables this file has to supply, read out of RECODE_INDICATORS
-    rather than hand-listed. Adding a fifth indicator to config.py is then one edit,
-    not two -- and forgetting the second used to surface as a bare KeyError deep in
-    run() rather than as anything a reader could connect to the config."""
+    so adding an indicator to config.py is one edit, not two."""
     return [spec["var"] for spec in RECODE_INDICATORS.values()
             if spec["file"] == kind and spec["var"]]
 

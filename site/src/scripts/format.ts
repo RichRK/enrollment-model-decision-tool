@@ -1,9 +1,4 @@
-/* Formatting primitives and DOM helpers, shared by every renderer.
- *
- * Ported from the pre-Astro app.js unchanged in behaviour. The comments that
- * survive here document traps that were paid for once already; they are not
- * restating what the code says.
- */
+/* Formatting primitives and DOM helpers, shared by every renderer. */
 
 // A missing value is missing. It is never zero, and it never borrows a number
 // from somewhere else.
@@ -64,11 +59,8 @@ export function text(node: Element | null, value: string): void {
    wraps initialisation in a try/catch that surfaces exactly that as the "could
    not load" panel.
 
-   Use $opt() instead for anything the page reads fine without. Deleting the
-   masthead's provenance line once took the whole article down with it: $() threw
-   on its [data-bind="generated"] span before app.ts reached the line that
-   unhides the article, so removing one paragraph of chrome produced a page-level
-   "could not load the region data". Nothing had failed to load. */
+   Use $opt() instead for anything the page reads fine without, so editing
+   optional chrome out of a component cannot take the whole article down. */
 export function $(name: string): HTMLElement {
   const node = document.querySelector<HTMLElement>('[data-bind="' + name + '"]');
   if (!node) throw new Error('no [data-bind="' + name + '"] element on the page');

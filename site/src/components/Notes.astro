@@ -27,9 +27,7 @@ const regionCount = data.regions.length;
 const gradientOf = (region: Region) => (region.quintiles || {})[headline] || null;
 
 // The regions with no targeting distortion, and why each one has none. Computed,
-// never counted by hand -- an earlier version of this page stated the number in
-// prose and recomputed it in script, four paragraphs apart, and the two agreed
-// only by luck.
+// never counted by hand.
 const noAnswer = data.regions
   .filter((region) => (gradientOf(region)?.targeting_distortion ?? null) === null)
   .map((region) => ({

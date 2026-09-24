@@ -18,38 +18,15 @@ Three sources, all CC BY 4.0 or equivalent.
 
 ### DHS Program — survey microdata
 
-- **Used for:** the regional wealth-quintile breakdown, once the household recode
-  is available. See [`pipeline/docs/02-crosstab.md`](pipeline/docs/02-crosstab.md)
-  for why the aggregate API cannot supply it.
+- **Used for:** the regional wealth-quintile breakdown, which the aggregate API
+  cannot supply.
 - **Licence:** obtained under a **signed data agreement**, not an open licence.
-  Full terms and what they constrain:
-  [`pipeline/docs/dhs-data-terms-constraints.md`](pipeline/docs/dhs-data-terms-constraints.md).
 - **Attribution:** Demographic and Health Surveys (DHS) Program, **Madagascar
   Standard DHS 2021 (`MD2021DHS`)**, Household Recode.
 
-  The binding constraints, in short:
-
-  - **Record-level data is never redistributed**, directly or inside any tool or
-    dashboard. Only aggregates are published. Raw files stay in `pipeline/data/raw/`,
-    which is gitignored.
-  - **Cell suppression is mandatory, not configurable**: cells under 50 unweighted
-    cases are flagged, under 25 suppressed. A cell whose unweighted count cannot be
-    produced is not published at all — the rule was established on women's internet
-    use (`CO_INUS_W_U12`), which the API returns without one, and still applies to
-    any indicator that comes back the same way.
-  - **Nothing is output at cluster or enumeration-area level**, and no attempt is
-    made to identify any individual, household or enumeration area.
-  - **The files are not shared with anyone.** Outputs, code and write-ups are free
-    to share; the data is not. Anyone wanting it applies to DHS directly.
-  - **Scope is limited to the registered project**: phone ownership, literacy and
-    electricity access by region and wealth quintile in Madagascar, and the
-    implications for enrollment modality.
-  - **Non-commercial.** The published site carries no analytics, tracking,
-    advertising or data capture, and `make check-data` verifies that.
-
-  **Standing obligation on the project owner:** any resulting report or publication
-  must be sent to `references@dhsprogram.com`. This is a condition of access, not a
-  courtesy.
+  What the agreement constrains, and how this repo complies:
+  [`pipeline/docs/dhs-data-terms-constraints.md`](pipeline/docs/dhs-data-terms-constraints.md).
+  Any resulting report or publication must be sent to `references@dhsprogram.com`.
 
 ### WorldPop
 
@@ -74,9 +51,9 @@ Three sources, all CC BY 4.0 or equivalent.
 ## What this repository is licensed under
 
 **Code** — everything under `pipeline/`, `site/` (excluding its `node_modules/`,
-which is third-party and not part of this repo's license) and `attic/`, plus the
-`Makefile` — is **MIT**.
+which is third-party and not part of this repo's license), plus the `Makefile` —
+is **MIT**.
 
 **Data** — `pipeline/data/regions.json` — is **CC BY 4.0**. Redistribute freely with
 attribution to the three sources above. No NonCommercial restriction and no
-ShareAlike obligation applies, following the removal of Ookla.
+ShareAlike obligation applies.

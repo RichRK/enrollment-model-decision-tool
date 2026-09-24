@@ -3,9 +3,8 @@
  * "compare" mode. Both are built once from the same projection and repainted on
  * every render.
  *
- * The geometry ships inside regions.json and is projected here at runtime, as it
- * was before the redesign -- nothing about the projection changed, and the
- * comments in it document real Chromium behaviour, not style.
+ * The geometry ships inside regions.json and is projected here at runtime. The
+ * comments below document real Chromium behaviour, not style.
  */
 
 import { $, absent, el, MISSING, share } from "./format";
