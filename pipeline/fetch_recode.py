@@ -38,6 +38,8 @@ from config import (
     RECODE_INDICATORS,
     RECODE_INDIVIDUAL,
     RECODE_LITERACY,
+    RECODE_MEN,
+    RECODE_MEN_AGE,
     RECODE_REGION_TO_DHS,
     RECODE_TOLERANCE_PP,
     RECODE_VARS,
@@ -98,6 +100,15 @@ def load_individual():
     reading = frame[RECODE_LITERACY["reading"]]
     frame["literacy_f"] = reading.isin(RECODE_LITERACY["reading_literate"]).astype("float64")
     frame.loc[reading.isna(), "literacy_f"] = np.nan
+    return frame
+
+
+def load_men():
+    """The men's recode, cut to the 15-49 range the API publishes for."""
+    age = RECODE_MEN_AGE["var"]
+    frame = load_recode("men", RECODE_MEN, extra_columns=[age])
+    frame = frame.loc[frame[age] <= RECODE_MEN_AGE["max"]].drop(columns=[age])
+    log("men recode: %d records aged %d or under" % (len(frame), RECODE_MEN_AGE["max"]))
     return frame
 
 
@@ -364,12 +375,19 @@ def run():
 
     frames = {"household": map_regions(load_recode("household", RECODE_HOUSEHOLD)),
               "individual": map_regions(load_individual())}
+    if RECODE_MEN.exists():
+        frames["men"] = map_regions(load_men())
+    else:
+        log("men's recode not present -- skipping phone_own_m.")
+        log("  expected %s" % RECODE_MEN.relative_to(RAW.parent.parent))
 
     api_quintiles = read_json(RAW / "dhs_quintiles.json")["indicators"]
     api_regions = api_regional_values()
 
     output = {}
     for key, spec in RECODE_INDICATORS.items():
+        if spec["file"] not in frames:
+            continue
         frame = frames[spec["file"]]
         # An indicator either names a raw recode variable, which needs the DHS
         # yes/no coding collapsing to 0/1/NaN, or it is derived upstream into a

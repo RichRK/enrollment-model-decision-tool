@@ -225,6 +225,12 @@ def load_regional_gradient(regions):
                 fail("recode aggregates reference region %s, which is not one of the "
                      "%d geometry regions" % (region_id, len(regions)))
             out[region_id][key] = summary
+    # An optional recode that wasn't present (the men's) still gets a reason.
+    for key in RECODE_INDICATORS:
+        if key not in by_indicator:
+            for record in out.values():
+                record[key] = {"pending_reason": "the MD 2021 recode this needs was not "
+                                                 "present when the aggregates were computed"}
 
     usable = sum(1 for r in out.values()
                  if (r.get(HEADLINE_INDICATOR) or {}).get("targeting_distortion") is not None)
