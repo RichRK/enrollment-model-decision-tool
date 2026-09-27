@@ -218,6 +218,29 @@ WORLDPOP_URL = (
 WORLDPOP_YEAR = 2025
 
 # ---------------------------------------------------------------------------
+# Meta Relative Wealth Index
+# ---------------------------------------------------------------------------
+
+# Madagascar file from HDX, verified 2026-09-27: 43,639 squares with rwi and error.
+# CC BY-NC 4.0; cite Chi et al., PNAS 2022. RWI ranks places relative to each
+# other; it says nothing about who is below a poverty line.
+RWI_URL = (
+    "https://data.humdata.org/dataset/76f2a2ea-ba50-40f5-b79c-db95d668b843/resource/"
+    "618e76b2-9108-4f5f-9a7e-8d655b11d37a/download/mdg_relative_wealth_index.csv"
+)
+RWI_EXPECTED_ROWS = 43_639
+
+# Meta publishes one point per Bing Maps zoom-14 tile (about 2.4 km across), so
+# squares are keyed by their zoom-14 tile x/y.
+RWI_TILE_ZOOM = 14
+
+# Some coastal squares' centres fall just outside every region polygon, because
+# the outlines are simplified (SIMPLIFY_TOLERANCE). Squares within this distance,
+# in degrees (~3 km), join the nearest region; the rest keep no region and no
+# survey figure.
+RWI_COASTAL_SNAP_DEG = 0.03
+
+# ---------------------------------------------------------------------------
 # World Bank / Global Findex
 # ---------------------------------------------------------------------------
 

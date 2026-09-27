@@ -1,6 +1,7 @@
 # Licences and attribution
 
-Three sources, all CC BY 4.0 or equivalent.
+Four sources, all CC BY 4.0 or equivalent except Meta's Relative Wealth Index,
+which is CC BY-NC 4.0.
 
 ---
 
@@ -61,6 +62,17 @@ Three sources, all CC BY 4.0 or equivalent.
   Population Denominators Project. Constrained population estimates, Madagascar,
   2025 release R2025A.
 
+### Meta Relative Wealth Index
+
+- **Used for:** which ~2.4 km squares are poorer or richer than others, Madagascar
+  file from HDX (`mdg_relative_wealth_index.csv`). Built into
+  `pipeline/data/squares.json`.
+- **Licence:** [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
+- **Attribution:** Relative Wealth Index, Data for Good at Meta. Chi, G., Fang, H.,
+  Chatterjee, S. and Blumenstock, J. E. (2022). Microestimates of wealth for all
+  low- and middle-income countries. *PNAS* 119(3), e2113658119.
+  Retrieved from the Humanitarian Data Exchange on 2026-09-27.
+
 ### Global Findex, via the World Bank Indicators API
 
 - **Used for:** one national reference series, `FX.OWN.TOTL.ZS` — account ownership
@@ -78,5 +90,8 @@ which is third-party and not part of this repo's license) and `attic/`, plus the
 `Makefile` — is **MIT**.
 
 **Data** — `pipeline/data/regions.json` — is **CC BY 4.0**. Redistribute freely with
-attribution to the three sources above. No NonCommercial restriction and no
-ShareAlike obligation applies, following the removal of Ookla.
+attribution to the DHS, WorldPop and Findex sources above. No NonCommercial
+restriction and no ShareAlike obligation applies, following the removal of Ookla.
+
+`pipeline/data/squares.json` is adapted from the Relative Wealth Index, so it is
+**CC BY-NC 4.0**: non-commercial use only, with attribution to Meta and WorldPop.
