@@ -59,11 +59,14 @@ fast path when you want the audit without a full rebuild.
 
 ## What this project is
 
-A static page scoring each of Madagascar's 23 DHS survey regions on whether
-enrollment can be done remotely, and on *who* remote enrollment
-would exclude. The headline metric is `targeting_distortion`: the poorest
-quintile's share of everyone a channel reaches, divided by their share of the
-population. Below 1.0 means the channel selects against the poor.
+A static page asking who in Madagascar could enroll by phone. Meta's Relative
+Wealth Index splits the country into ~43,600 squares of 2.4 km, ranked poorest
+first; each square takes the DHS phone-ownership rate for its region and wealth
+fifth, and WorldPop's population turns that into people. A wealth slider picks
+the poorest X% to include, and the page splits them into "by phone, at most" and
+"in person on the visit". A square only ever shows a regional DHS figure; that
+is not cluster- or enumeration-area-level output (the project owner's reading,
+2026-09-27).
 
 Read `README.md` first; it leads with limitations rather than features, which is
 deliberate.
@@ -81,10 +84,11 @@ frontend isn't just templated inside the Python pipeline.
   `pipeline/check_data.py`
   is its own data-agreement audit, self-contained to this directory.
 - **Site** (`site/`): Astro, managed via [bun](https://bun.sh) rather than npm.
-  Astro reads `pipeline/data/regions.json` off disk at build time and inlines
-  it into the page — no copy of the file, no runtime fetch. `site/src/scripts/app.js`
-  is the interactive part (the cost calculator, map, sortable table); it's
-  carried over from the pre-Astro version essentially unchanged.
+  `src/pages/index.astro` reads both pipeline outputs off disk at build time and
+  inlines what the page needs — no copy of either file, no runtime fetch.
+  `site/src/scripts/` is the interactive part: `app.ts` (controls and answer
+  panel), `map.ts` (the canvas map), `tips.ts` (tooltips and dialogs), `data.ts`
+  (the inlined data and each square's score).
   `site/tests/check-data.test.js` (`bun test`) is this side's own audit —
   attribution and no tracking/external-resources in the built output.
   `site/e2e/` (`make test-e2e`) is a Playwright suite over the built site — behaviour
@@ -98,7 +102,7 @@ run_all.py --clean` then `cd site && bun run build`. `make serve` serves the
 production build (`site/dist`, via `astro preview`) at <http://localhost:4321/>
 — that's what `make check-data` audits, so it's what to screenshot when
 verifying a change. For iterative editing, `bun run dev` in `site/` re-reads
-`pipeline/data/regions.json` on every request instead of needing a rebuild.
+the pipeline's outputs on every request instead of needing a rebuild.
 
 ## Verifying the site — take a screenshot, every time
 

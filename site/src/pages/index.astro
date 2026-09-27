@@ -1,71 +1,70 @@
 ---
-// Reads pipeline/data/regions.json off disk at build time -- the pipeline's
-// output is the single source of truth, and this file is never copied or
-// duplicated. Inlined into the page as JSON below rather than fetched at
-// runtime, so there's no "must be served over HTTP" failure mode left: the data
-// is part of the HTML response.
+// Reads the pipeline's two outputs off disk at build time and inlines what the
+// page needs as JSON, so there is no runtime fetch. regions.json supplies the
+// DHS rates by region and wealth fifth; squares.json supplies the wealth squares
+// and their populations. Every figure in the prose below is derived here.
 import fs from "node:fs";
 import path from "node:path";
 import "../styles/styles.css";
+import type { PageData, Basis } from "../scripts/data";
 
-import Masthead from "../components/Masthead.astro";
-import Scenario from "../components/Scenario.astro";
-import GradientSection from "../components/GradientSection.astro";
-import MapColumn from "../components/MapColumn.astro";
-import RegionDrawer from "../components/RegionDrawer.astro";
-import Notes from "../components/Notes.astro";
-import SourcesFooter from "../components/SourcesFooter.astro";
-import type { Data, Region } from "../scripts/state";
+const read = (name: string) =>
+  JSON.parse(fs.readFileSync(path.resolve(process.cwd(), "../pipeline/data", name), "utf-8"));
+const regionsFile = read("regions.json");
+const squaresFile = read("squares.json");
 
-const regionsPath = path.resolve(process.cwd(), "../pipeline/data/regions.json");
-const regionsJson = fs.readFileSync(regionsPath, "utf-8");
-// Defensive escaping in case a future field ever contains a literal "</script>"
-// sequence -- it would otherwise close the tag early and truncate the data.
-const inlineSafeJson = regionsJson.replace(/<\/script/gi, "<\\/script");
+const BASES: Basis[] = ["hh_mobile_phone", "phone_own"];
+// DHS's own page for each survey, which the API does not return.
+const DHS_SURVEY_PAGES: Record<string, number> = { MD2021DHS: 560 };
 
-/* Every figure quoted in the prose below is derived here, from the same file the
- * page ships. None of them is typed by hand.
- *
- * This is not stylistic. The page's whole argument is that a number should never
- * be substituted, imputed or assumed -- and it used to assert six figures in its
- * own copy that the pipeline recomputes on every run. They were all correct, which
- * is exactly the problem: nothing would have told anyone when they stopped being.
- * The worst pair were four paragraphs apart and disagreed by construction, one
- * hardcoded ("Four regions have no answer") and one computed by the script from
- * the same data. */
-const data = JSON.parse(regionsJson) as Data;
-const surveyYear = data.sources.dhs.survey_year;
-const headline = data.constants.headline_indicator;
+type Cell = { value: number | null; suppressed: boolean; merged?: string[] };
+const cellsOf = (region: any, basis: Basis): Cell[] =>
+  region.quintiles?.[basis]?.ownership_by_quintile ?? [];
 
-const gradientOf = (region: Region) => (region.quintiles || {})[headline] || null;
+const surveyYear: number = regionsFile.sources.dhs.survey_year;
+const surveyId: string = regionsFile.sources.dhs.survey_id;
+const country: string = regionsFile.country;
+const popYear: number = squaresFile.sources.worldpop.year;
 
-// The cost inputs' starting values. Placeholders, stated once here and bound into
-// the two fields, because the worked example below has to be chosen against the
-// same line they imply -- otherwise the page could name a region as one that
-// "would clear the line" while its own defaults shade it the other way.
-const defaultCostRemote = 1;
-const defaultCostInPerson = 2;
-const defaultLine = defaultCostRemote / defaultCostInPerson;
+if (JSON.stringify(squaresFile.regions) !== JSON.stringify(regionsFile.regions.map((r: any) => r.region_id))) {
+  throw new Error("squares.json and regions.json list different regions -- rerun the pipeline");
+}
 
-// The worked example in "Read the map second": of the regions that clear the
-// default cost line on average -- so the sentence's "would often clear the line"
-// is true of it -- the one with the worst targeting distortion. Picked by the
-// data, not from memory.
-//
-// Computed on the headline (household) indicator, which is what the prose says it
-// is. That has to stay explicit: the map, the table and the drawer now follow the
-// basis selector, so an unqualified "its targeting distortion is 0.23" here would
-// contradict the 0.15 the table shows for the same region under the women's
-// basis. This sentence is build-time prose and cannot follow a runtime choice --
-// so it names the reading it quotes instead.
-const worked = data.regions
-  .filter((region) => region[headline as "hh_mobile_phone"] !== null &&
-    (region[headline as "hh_mobile_phone"] as number) / 100 >= defaultLine &&
-    (gradientOf(region)?.targeting_distortion ?? null) !== null)
-  .sort((a, b) => (gradientOf(a)!.targeting_distortion as number) -
-    (gradientOf(b)!.targeting_distortion as number))[0];
-const workedDistortion = gradientOf(worked)!.targeting_distortion as number;
-const workedRate = worked[headline as "hh_mobile_phone"] as number;
+// Region outlines in zoom-level tile units, the same space the squares sit in.
+const n = 2 ** squaresFile.tile_zoom;
+const project = ([lon, lat]: number[]) => {
+  const r = (lat * Math.PI) / 180;
+  const y = ((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2) * n;
+  return [Math.round(((lon + 180) / 360) * n * 10) / 10, Math.round(y * 10) / 10];
+};
+const outlines = regionsFile.regions.map((r: any) => {
+  const g = r.geometry;
+  const polys = g.type === "Polygon" ? [g.coordinates] : g.coordinates;
+  return polys.map((poly: number[][][]) => poly.map((ring) => ring.map(project)));
+});
+
+const col = (k: number) => squaresFile.squares.map((s: number[]) => s[k]);
+const data: PageData = {
+  survey_year: surveyYear,
+  names: regionsFile.regions.map((r: any) => r.name),
+  outlines,
+  rates: Object.fromEntries(BASES.map((b) => [b, regionsFile.regions.map((r: any) =>
+    cellsOf(r, b).map((c) => (c.suppressed || c.value === null ? null : Math.round(c.value * 10) / 10)))])) as PageData["rates"],
+  tx: col(0), ty: col(1), region: col(4), pop: col(5), fifth: col(6),
+};
+const inlineJson = JSON.stringify(data).replace(/<\/script/gi, "<\\/script");
+
+// Figures quoted in the two dialogs.
+const covered = data.pop.reduce((a, b) => a + b, 0);
+const uncovered = squaresFile.pop_total - covered;
+const outside = data.pop.reduce((a, p, i) => a + (data.region[i] < 0 ? p : 0), 0);
+const gaps = squaresFile.wealth_check.map((c: any) => c.gap).sort((a: number, b: number) => a - b);
+const medianGap = gaps.length ? Math.round(gaps[gaps.length >> 1] * 100) + "%" : "—";
+const mergedRegions = regionsFile.regions.filter((r: any) =>
+  BASES.some((b) => cellsOf(r, b).some((c) => c.merged))).length;
+const WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+const word = (k: number) => WORDS[k] ?? String(k);
+const surveyPage = DHS_SURVEY_PAGES[surveyId];
 ---
 
 <!doctype html>
@@ -73,76 +72,83 @@ const workedRate = worked[headline as "hh_mobile_phone"] as number;
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Remote enrollment vs. in-person registration &mdash; {data.country} by region</title>
+<title>{country} Remote Enrollment</title>
 </head>
 <body>
+<div class="wrap">
+  <div class="left">
+    <div>
+      <h1>Who in {country} could enroll by phone?</h1>
+      <p class="lede">Every included area receives one visit to build trust. People who are able to enroll by phone do so; everyone else enrolls in person during that visit.</p>
+    </div>
 
-<Masthead country={data.country} surveyYear={surveyYear} regionCount={data.regions.length} />
+    <div class="answer">
+      <div class="slider" id="sliderBox">
+        <span class="top"><span class="lab">Wealth slider
+          <span class="info"><button type="button" aria-label="How people are ranked" aria-expanded="false">i</button>
+            <span class="pop" role="tooltip">{country} is split into small areas, each scored from poorest to richest. The slider starts with the poorest areas and adds richer ones until it covers the share of people you pick. Everyone in an area gets that area's score.</span>
+          </span>
+        </span><span class="cnt" id="cnt"></span></span>
+        <span class="row"><input id="pct" type="range" min="5" max="100" step="5" value="100" aria-label="Share of people to include, poorest first"><output id="pctOut">Everyone</output></span>
+      </div>
+      <div class="selbar" id="selbar" hidden><span id="selName"></span></div>
+      <div class="chips" id="big"></div>
+      <div class="stack" id="stack" aria-hidden="true"></div>
+      <div class="set">Show as
+        <span class="unit" id="unitSeg" role="group" aria-label="Show as"><button type="button" data-u="pc" aria-pressed="true">Percentages</button><button type="button" data-u="n" aria-pressed="false">Numbers</button></span></div>
+    </div>
 
-<main>
+    <div class="settings" id="settings">
+      <div class="set">Phone owners enroll household members
+        <span class="unit" id="hhSeg" role="group" aria-label="Phone owners enroll household members"><button type="button" data-b="hh_mobile_phone" aria-pressed="false">Yes</button><button type="button" data-b="phone_own" aria-pressed="true">No</button></span>
+        <span class="info"><button type="button" aria-label="About household members" aria-expanded="false">i</button><span class="pop" role="tooltip">Yes: everyone in a household with a phone counts as reachable, using the survey's household phone ownership. No: only people who own a phone themselves count. This uses the survey's own-phone rate for women and men aged 15–49, pooled and counted equally.</span></span></div>
+      <div class="set">Phone owners also enroll
+        <span class="kgrp"><span class="unit" id="kSeg" role="group" aria-label="People without a phone each owner also enrolls"><button type="button" data-k="0" aria-pressed="true">0</button><button type="button" data-k="1" aria-pressed="false">1</button><button type="button" data-k="2" aria-pressed="false">2</button></span>others
+          <span class="info"><button type="button" aria-label="About phone sharing" aria-expanded="false">i</button><span class="pop" role="tooltip">Adds people without a phone who enroll using someone else's handset, such as a neighbour or relative. The survey doesn't say how often this happens.</span></span></span></div>
+    </div>
 
-<noscript>
-  <section class="panel warn">
-    <h2>This page needs JavaScript</h2>
-    <p>
-      The recommendation recomputes as you change the cost inputs, which is the point of
-      the tool, so the values are calculated in the browser rather than baked in. The
-      notes below are readable without it. The underlying data is a single file:
-      <code>pipeline/data/regions.json</code>.
-    </p>
-  </section>
-</noscript>
+    <div class="links">
+      <button type="button" class="methodsBtn" data-dialog="methods" aria-haspopup="dialog">How are these calculations made?</button>
+      <button type="button" class="methodsBtn" data-dialog="limits" aria-haspopup="dialog">What limitations exist?</button>
+    </div>
+    <p class="credit">Data: The DHS Program, {country} DHS {surveyYear}; Relative Wealth Index, Data for Good at Meta; WorldPop {popYear}.</p>
 
-<div data-bind="load-error" class="panel warn" hidden>
-  <h2>Could not load the region data</h2>
-  <p>
-    The data this page needs is normally embedded in it at build time, so this means the
-    build itself is stale or broken rather than a network problem. Run <code>make build</code>
-    (or <code>uv run python pipeline/run_all.py</code>) from the repository root, then
-    rebuild the site with <code>bun run build</code> in <code>site/</code>.
-  </p>
-</div>
-
-<!-- Left column scrolls, right column stays pinned. The sticky map releases
-     naturally where .article ends, which is above the notes. -->
-<div class="article" data-bind="app" hidden>
-  <!-- data-bind="copy" so focus.ts can make the pane inert while it is faded
-       out; see setMapFocus(). -->
-  <div class="copy" data-bind="copy">
-    <Scenario costRemote={defaultCostRemote} costInPerson={defaultCostInPerson} />
-
-    <GradientSection />
-
-    <section class="read-second">
-      <h2>Read the map second</h2>
-      <p>
-        The map shades each region by <em>average</em> &mdash; and the average is not the
-        decision. A region shaded for remote enrollment may still exclude nearly all of its
-        poorest households: {worked.name} averages {workedRate.toFixed(1)}% household phone
-        ownership and would often clear the line, yet its targeting distortion on that same
-        household reading is{" "}{workedDistortion.toFixed(2)}.
-      </p>
-      <p>
-        The <strong>Who it excludes</strong> layer shows that directly, and
-        <strong>Compare</strong> puts the two side by side: the regions to worry about are
-        the ones shaded for remote on the left but pale on the right. Any region&rsquo;s
-        drawer puts its targeting distortion above everything the cost model says.
-      </p>
-    </section>
+    <dialog id="methods" aria-labelledby="methodsTitle">
+      <button type="button" class="close" aria-label="Close">×</button>
+      <h2 id="methodsTitle">How are these calculations made?</h2>
+      <p><b>One score per square.</b> Each 2.4&nbsp;km square gets the share of its households that own a mobile phone, taken from the DHS {surveyYear} survey for its region and wealth fifth. With household members switched off, it uses the share of adults aged 15–49 who own a phone themselves instead, with women and men pooled and counted equally. Meta's Relative Wealth Index decides which wealth fifth a square belongs to. WorldPop's {popYear} estimates give the number of people, which turns shares into totals.</p>
+      <p><b>Phone sharing.</b> "Phone owners also enroll" lets each phone owner also enroll 0–2 people without a phone, such as a neighbour or relative using their handset. It multiplies each square's phone share by one plus that number, capped at everyone in the square. The survey says nothing about how often this happens.</p>
+      <p><b>Why "at most".</b> Access to a phone is necessary for remote enrollment but not enough on its own. Literacy, an ID for the SIM, trust and signal coverage all reduce the number further, and none of them is included here. Phone ownership has also probably risen since {surveyYear}.</p>
+      <p><b>Why a range.</b> The wealth index and the survey disagree about who is poor: in the median region, {medianGap} of people fall in a different wealth fifth. The upper figure uses the next-richer fifth's phone rate for each square.</p>
+      <p><b>Neighbouring squares often share a score.</b> The survey reports phone ownership only by region and wealth fifth, so the scores take at most {data.names.length * 5} values. The map shows where each value applies, not variation within a region.</p>
+      <p><b>Merged fifths.</b> Where a region has fewer than 25 survey cases in one wealth fifth, that fifth is published together with a neighbouring fifth as one figure, so its own rate can't be worked out from the region's total. This happens in {word(mergedRegions)} regions, and the shared figure leans towards the better-sampled fifth.</p>
+      <p>Sources: <a href="https://ai.meta.com/ai-for-good/datasets/relative-wealth-index/" target="_blank" rel="noopener">Relative Wealth Index</a>, Data for Good at Meta (CC BY-NC 4.0; <a href="https://doi.org/10.1073/pnas.2113658119" target="_blank" rel="noopener">Chi et al., PNAS 2022</a>). <a href="https://hub.worldpop.org/" target="_blank" rel="noopener">WorldPop</a> {popYear} constrained population. The DHS Program, {surveyPage
+        ? <a href={`https://dhsprogram.com/methodology/survey/survey-display-${surveyPage}.cfm`} target="_blank" rel="noopener">{country} DHS {surveyYear}</a>
+        : <>{country} DHS {surveyYear}</>}.</p>
+    </dialog>
+    <dialog id="limits" aria-labelledby="limitsTitle">
+      <button type="button" class="close" aria-label="Close">×</button>
+      <h2 id="limitsTitle">What limitations exist?</h2>
+      <p><b>Blank areas on the map.</b> Squares appear only where Meta's Relative Wealth Index gives a score, and Meta scored only the squares it treated as populated. WorldPop counts about {Math.round((uncovered / squaresFile.pop_total) * 100)}% of {country}'s people ({(uncovered / 1e6).toFixed(1)}M) living in the blank areas, mostly in thinly settled countryside. They are left out of every figure here, and they may be among the hardest people to reach.</p>
+      <p><b>Squares outside the survey regions.</b> A few coastal squares ({(Math.round(outside / 10) * 10).toLocaleString("en")} people) fall outside every DHS region's boundary, so they have no survey figure and show in grey.</p>
+    </dialog>
   </div>
 
-  <MapColumn surveyYear={surveyYear} regionCount={data.regions.length} />
+  <div class="mapcol">
+    <div class="mapbox" id="mapbox">
+      <canvas id="map" aria-label="Map of the share of people in each square who could enroll by phone"></canvas>
+      <div class="zoom">
+        <button id="zin" aria-label="Zoom in">+</button>
+        <button id="zout" aria-label="Zoom out">&minus;</button>
+        <button id="zfit" aria-label="Reset view" style="font-size:12px">&#8634;</button>
+      </div>
+      <div class="tip" id="tip" hidden></div>
+    </div>
+    <div class="legend" id="legend"></div>
+  </div>
 </div>
 
-<RegionDrawer />
-
-<Notes data={data} />
-
-</main>
-
-<SourcesFooter data={data} />
-
-<script type="application/json" id="regions-data" set:html={inlineSafeJson}></script>
+<script type="application/json" id="page-data" set:html={inlineJson}></script>
 <script src="../scripts/app.ts"></script>
 </body>
 </html>
