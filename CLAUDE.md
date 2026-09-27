@@ -75,8 +75,10 @@ frontend isn't just templated inside the Python pipeline.
 
 - **Pipeline** (`pipeline/` — its own `pyproject.toml`/`uv.lock`, plus
   `pipeline/data/` and `pipeline/docs/`): Python 3.12+, managed via
-  [uv](https://docs.astral.sh/uv/). Produces `pipeline/data/regions.json`, the
-  pipeline's only output and the site's only input. `pipeline/check_data.py`
+  [uv](https://docs.astral.sh/uv/). Produces `pipeline/data/regions.json` (DHS
+  aggregates by region and wealth fifth) and `pipeline/data/squares.json` (Meta
+  wealth squares with WorldPop population and a region index, no DHS values).
+  `pipeline/check_data.py`
   is its own data-agreement audit, self-contained to this directory.
 - **Site** (`site/`): Astro, managed via [bun](https://bun.sh) rather than npm.
   Astro reads `pipeline/data/regions.json` off disk at build time and inlines

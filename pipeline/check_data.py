@@ -1,4 +1,4 @@
-"""Audit pipeline/data/regions.json against the DHS data agreement.
+"""Audit pipeline/data/regions.json and squares.json against the DHS data agreement.
 
 This is section 7 of docs/dhs-data-terms-constraints.md made runnable, because a
 checklist that has to be remembered is a checklist that eventually is not.
@@ -25,7 +25,7 @@ import sys
 from pathlib import Path
 
 from common import SourceError
-from config import RECODE_POOLED
+from config import DHS_INDICATORS, RECODE_INDICATORS, RECODE_POOLED
 
 ROOT = Path(__file__).resolve().parent  # this directory (pipeline/)
 
@@ -39,6 +39,14 @@ DISCLOSIVE_KEYS = re.compile(
     r"v001|v002|v003|hv001|hv002|hv003|midx|respondent)\b",
     re.IGNORECASE,
 )
+
+SQUARES_KEYS = {"schema_version", "fields", "tile_zoom", "regions", "pop_total", "sources",
+                "wealth_check", "squares"}
+
+# Keys that would mean a DHS indicator value or cell had reached squares.json.
+# Rates belong in regions.json, where the suppression checks above can see them.
+DHS_VALUE_KEYS = {"value", "cases_unweighted", "denominator_weighted", "quintiles",
+                  *DHS_INDICATORS, *RECODE_INDICATORS, *RECODE_POOLED}
 
 
 def git(*args):
@@ -204,6 +212,37 @@ def run():
         check("Indicators withheld for missing case counts are recorded, not silently dropped",
               isinstance(withheld, dict),
               ("withheld: " + ", ".join(sorted(withheld))) if withheld else "none withheld")
+
+    # -----------------------------------------------------------------------
+    # 3. squares.json carries no DHS values, only squares and region indices
+    # -----------------------------------------------------------------------
+
+    squares_path = ROOT / "data" / "squares.json"
+    if not squares_path.exists():
+        check("data/squares.json exists", False, "run `uv run python run_all.py` first")
+    else:
+        sq = json.loads(squares_path.read_text(encoding="utf-8"))
+        extra = sorted(set(sq) - SQUARES_KEYS)
+        check("squares.json has only its known top-level keys", not extra,
+              "unexpected: " + ", ".join(extra) if extra else "")
+
+        head = json.dumps({k: v for k, v in sq.items() if k != "squares"})
+        hits = sorted(set(m.group(0) for m in DISCLOSIVE_KEYS.finditer(head))
+                      | {k for k in DHS_VALUE_KEYS if '"%s"' % k in head})
+        check("No DHS values or record-level identifiers in squares.json", not hits,
+              "found: " + ", ".join(hits) if hits else "")
+
+        rows = sq.get("squares", [])
+        n_regions = len(sq.get("regions", []))
+        bad = [i for i, r in enumerate(rows)
+               if len(r) != len(sq.get("fields", [])) or not -1 <= r[4] < n_regions]
+        check("Every square has one value per field and a valid region index", not bad,
+              "rows: %s" % bad[:5] if bad else "%d squares checked" % len(rows))
+
+        if regions_path.exists():
+            ids = [r["region_id"] for r in payload.get("regions", [])]
+            check("squares.json indexes the same regions, in order, as regions.json",
+                  sq.get("regions") == ids)
 
     # -----------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
-"""Run the whole pipeline: fetch every source, build data/regions.json, then
-audit it against the DHS data agreement (check_data.run) -- a build that
-raises no exception but fails the audit still fails.
+"""Run the whole pipeline: fetch every source, build data/regions.json and
+data/squares.json, then audit them against the DHS data agreement (check_data.run) --
+a build that raises no exception but fails the audit still fails.
 
 This is what `make build` invokes, so the Make path and the plain-Python path are
 the same code rather than two orderings that can drift apart. It also means the
@@ -30,10 +30,12 @@ from config import OUT, RAW              # noqa: E402
 from common import SourceError, log      # noqa: E402
 
 import build as build_step               # noqa: E402
+import build_squares                     # noqa: E402
 import check_data                        # noqa: E402
 import fetch_dhs                         # noqa: E402
 import fetch_findex                      # noqa: E402
 import fetch_recode                      # noqa: E402
+import fetch_rwi                         # noqa: E402
 import fetch_worldpop                    # noqa: E402
 
 # There is deliberately no Ookla step. It was removed in v2; attic/README.md says
@@ -43,6 +45,7 @@ import fetch_worldpop                    # noqa: E402
 STEPS = [
     ("fetch: DHS", fetch_dhs.run),
     ("fetch: WorldPop", fetch_worldpop.run),
+    ("fetch: RWI", fetch_rwi.run),
     ("fetch: Findex", fetch_findex.run),
     # Reads the restricted recodes if they are present in data/raw/, and writes
     # only suppressed aggregates. Skips cleanly when they are not, so a clean
@@ -70,6 +73,7 @@ def clean():
             path.unlink()
             removed += 1
     (OUT / "regions.json").unlink(missing_ok=True)
+    (OUT / "squares.json").unlink(missing_ok=True)
     print("removed %d refetchable file(s) from data/raw; recode directories kept"
           % removed, file=sys.stderr)
 
@@ -90,7 +94,7 @@ def run(steps):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--clean", action="store_true",
-                        help="delete data/raw and data/regions.json first")
+                        help="delete data/raw, regions.json and squares.json first")
     parser.add_argument("--fetch", action="store_true", help="fetch only, do not build")
     parser.add_argument("--clean-only", action="store_true",
                         help="delete and stop; do not fetch or build (what `make clean` runs)")
@@ -106,7 +110,8 @@ def main():
     # so there is nothing for that step to check yet.
     if args.fetch:
         return run(STEPS)
-    return run(STEPS + [("build", build_step.run), ("check-data", check_data.run)])
+    return run(STEPS + [("build", build_step.run), ("build: squares", build_squares.run),
+                        ("check-data", check_data.run)])
 
 
 if __name__ == "__main__":
