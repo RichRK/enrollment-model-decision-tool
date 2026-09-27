@@ -80,6 +80,8 @@ MIN_CASES_SUPPRESS = 25
 
 RECODE_HOUSEHOLD = RAW / "MDHR81DT" / "MDHR81FL.DTA"
 RECODE_INDIVIDUAL = RAW / "MDIR81DT" / "MDIR81FL.DTA"
+# Optional: without it, phone_own_m is skipped and everything else still builds.
+RECODE_MEN = RAW / "MDMR81DT" / "MDMR81FL.DTA"
 
 # Variable names verified against the survey's own .DTA metadata on 2026-08-05,
 # not carried over from another country's survey.
@@ -94,7 +96,19 @@ RECODE_VARS = {
         "wealth": "v190",
         "weight": "v005",       # women's individual sample weight, 6 implied decimals
     },
+    # Standard DHS men's recode names, confirmed by the API reproduction in
+    # fetch_recode.py (2026-09-27 rebuild).
+    "men": {
+        "region": "mv024",
+        "wealth": "mv190",
+        "weight": "mv005",      # men's sample weight, 6 implied decimals
+    },
 }
+
+# CO_MOBB_M_MOB is published for men 15-49 only ("Total 15-49": 8,019 unweighted
+# cases, checked against the API 2026-09-26), so the men's recode is cut to that
+# range before anything is computed. Without the cut the case counts cannot match.
+RECODE_MEN_AGE = {"var": "mv012", "max": 49}
 
 # Sample weights carry six implied decimal places in DHS recodes.
 RECODE_WEIGHT_SCALE = 1_000_000.0
@@ -109,8 +123,16 @@ RECODE_INDICATORS = {
     "hh_mobile_phone": {"file": "household", "var": "hv243a", "api": "HC_HEFF_H_MPH"},
     "hh_electricity": {"file": "household", "var": "hv206", "api": "HC_ELEC_H_ELC"},
     "phone_own_f": {"file": "individual", "var": "v169a", "api": "CO_MOBB_W_MOB"},
+    "phone_own_m": {"file": "men", "var": "mv169a", "api": "CO_MOBB_M_MOB"},
     "literacy_f": {"file": "individual", "var": None, "api": "ED_LITR_W_LIT"},
 }
+
+# Indicators pooled from two others' records, weighted so each component counts
+# equally nationally: phone_own is adults 15-49, women and men together. DHS
+# publishes no pooled figure, so it cannot be checked against the API; its
+# components are. Any one of a pooled cell and its two components can be derived
+# from the other two, so the components' cells are not published.
+RECODE_POOLED = {"phone_own": ("phone_own_f", "phone_own_m")}
 
 # Literacy is the reading-card result alone: v155 in (1, 2). Nothing else.
 #

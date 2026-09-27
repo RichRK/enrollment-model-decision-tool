@@ -38,6 +38,9 @@ from config import (
     RECODE_INDICATORS,
     RECODE_INDIVIDUAL,
     RECODE_LITERACY,
+    RECODE_MEN,
+    RECODE_MEN_AGE,
+    RECODE_POOLED,
     RECODE_REGION_TO_DHS,
     RECODE_TOLERANCE_PP,
     RECODE_VARS,
@@ -96,6 +99,15 @@ def load_individual():
     reading = frame[RECODE_LITERACY["reading"]]
     frame["literacy_f"] = reading.isin(RECODE_LITERACY["reading_literate"]).astype("float64")
     frame.loc[reading.isna(), "literacy_f"] = np.nan
+    return frame
+
+
+def load_men():
+    """The men's recode, cut to the 15-49 range the API publishes for."""
+    age = RECODE_MEN_AGE["var"]
+    frame = load_recode("men", RECODE_MEN, extra_columns=[age])
+    frame = frame.loc[frame[age] <= RECODE_MEN_AGE["max"]].drop(columns=[age])
+    log("men recode: %d records aged %d or under" % (len(frame), RECODE_MEN_AGE["max"]))
     return frame
 
 
@@ -251,7 +263,56 @@ def apply_suppression(cell):
         "denominator_weighted": None if suppressed else cell["denominator_weighted"],
         "suppressed": suppressed,
         "flagged": (not suppressed) and n < MIN_CASES_FLAG,
+        **({"merged": cell["merged"]} if "merged" in cell else {}),
     }
+
+
+def merge_lone_thin_cells(per_region):
+    """Publish a region's one thin quintile together with a neighbour, as one figure.
+
+    DHS publishes each region's overall rate and weighted size, so a region with
+    exactly one withheld quintile would give it back by subtraction from the other
+    four. Merging it with the smaller adjacent quintile leaves nothing withheld,
+    and neither fifth's own rate can be separated out. Regions with two or more
+    thin quintiles are already safe and are left as they are.
+    per_region is {region_id: {quintile: raw cell}}; a missing quintile is absent.
+    Both merged quintiles carry the combined cell and a "merged" list.
+    """
+    for per_quintile in per_region.values():
+        present = [q for q in DHS_QUINTILES if q in per_quintile]
+        thin = [q for q in present if per_quintile[q]["cases_unweighted"] < MIN_CASES_SUPPRESS]
+        if len(thin) != 1:
+            continue
+        i = present.index(thin[0])
+        neighbours = [present[j] for j in (i - 1, i + 1) if 0 <= j < len(present)]
+        if not neighbours:
+            continue
+        other = min(neighbours, key=lambda q: per_quintile[q]["cases_unweighted"])
+        a, b = per_quintile[thin[0]], per_quintile[other]
+        if a["value"] is None or b["value"] is None:
+            continue
+        weight = a["denominator_weighted"] + b["denominator_weighted"]
+        merged = {
+            "value": (a["value"] * a["denominator_weighted"]
+                      + b["value"] * b["denominator_weighted"]) / weight,
+            "denominator_weighted": weight,
+            "cases_unweighted": a["cases_unweighted"] + b["cases_unweighted"],
+            "merged": [q for q in DHS_QUINTILES if q in (thin[0], other)],
+        }
+        per_quintile[thin[0]] = dict(merged)
+        per_quintile[other] = dict(merged)
+
+
+def pooled_frame(parts):
+    """Stack the components' records under one column, each component's weights
+    rescaled to sum to 1 so women and men count equally nationally."""
+    stacked = []
+    for frame, column in parts:
+        part = frame.loc[:, ["region_id", "wealth", "weight"]].copy()
+        part["_pooled"] = frame[column]
+        part["weight"] = part["weight"] / part["weight"].sum()
+        stacked.append(part)
+    return pd.concat(stacked, ignore_index=True)
 
 
 def absent_cell(quintile):
@@ -280,6 +341,8 @@ def region_summary(region_id, per_quintile):
     absent = [DHS_QUINTILES[i] for i, c in enumerate(ordered) if c is None]
     suppressed = [DHS_QUINTILES[i] for i, c in enumerate(ordered)
                   if c is not None and c["suppressed"]]
+    merged = [DHS_QUINTILES[i] for i, c in enumerate(ordered)
+              if c is not None and c.get("merged")]
     flagged = [DHS_QUINTILES[i] for i, c in enumerate(ordered)
                if c is not None and c["flagged"]]
 
@@ -299,7 +362,7 @@ def region_summary(region_id, per_quintile):
         "flagged_quintiles": flagged,
     }
 
-    if absent or suppressed:
+    if absent or suppressed or merged:
         # The reachable pool is a sum across all five cells. With one missing, the
         # denominator is understated and every share built on it is wrong in a
         # direction that flatters the result. Do not publish a distortion here.
@@ -312,6 +375,9 @@ def region_summary(region_id, per_quintile):
         if suppressed:
             reasons.append("quintile cell(s) below %d unweighted cases: %s"
                            % (MIN_CASES_SUPPRESS, ", ".join(suppressed)))
+        if merged:
+            reasons.append("quintiles published as one figure, so the thinner one "
+                           "cannot be derived from the region total: %s" % ", ".join(merged))
         result.update({
             "reachable_pool_composition": None,
             "exclusion_gap": None,
@@ -362,12 +428,19 @@ def run():
 
     frames = {"household": map_regions(load_recode("household", RECODE_HOUSEHOLD)),
               "individual": map_regions(load_individual())}
+    if RECODE_MEN.exists():
+        frames["men"] = map_regions(load_men())
+    else:
+        log("men's recode not present -- skipping phone_own_m.")
+        log("  expected %s" % RECODE_MEN.relative_to(RAW.parent.parent))
 
     api_quintiles = read_json(RAW / "dhs_quintiles.json")["indicators"]
     api_regions = api_regional_values()
 
-    output = {}
+    by_key, worked = {}, {}
     for key, spec in RECODE_INDICATORS.items():
+        if spec["file"] not in frames:
+            continue
         frame = frames[spec["file"]]
         # An indicator either names a raw recode variable, which needs the DHS
         # yes/no coding collapsing to 0/1/NaN, or it is derived upstream into a
@@ -380,14 +453,33 @@ def run():
         national = cells(work, column, by_region=False)
         regional = cells(work, column, by_region=True)
         validate(key, national, regional, api_quintiles, api_regions)
+        if any(key in parts for parts in RECODE_POOLED.values()):
+            worked[key] = (work, column)
+        by_key[key] = regional
 
-        by_region = {}
+    for key, parts in RECODE_POOLED.items():
+        if all(p in worked for p in parts):
+            by_key[key] = cells(pooled_frame([worked[p] for p in parts]), "_pooled",
+                                by_region=True)
+            log("%-16s pooled from %s (no API figure; components checked above)"
+                % (key, " + ".join(parts)))
+
+    # A pooled indicator's components are not written at all: beside the pooled
+    # figure, one sex's cell would give back the other's.
+    pooled_parts = {k for key, parts in RECODE_POOLED.items() if key in by_key for k in parts}
+
+    output = {}
+    for key, regional in by_key.items():
+        per_region = {}
         for (region_id, quintile), cell in regional.items():
-            by_region.setdefault(region_id, {})[quintile] = apply_suppression(cell)
-
+            per_region.setdefault(region_id, {})[quintile] = cell
+        if key in pooled_parts:
+            continue
+        merge_lone_thin_cells(per_region)
         output[key] = {
-            region_id: region_summary(region_id, per_quintile)
-            for region_id, per_quintile in by_region.items()
+            region_id: region_summary(region_id, {q: apply_suppression(c)
+                                                  for q, c in per_quintile.items()})
+            for region_id, per_quintile in per_region.items()
         }
 
     # A last look before anything is written: no cell below the floor may carry a
