@@ -265,51 +265,44 @@ def apply_suppression(cell):
         "denominator_weighted": None if suppressed else cell["denominator_weighted"],
         "suppressed": suppressed,
         "flagged": (not suppressed) and n < MIN_CASES_FLAG,
+        **({"merged": cell["merged"]} if "merged" in cell else {}),
     }
 
 
-def hide(cell):
-    cell.update(value=None, denominator_weighted=None, suppressed=True, flagged=False,
-                complementary=True)
+def merge_lone_thin_cells(per_region):
+    """Publish a region's one thin quintile together with a neighbour, as one figure.
 
-
-def complementary_suppression(by_key):
-    """Withhold extra cells so no suppressed value can be recovered by subtraction.
-
-    Two routes would otherwise recover one:
-
-    *   DHS publishes each region's overall rate and weighted size. A region with
-        exactly one hidden quintile gives it back from the other four.
-    *   A pooled cell is a weighted mix of its components. Beside one published
-        component, it gives back the other.
-
-    So neither may leave exactly one cell hidden. Hiding a cell can break the
-    other rule elsewhere, hence the loop; it only ever hides, so it terminates.
-    by_key is {key: {region_id: {quintile: cell}}}; a quintile missing from a
-    region is absent (nobody sampled), carries no value and is not counted.
+    DHS publishes each region's overall rate and weighted size, so a region with
+    exactly one withheld quintile would give it back by subtraction from the other
+    four. Merging it with the smaller adjacent quintile leaves nothing withheld,
+    and neither fifth's own rate can be separated out. Regions with two or more
+    thin quintiles are already safe and are left as they are.
+    per_region is {region_id: {quintile: raw cell}}; a missing quintile is absent.
+    Both merged quintiles carry the combined cell and a "merged" list.
     """
-    changed = True
-    while changed:
-        changed = False
-        for pooled, parts in RECODE_POOLED.items():
-            if pooled not in by_key:
-                continue
-            for region_id, per_quintile in by_key[pooled].items():
-                for quintile, cell in per_quintile.items():
-                    linked = [by_key[k][region_id][quintile] for k in parts
-                              if quintile in by_key[k].get(region_id, {})]
-                    if cell["suppressed"] or sum(c["suppressed"] for c in linked) != 1:
-                        continue
-                    for c in linked:
-                        if not c["suppressed"]:
-                            hide(c)
-                            changed = True
-        for per_region in by_key.values():
-            for per_quintile in per_region.values():
-                shown = [c for c in per_quintile.values() if not c["suppressed"]]
-                if shown and len(per_quintile) - len(shown) == 1:
-                    hide(min(shown, key=lambda c: c["cases_unweighted"]))
-                    changed = True
+    for per_quintile in per_region.values():
+        present = [q for q in DHS_QUINTILES if q in per_quintile]
+        thin = [q for q in present if per_quintile[q]["cases_unweighted"] < MIN_CASES_SUPPRESS]
+        if len(thin) != 1:
+            continue
+        i = present.index(thin[0])
+        neighbours = [present[j] for j in (i - 1, i + 1) if 0 <= j < len(present)]
+        if not neighbours:
+            continue
+        other = min(neighbours, key=lambda q: per_quintile[q]["cases_unweighted"])
+        a, b = per_quintile[thin[0]], per_quintile[other]
+        if a["value"] is None or b["value"] is None:
+            continue
+        weight = a["denominator_weighted"] + b["denominator_weighted"]
+        merged = {
+            "value": (a["value"] * a["denominator_weighted"]
+                      + b["value"] * b["denominator_weighted"]) / weight,
+            "denominator_weighted": weight,
+            "cases_unweighted": a["cases_unweighted"] + b["cases_unweighted"],
+            "merged": [q for q in DHS_QUINTILES if q in (thin[0], other)],
+        }
+        per_quintile[thin[0]] = dict(merged)
+        per_quintile[other] = dict(merged)
 
 
 def pooled_frame(parts):
@@ -350,9 +343,8 @@ def region_summary(region_id, per_quintile):
     absent = [DHS_QUINTILES[i] for i, c in enumerate(ordered) if c is None]
     suppressed = [DHS_QUINTILES[i] for i, c in enumerate(ordered)
                   if c is not None and c["suppressed"]]
-    complementary = [DHS_QUINTILES[i] for i, c in enumerate(ordered)
-                     if c is not None and c.get("complementary")]
-    thin = [q for q in suppressed if q not in complementary]
+    merged = [DHS_QUINTILES[i] for i, c in enumerate(ordered)
+              if c is not None and c.get("merged")]
     flagged = [DHS_QUINTILES[i] for i, c in enumerate(ordered)
                if c is not None and c["flagged"]]
 
@@ -372,7 +364,7 @@ def region_summary(region_id, per_quintile):
         "flagged_quintiles": flagged,
     }
 
-    if absent or suppressed:
+    if absent or suppressed or merged:
         # The reachable pool is a sum across all five cells. With one missing, the
         # denominator is understated and every share built on it is wrong in a
         # direction that flatters the result. Do not publish a distortion here.
@@ -382,12 +374,12 @@ def region_summary(region_id, per_quintile):
         if absent:
             reasons.append("quintile(s) with no households sampled at all: %s"
                            % ", ".join(absent))
-        if thin:
+        if suppressed:
             reasons.append("quintile cell(s) below %d unweighted cases: %s"
-                           % (MIN_CASES_SUPPRESS, ", ".join(thin)))
-        if complementary:
-            reasons.append("quintile cell(s) withheld so a suppressed cell cannot be "
-                           "derived from published totals: %s" % ", ".join(complementary))
+                           % (MIN_CASES_SUPPRESS, ", ".join(suppressed)))
+        if merged:
+            reasons.append("quintiles published as one figure, so the thinner one "
+                           "cannot be derived from the region total: %s" % ", ".join(merged))
         result.update({
             "reachable_pool_composition": None,
             "exclusion_gap": None,
@@ -474,18 +466,27 @@ def run():
             log("%-16s pooled from %s (no API figure; components checked above)"
                 % (key, " + ".join(parts)))
 
-    suppressed = {}
-    for key, regional in by_key.items():
-        for (region_id, quintile), cell in regional.items():
-            suppressed.setdefault(key, {}).setdefault(region_id, {})[quintile] = \
-                apply_suppression(cell)
-    complementary_suppression(suppressed)
+    # A pooled indicator's components are not published by cell: beside the pooled
+    # figure, one sex's cell would give back the other's.
+    pooled_parts = {k for key, parts in RECODE_POOLED.items() if key in by_key for k in parts}
 
-    output = {
-        key: {region_id: region_summary(region_id, per_quintile)
-              for region_id, per_quintile in per_region.items()}
-        for key, per_region in suppressed.items()
-    }
+    output = {}
+    for key, regional in by_key.items():
+        per_region = {}
+        for (region_id, quintile), cell in regional.items():
+            per_region.setdefault(region_id, {})[quintile] = cell
+        if key in pooled_parts:
+            output[key] = {region_id: {"pending_reason": "published only within the pooled "
+                                                         "indicator, so neither sex's cells "
+                                                         "can be subtracted from it"}
+                           for region_id in per_region}
+            continue
+        merge_lone_thin_cells(per_region)
+        output[key] = {
+            region_id: region_summary(region_id, {q: apply_suppression(c)
+                                                  for q, c in per_quintile.items()})
+            for region_id, per_quintile in per_region.items()
+        }
 
     # A last look before anything is written: no cell below the floor may carry a
     # value, and every cell must carry a count.
