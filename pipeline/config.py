@@ -97,8 +97,8 @@ RECODE_VARS = {
         "wealth": "v190",
         "weight": "v005",       # women's individual sample weight, 6 implied decimals
     },
-    # Standard DHS men's recode names, not yet checked against this survey's .DTA
-    # metadata. The API reproduction in fetch_recode.py is what confirms them.
+    # Standard DHS men's recode names, confirmed by the API reproduction in
+    # fetch_recode.py (2026-09-27 rebuild).
     "men": {
         "region": "mv024",
         "wealth": "mv190",
