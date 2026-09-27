@@ -189,6 +189,12 @@ def build_national_gradient():
     return {"indicators": out, "dropped": dropped}
 
 
+# Every regional quintile indicator the recode step publishes. A pooled
+# indicator's components are left out: fetch_recode.py does not write them.
+PUBLISHED_RECODE = [k for k in [*RECODE_INDICATORS, *RECODE_POOLED]
+                    if not any(k in parts for parts in RECODE_POOLED.values())]
+
+
 def load_regional_gradient(regions):
     """Region x quintile aggregates from the recodes, if they have been computed.
 
@@ -214,7 +220,7 @@ def load_regional_gradient(regions):
                 "pending_reason": "requires the MD 2021 recode microdata; the "
                                   "aggregate API cannot cross region with wealth quintile",
             }
-            for key in [*RECODE_INDICATORS, *RECODE_POOLED]
+            for key in PUBLISHED_RECODE
         }
         return {region_id: dict(pending) for region_id in regions}, False
 
@@ -227,7 +233,7 @@ def load_regional_gradient(regions):
                      "%d geometry regions" % (region_id, len(regions)))
             out[region_id][key] = summary
     # An optional recode that wasn't present (the men's) still gets a reason.
-    for key in [*RECODE_INDICATORS, *RECODE_POOLED]:
+    for key in PUBLISHED_RECODE:
         if key not in by_indicator:
             for record in out.values():
                 record[key] = {"pending_reason": "the MD 2021 recode this needs was not "

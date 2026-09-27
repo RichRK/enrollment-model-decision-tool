@@ -466,7 +466,7 @@ def run():
             log("%-16s pooled from %s (no API figure; components checked above)"
                 % (key, " + ".join(parts)))
 
-    # A pooled indicator's components are not published by cell: beside the pooled
+    # A pooled indicator's components are not written at all: beside the pooled
     # figure, one sex's cell would give back the other's.
     pooled_parts = {k for key, parts in RECODE_POOLED.items() if key in by_key for k in parts}
 
@@ -476,10 +476,6 @@ def run():
         for (region_id, quintile), cell in regional.items():
             per_region.setdefault(region_id, {})[quintile] = cell
         if key in pooled_parts:
-            output[key] = {region_id: {"pending_reason": "published only within the pooled "
-                                                         "indicator, so neither sex's cells "
-                                                         "can be subtracted from it"}
-                           for region_id in per_region}
             continue
         merge_lone_thin_cells(per_region)
         output[key] = {
