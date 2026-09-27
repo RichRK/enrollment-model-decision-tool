@@ -4177,29 +4177,108 @@
      "targeting_distortion_bottom2": 0.7462944752203546,
      "top_group_rate": 89.39524528449849
     },
-    "phone_own_f": {
+    "phone_own": {
      "absent_quintiles": [],
-     "bottom_group_rate": 2.516767606605604,
-     "exclusion_gap": -38.03829449431475,
-     "flagged_quintiles": [
-      "Lowest"
-     ],
+     "bottom_group_rate": 10.77800010742138,
+     "exclusion_gap": -38.08085665057661,
+     "flagged_quintiles": [],
      "ownership_by_quintile": [
       {
-       "cases_unweighted": 45,
-       "denominator_weighted": 38.323984,
-       "flagged": true,
+       "cases_unweighted": 65,
+       "denominator_weighted": 0.004212359293429486,
+       "flagged": false,
        "quintile": "Lowest",
        "suppressed": false,
-       "value": 4.5456025657457735
+       "value": 13.297056492946652
       },
       {
-       "cases_unweighted": 119,
-       "denominator_weighted": 122.101118,
+       "cases_unweighted": 168,
+       "denominator_weighted": 0.012395620819478603,
        "flagged": false,
        "quintile": "Second",
        "suppressed": false,
-       "value": 1.8799754151309245
+       "value": 9.921958225310417
+      },
+      {
+       "cases_unweighted": 244,
+       "denominator_weighted": 0.018805693107029016,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 29.22941462561986
+      },
+      {
+       "cases_unweighted": 361,
+       "denominator_weighted": 0.029872748335179864,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 44.08209818487586
+      },
+      {
+       "cases_unweighted": 314,
+       "denominator_weighted": 0.02366426672889007,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 70.48809958138146
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.01508300261385484,
+       "population_share": 0.047356118032274415,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.03311864516344471,
+       "population_share": 0.13935384940362833,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.14801861886132325,
+       "population_share": 0.21141706118096673,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.3546045655496438,
+       "population_share": 0.3358349318197559,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.44917516781173333,
+       "population_share": 0.26603803956337463,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.3185016686455462,
+     "targeting_distortion_bottom2": 0.25816322738017244,
+     "top_group_rate": 48.858856757997984
+    },
+    "phone_own_f": {
+     "absent_quintiles": [],
+     "exclusion_gap": null,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 45,
+       "complementary": true,
+       "denominator_weighted": null,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": true,
+       "value": null
+      },
+      {
+       "cases_unweighted": 119,
+       "complementary": true,
+       "denominator_weighted": null,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 175,
@@ -4226,45 +4305,19 @@
        "value": 66.6853458989545
       }
      ],
-     "pending_reason": null,
-     "reachable_pool_composition": [
-      {
-       "pool_share": 0.00637774688636105,
-       "population_share": 0.046510350004425736,
-       "quintile": "Lowest"
-      },
-      {
-       "pool_share": 0.008403824574515448,
-       "population_share": 0.14818307340154632,
-       "quintile": "Second"
-      },
-      {
-       "pool_share": 0.10528591245080397,
-       "population_share": 0.22435241874400655,
-       "quintile": "Middle"
-      },
-      {
-       "pool_share": 0.3662019540085362,
-       "population_share": 0.32557891978307774,
-       "quintile": "Fourth"
-      },
-      {
-       "pool_share": 0.5137305620797834,
-       "population_share": 0.2553752380669437,
-       "quintile": "Highest"
-      }
+     "pending_reason": "quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Lowest, Second",
+     "reachable_pool_composition": null,
+     "suppressed_quintiles": [
+      "Lowest",
+      "Second"
      ],
-     "suppressed_quintiles": [],
-     "targeting_distortion": 0.13712532556203447,
-     "targeting_distortion_bottom2": 0.07592229466351397,
-     "top_group_rate": 40.55506210092035
+     "targeting_distortion": null,
+     "targeting_distortion_bottom2": null
     },
     "phone_own_m": {
      "absent_quintiles": [],
      "exclusion_gap": null,
-     "flagged_quintiles": [
-      "Second"
-     ],
+     "flagged_quintiles": [],
      "ownership_by_quintile": [
       {
        "cases_unweighted": 20,
@@ -4276,11 +4329,12 @@
       },
       {
        "cases_unweighted": 49,
-       "denominator_weighted": 47.555524,
-       "flagged": true,
+       "complementary": true,
+       "denominator_weighted": null,
+       "flagged": false,
        "quintile": "Second",
-       "suppressed": false,
-       "value": 18.705559842007
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 69,
@@ -4307,10 +4361,11 @@
        "value": 73.8774113601174
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Second",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Lowest"
+      "Lowest",
+      "Second"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -6219,11 +6274,12 @@
       },
       {
        "cases_unweighted": 76,
-       "denominator_weighted": 187.905665,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Second",
-       "suppressed": false,
-       "value": 3.288127582529244
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 156,
@@ -6250,10 +6306,11 @@
        "value": 96.91818881508284
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Second",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Lowest"
+      "Lowest",
+      "Second"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -6273,11 +6330,12 @@
       },
       {
        "cases_unweighted": 76,
-       "denominator_weighted": 187.905665,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Second",
-       "suppressed": false,
-       "value": 27.217417846343274
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 156,
@@ -6304,10 +6362,11 @@
        "value": 90.99672769451132
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Second",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Lowest"
+      "Lowest",
+      "Second"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -6327,11 +6386,12 @@
       },
       {
        "cases_unweighted": 71,
-       "denominator_weighted": 171.726207,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Second",
-       "suppressed": false,
-       "value": 94.10796279917835
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 133,
@@ -6358,10 +6418,67 @@
        "value": 96.08084850723768
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Second",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Lowest"
+      "Lowest",
+      "Second"
+     ],
+     "targeting_distortion": null,
+     "targeting_distortion_bottom2": null
+    },
+    "phone_own": {
+     "absent_quintiles": [],
+     "exclusion_gap": null,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 24,
+       "denominator_weighted": null,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": true,
+       "value": null
+      },
+      {
+       "cases_unweighted": 101,
+       "complementary": true,
+       "denominator_weighted": null,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": true,
+       "value": null
+      },
+      {
+       "cases_unweighted": 204,
+       "denominator_weighted": 0.03658288037775354,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 34.19471351824049
+      },
+      {
+       "cases_unweighted": 393,
+       "denominator_weighted": 0.06907894490766577,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 43.89880055802393
+      },
+      {
+       "cases_unweighted": 456,
+       "denominator_weighted": 0.07492291755762101,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 74.98292750658355
+      }
+     ],
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Second",
+     "reachable_pool_composition": null,
+     "suppressed_quintiles": [
+      "Lowest",
+      "Second"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -6381,11 +6498,12 @@
       },
       {
        "cases_unweighted": 71,
-       "denominator_weighted": 171.726207,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Second",
-       "suppressed": false,
-       "value": 9.59966698618109
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 133,
@@ -6412,10 +6530,11 @@
        "value": 71.23301810190466
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Second",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Lowest"
+      "Lowest",
+      "Second"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -6423,9 +6542,7 @@
     "phone_own_m": {
      "absent_quintiles": [],
      "exclusion_gap": null,
-     "flagged_quintiles": [
-      "Second"
-     ],
+     "flagged_quintiles": [],
      "ownership_by_quintile": [
       {
        "cases_unweighted": 8,
@@ -6437,11 +6554,12 @@
       },
       {
        "cases_unweighted": 30,
-       "denominator_weighted": 78.96697499999999,
-       "flagged": true,
+       "complementary": true,
+       "denominator_weighted": null,
+       "flagged": false,
        "quintile": "Second",
-       "suppressed": false,
-       "value": 35.356296730373685
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 71,
@@ -6468,10 +6586,11 @@
        "value": 79.38344033102571
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Second",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Lowest"
+      "Lowest",
+      "Second"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -10064,11 +10183,12 @@
       },
       {
        "cases_unweighted": 107,
-       "denominator_weighted": 141.057703,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Second",
-       "suppressed": false,
-       "value": 7.955119615126584
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 250,
@@ -10095,10 +10215,11 @@
        "value": 88.65839386167808
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Second",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Lowest"
+      "Lowest",
+      "Second"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -10118,11 +10239,12 @@
       },
       {
        "cases_unweighted": 107,
-       "denominator_weighted": 141.057703,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Second",
-       "suppressed": false,
-       "value": 18.645473760479426
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 250,
@@ -10149,10 +10271,11 @@
        "value": 95.51405787538464
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Second",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Lowest"
+      "Lowest",
+      "Second"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -10172,11 +10295,12 @@
       },
       {
        "cases_unweighted": 84,
-       "denominator_weighted": 108.943864,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Second",
-       "suppressed": false,
-       "value": 65.47324225621371
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 215,
@@ -10203,10 +10327,67 @@
        "value": 97.20883847762752
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Second",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Lowest"
+      "Lowest",
+      "Second"
+     ],
+     "targeting_distortion": null,
+     "targeting_distortion_bottom2": null
+    },
+    "phone_own": {
+     "absent_quintiles": [],
+     "exclusion_gap": null,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 22,
+       "denominator_weighted": null,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": true,
+       "value": null
+      },
+      {
+       "cases_unweighted": 116,
+       "complementary": true,
+       "denominator_weighted": null,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": true,
+       "value": null
+      },
+      {
+       "cases_unweighted": 314,
+       "denominator_weighted": 0.02972463650821692,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 39.71072790433659
+      },
+      {
+       "cases_unweighted": 420,
+       "denominator_weighted": 0.03822520881843618,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 52.998741074508196
+      },
+      {
+       "cases_unweighted": 262,
+       "denominator_weighted": 0.019663454275791945,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 78.98874340731474
+      }
+     ],
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Second",
+     "reachable_pool_composition": null,
+     "suppressed_quintiles": [
+      "Lowest",
+      "Second"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -10226,11 +10407,12 @@
       },
       {
        "cases_unweighted": 84,
-       "denominator_weighted": 108.943864,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Second",
-       "suppressed": false,
-       "value": 11.510892435392229
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 215,
@@ -10257,10 +10439,11 @@
        "value": 76.61171837062454
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Second",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Lowest"
+      "Lowest",
+      "Second"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -10268,9 +10451,7 @@
     "phone_own_m": {
      "absent_quintiles": [],
      "exclusion_gap": null,
-     "flagged_quintiles": [
-      "Second"
-     ],
+     "flagged_quintiles": [],
      "ownership_by_quintile": [
       {
        "cases_unweighted": 4,
@@ -10282,11 +10463,12 @@
       },
       {
        "cases_unweighted": 32,
-       "denominator_weighted": 39.2432,
-       "flagged": true,
+       "complementary": true,
+       "denominator_weighted": null,
+       "flagged": false,
        "quintile": "Second",
-       "suppressed": false,
-       "value": 10.484858523260081
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 99,
@@ -10313,10 +10495,11 @@
        "value": 81.51506192173333
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Second",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Lowest"
+      "Lowest",
+      "Second"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -12956,6 +13139,86 @@
      "targeting_distortion_bottom2": 0.8694872383433834,
      "top_group_rate": 90.9424302942447
     },
+    "phone_own": {
+     "absent_quintiles": [],
+     "bottom_group_rate": 16.09649100085052,
+     "exclusion_gap": -28.710967448082748,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 254,
+       "denominator_weighted": 0.013034377163124052,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": 12.827604069873946
+      },
+      {
+       "cases_unweighted": 327,
+       "denominator_weighted": 0.016912347493357648,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 18.615828140694056
+      },
+      {
+       "cases_unweighted": 309,
+       "denominator_weighted": 0.01497561054244355,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 33.857300275581245
+      },
+      {
+       "cases_unweighted": 206,
+       "denominator_weighted": 0.00955856453885058,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 45.75057880370863
+      },
+      {
+       "cases_unweighted": 160,
+       "denominator_weighted": 0.006102133036643618,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 70.20356608418898
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.09014574496360162,
+       "population_share": 0.21514897102720948,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.16974447839516743,
+       "population_share": 0.27915980298197796,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.27336711169885675,
+       "population_share": 0.24719149663908616,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.2357754982966068,
+       "population_share": 0.1577762634373528,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.23096716664576744,
+       "population_share": 0.10072346591437363,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.4189922198242866,
+     "targeting_distortion_bottom2": 0.5257649409110804,
+     "top_group_rate": 44.80745844893327
+    },
     "phone_own_f": {
      "absent_quintiles": [],
      "bottom_group_rate": 8.965694392912868,
@@ -14828,11 +15091,12 @@
       },
       {
        "cases_unweighted": 61,
-       "denominator_weighted": 41.94059,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Fourth",
-       "suppressed": false,
-       "value": 9.906875415915703
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 18,
@@ -14843,9 +15107,10 @@
        "value": null
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Highest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Highest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Fourth",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
+      "Fourth",
       "Highest"
      ],
      "targeting_distortion": null,
@@ -14882,11 +15147,12 @@
       },
       {
        "cases_unweighted": 61,
-       "denominator_weighted": 41.94059,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Fourth",
-       "suppressed": false,
-       "value": 75.64356152357419
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 18,
@@ -14897,9 +15163,10 @@
        "value": null
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Highest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Highest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Fourth",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
+      "Fourth",
       "Highest"
      ],
      "targeting_distortion": null,
@@ -14936,11 +15203,12 @@
       },
       {
        "cases_unweighted": 62,
-       "denominator_weighted": 42.411988,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Fourth",
-       "suppressed": false,
-       "value": 89.43771746799513
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 22,
@@ -14951,13 +15219,96 @@
        "value": null
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Highest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Highest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Fourth",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
+      "Fourth",
       "Highest"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
+    },
+    "phone_own": {
+     "absent_quintiles": [],
+     "bottom_group_rate": 20.391782023294784,
+     "exclusion_gap": -17.38875378046347,
+     "flagged_quintiles": [
+      "Highest"
+     ],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 398,
+       "denominator_weighted": 0.022935255042721727,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": 14.709538949452025
+      },
+      {
+       "cases_unweighted": 315,
+       "denominator_weighted": 0.020268145175864272,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 26.82175837201933
+      },
+      {
+       "cases_unweighted": 172,
+       "denominator_weighted": 0.009508897188690116,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 28.180010429552787
+      },
+      {
+       "cases_unweighted": 84,
+       "denominator_weighted": 0.004316530754002392,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 49.4668955930369
+      },
+      {
+       "cases_unweighted": 31,
+       "denominator_weighted": 0.0012456558942763017,
+       "flagged": true,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 70.57119452070899
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.2326046828561532,
+       "population_share": 0.3935728546452142,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.37481509370969335,
+       "population_share": 0.34780479834951505,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.18475113734227055,
+       "population_share": 0.16317428361313333,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.14721949203130041,
+       "population_share": 0.07407239761895298,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.0606095940605825,
+       "population_share": 0.021375665773184376,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.5910079420132632,
+     "targeting_distortion_bottom2": 0.8193122278669019,
+     "top_group_rate": 37.780535803758255
     },
     "phone_own_f": {
      "absent_quintiles": [],
@@ -14990,11 +15341,12 @@
       },
       {
        "cases_unweighted": 62,
-       "denominator_weighted": 42.411988,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Fourth",
-       "suppressed": false,
-       "value": 58.68369575130503
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 22,
@@ -15005,9 +15357,10 @@
        "value": null
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Highest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Highest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Fourth",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
+      "Fourth",
       "Highest"
      ],
      "targeting_distortion": null,
@@ -18629,6 +18982,86 @@
      "targeting_distortion_bottom2": 0.7682734890056583,
      "top_group_rate": 70.18794921217328
     },
+    "phone_own": {
+     "absent_quintiles": [],
+     "bottom_group_rate": 11.613822972648359,
+     "exclusion_gap": -29.02041611696223,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 476,
+       "denominator_weighted": 0.026707893185095682,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": 8.141245485548897
+      },
+      {
+       "cases_unweighted": 330,
+       "denominator_weighted": 0.017909805985096915,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 16.792283793474414
+      },
+      {
+       "cases_unweighted": 157,
+       "denominator_weighted": 0.008076857468941719,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 22.360919840243334
+      },
+      {
+       "cases_unweighted": 93,
+       "denominator_weighted": 0.004301018817553698,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 33.50292230137047
+      },
+      {
+       "cases_unweighted": 99,
+       "denominator_weighted": 0.004498603290328671,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 80.2605211280834
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.180602536670543,
+       "population_share": 0.43431579588972696,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.24980090730865281,
+       "population_share": 0.2912439250351935,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.15001180914885376,
+       "population_share": 0.13134344800618317,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.11968711474651926,
+       "population_share": 0.06994188564169347,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.29989763212543114,
+       "population_share": 0.073154945427203,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.41583230078142974,
+     "targeting_distortion_bottom2": 0.5932019537006977,
+     "top_group_rate": 40.63423908961059
+    },
     "phone_own_f": {
      "absent_quintiles": [],
      "bottom_group_rate": 4.196185719108438,
@@ -18965,11 +19398,12 @@
       },
       {
        "cases_unweighted": 188,
-       "denominator_weighted": 140.625905,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Fourth",
-       "suppressed": false,
-       "value": 40.10134334779926
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 1287,
@@ -18980,10 +19414,11 @@
        "value": 94.57989553341542
       }
      ],
-     "pending_reason": "quintile(s) with no households sampled at all: Lowest, Second; quintile cell(s) below 25 unweighted cases: Middle",
+     "pending_reason": "quintile(s) with no households sampled at all: Lowest, Second; quintile cell(s) below 25 unweighted cases: Middle; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Fourth",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Middle"
+      "Middle",
+      "Fourth"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -19024,11 +19459,12 @@
       },
       {
        "cases_unweighted": 188,
-       "denominator_weighted": 140.625905,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Fourth",
-       "suppressed": false,
-       "value": 38.67744353360784
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 1287,
@@ -19039,10 +19475,11 @@
        "value": 89.26488571108217
       }
      ],
-     "pending_reason": "quintile(s) with no households sampled at all: Lowest, Second; quintile cell(s) below 25 unweighted cases: Middle",
+     "pending_reason": "quintile(s) with no households sampled at all: Lowest, Second; quintile cell(s) below 25 unweighted cases: Middle; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Fourth",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Middle"
+      "Middle",
+      "Fourth"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -19083,11 +19520,12 @@
       },
       {
        "cases_unweighted": 185,
-       "denominator_weighted": 142.256739,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Fourth",
-       "suppressed": false,
-       "value": 80.25932325076002
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 1316,
@@ -19098,10 +19536,72 @@
        "value": 92.95188508643842
       }
      ],
-     "pending_reason": "quintile(s) with no households sampled at all: Lowest, Second; quintile cell(s) below 25 unweighted cases: Middle",
+     "pending_reason": "quintile(s) with no households sampled at all: Lowest, Second; quintile cell(s) below 25 unweighted cases: Middle; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Fourth",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Middle"
+      "Middle",
+      "Fourth"
+     ],
+     "targeting_distortion": null,
+     "targeting_distortion_bottom2": null
+    },
+    "phone_own": {
+     "absent_quintiles": [
+      "Lowest",
+      "Second"
+     ],
+     "exclusion_gap": null,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "absent": true,
+       "cases_unweighted": 0,
+       "denominator_weighted": null,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": null
+      },
+      {
+       "absent": true,
+       "cases_unweighted": 0,
+       "denominator_weighted": null,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": null
+      },
+      {
+       "cases_unweighted": 8,
+       "denominator_weighted": null,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": true,
+       "value": null
+      },
+      {
+       "cases_unweighted": 274,
+       "complementary": true,
+       "denominator_weighted": null,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": true,
+       "value": null
+      },
+      {
+       "cases_unweighted": 1831,
+       "denominator_weighted": 0.10262814820613739,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 75.01279251625294
+      }
+     ],
+     "pending_reason": "quintile(s) with no households sampled at all: Lowest, Second; quintile cell(s) below 25 unweighted cases: Middle; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Fourth",
+     "reachable_pool_composition": null,
+     "suppressed_quintiles": [
+      "Middle",
+      "Fourth"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -19142,11 +19642,12 @@
       },
       {
        "cases_unweighted": 185,
-       "denominator_weighted": 142.256739,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Fourth",
-       "suppressed": false,
-       "value": 19.808279873475797
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 1316,
@@ -19157,10 +19658,11 @@
        "value": 69.91183566350432
       }
      ],
-     "pending_reason": "quintile(s) with no households sampled at all: Lowest, Second; quintile cell(s) below 25 unweighted cases: Middle",
+     "pending_reason": "quintile(s) with no households sampled at all: Lowest, Second; quintile cell(s) below 25 unweighted cases: Middle; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Fourth",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Middle"
+      "Middle",
+      "Fourth"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -19201,11 +19703,12 @@
       },
       {
        "cases_unweighted": 89,
-       "denominator_weighted": 76.435635,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Fourth",
-       "suppressed": false,
-       "value": 36.47304035611138
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 515,
@@ -19216,10 +19719,11 @@
        "value": 80.16760220494062
       }
      ],
-     "pending_reason": "quintile(s) with no households sampled at all: Lowest, Second; quintile cell(s) below 25 unweighted cases: Middle",
+     "pending_reason": "quintile(s) with no households sampled at all: Lowest, Second; quintile cell(s) below 25 unweighted cases: Middle; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Fourth",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Middle"
+      "Middle",
+      "Fourth"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -25047,6 +25551,86 @@
      "targeting_distortion_bottom2": 0.5516151863220704,
      "top_group_rate": 88.27140997837323
     },
+    "phone_own": {
+     "absent_quintiles": [],
+     "bottom_group_rate": 16.155054922095736,
+     "exclusion_gap": -37.759932537619186,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 400,
+       "denominator_weighted": 0.04980550860074401,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": 11.179149853212271
+      },
+      {
+       "cases_unweighted": 136,
+       "denominator_weighted": 0.01820028550371178,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 29.7717359710946
+      },
+      {
+       "cases_unweighted": 120,
+       "denominator_weighted": 0.01595412137401134,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 34.79213259731912
+      },
+      {
+       "cases_unweighted": 192,
+       "denominator_weighted": 0.02552008497954165,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 47.35864435805818
+      },
+      {
+       "cases_unweighted": 304,
+       "denominator_weighted": 0.0355061741932008,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 67.21990671209782
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.10607347706065441,
+       "population_share": 0.3435190198000613,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.10322930597840872,
+       "population_share": 0.12553117942104378,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.10574859100012358,
+       "population_share": 0.11003891517513212,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.23025126581353472,
+       "population_share": 0.17601736883488941,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.45469736014727863,
+       "population_share": 0.24489351676887336,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.30878487346171535,
+     "targeting_distortion_bottom2": 0.44622682899746546,
+     "top_group_rate": 53.91498745971492
+    },
     "phone_own_f": {
      "absent_quintiles": [],
      "bottom_group_rate": 8.515873783945185,
@@ -27686,14 +28270,92 @@
      "targeting_distortion_bottom2": 0.8119042045706971,
      "top_group_rate": 84.21296325738805
     },
-    "phone_own_f": {
+    "phone_own": {
      "absent_quintiles": [],
-     "bottom_group_rate": 3.91844647254763,
-     "exclusion_gap": -39.17058217969179,
+     "bottom_group_rate": 11.717945981681876,
+     "exclusion_gap": -36.49910422633542,
      "flagged_quintiles": [
-      "Fourth",
       "Highest"
      ],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 644,
+       "denominator_weighted": 0.03706561040153371,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": 9.145587278878164
+      },
+      {
+       "cases_unweighted": 189,
+       "denominator_weighted": 0.010405493892543537,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 20.88099450929102
+      },
+      {
+       "cases_unweighted": 97,
+       "denominator_weighted": 0.004706826653203679,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 34.090680769912765
+      },
+      {
+       "cases_unweighted": 69,
+       "denominator_weighted": 0.0031840771172240495,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 49.15765103709238
+      },
+      {
+       "cases_unweighted": 49,
+       "denominator_weighted": 0.0023424845540717227,
+       "flagged": true,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 75.32306740569916
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.32294061952054953,
+       "population_share": 0.6423349156977293,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.20699211242080695,
+       "population_share": 0.18032380877730333,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.1528634992045645,
+       "population_share": 0.08156776777010287,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.1491126947359016,
+       "population_share": 0.05517901592637876,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.16809107411817736,
+       "population_share": 0.04059449182848566,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.5027604939858498,
+     "targeting_distortion_bottom2": 0.64417080397406,
+     "top_group_rate": 48.21705020801729
+    },
+    "phone_own_f": {
+     "absent_quintiles": [],
+     "exclusion_gap": null,
+     "flagged_quintiles": [],
      "ownership_by_quintile": [
       {
        "cases_unweighted": 446,
@@ -27721,53 +28383,31 @@
       },
       {
        "cases_unweighted": 46,
-       "denominator_weighted": 26.466756,
-       "flagged": true,
+       "complementary": true,
+       "denominator_weighted": null,
+       "flagged": false,
        "quintile": "Fourth",
-       "suppressed": false,
-       "value": 55.079288901140735
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 37,
-       "denominator_weighted": 26.078206,
-       "flagged": true,
+       "complementary": true,
+       "denominator_weighted": null,
+       "flagged": false,
        "quintile": "Highest",
-       "suppressed": false,
-       "value": 68.1342612294726
+       "suppressed": true,
+       "value": null
       }
      ],
-     "pending_reason": null,
-     "reachable_pool_composition": [
-      {
-       "pool_share": 0.1957347087947055,
-       "population_share": 0.6310695420075826,
-       "quintile": "Lowest"
-      },
-      {
-       "pool_share": 0.09036259734660777,
-       "population_share": 0.18397963091373973,
-       "quintile": "Second"
-      },
-      {
-       "pool_share": 0.18632367361133606,
-       "population_share": 0.08927914684272731,
-       "quintile": "Middle"
-      },
-      {
-       "pool_share": 0.2377701853298234,
-       "population_share": 0.048189567953535184,
-       "quintile": "Fourth"
-      },
-      {
-       "pool_share": 0.28980883491752724,
-       "population_share": 0.047482112282415306,
-       "quintile": "Highest"
-      }
+     "pending_reason": "quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Fourth, Highest",
+     "reachable_pool_composition": null,
+     "suppressed_quintiles": [
+      "Fourth",
+      "Highest"
      ],
-     "suppressed_quintiles": [],
-     "targeting_distortion": 0.3101634538913521,
-     "targeting_distortion_bottom2": 0.35101846078301663,
-     "top_group_rate": 43.08902865223942
+     "targeting_distortion": null,
+     "targeting_distortion_bottom2": null
     },
     "phone_own_m": {
      "absent_quintiles": [],
@@ -31129,19 +31769,99 @@
      "targeting_distortion_bottom2": 0.7673819757639361,
      "top_group_rate": 90.69693976093049
     },
-    "phone_own_f": {
+    "phone_own": {
      "absent_quintiles": [],
-     "bottom_group_rate": 1.3918689643841335,
-     "exclusion_gap": -51.58192941729956,
+     "bottom_group_rate": 4.952291182830549,
+     "exclusion_gap": -50.575894213902416,
      "flagged_quintiles": [],
      "ownership_by_quintile": [
       {
-       "cases_unweighted": 67,
-       "denominator_weighted": 86.602854,
+       "cases_unweighted": 85,
+       "denominator_weighted": 0.007396020786963187,
        "flagged": false,
        "quintile": "Lowest",
        "suppressed": false,
        "value": 0.0
+      },
+      {
+       "cases_unweighted": 243,
+       "denominator_weighted": 0.025679595076989328,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 6.378608397782656
+      },
+      {
+       "cases_unweighted": 243,
+       "denominator_weighted": 0.0269892080480575,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 27.17130835898387
+      },
+      {
+       "cases_unweighted": 157,
+       "denominator_weighted": 0.015731110311631092,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 51.05600220027525
+      },
+      {
+       "cases_unweighted": 249,
+       "denominator_weighted": 0.027988052033723062,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 85.38671432026695
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.0,
+       "population_share": 0.07126360292832161,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.04004786611628688,
+       "population_share": 0.24743311567652557,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.17929408449409362,
+       "population_share": 0.2600517577069115,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.19636833182374844,
+       "population_share": 0.151575506770582,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.584289717565871,
+       "population_share": 0.2696760169176593,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.0,
+     "targeting_distortion_bottom2": 0.12566136950390858,
+     "top_group_rate": 55.528185396732965
+    },
+    "phone_own_f": {
+     "absent_quintiles": [],
+     "exclusion_gap": null,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 67,
+       "complementary": true,
+       "denominator_weighted": null,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 163,
@@ -31161,11 +31881,12 @@
       },
       {
        "cases_unweighted": 123,
-       "denominator_weighted": 185.303316,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Fourth",
-       "suppressed": false,
-       "value": 47.61228935590122
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 186,
@@ -31176,45 +31897,19 @@
        "value": 84.02682332780236
       }
      ],
-     "pending_reason": null,
-     "reachable_pool_composition": [
-      {
-       "pool_share": 0.0,
-       "population_share": 0.08239046821037106,
-       "quintile": "Lowest"
-      },
-      {
-       "pool_share": 0.011220613017100778,
-       "population_share": 0.21923515888874412,
-       "quintile": "Second"
-      },
-      {
-       "pool_share": 0.13964289557573567,
-       "population_share": 0.24387337055254937,
-       "quintile": "Middle"
-      },
-      {
-       "pool_share": 0.2243349902959715,
-       "population_share": 0.17629011355877883,
-       "quintile": "Fourth"
-      },
-      {
-       "pool_share": 0.624801501111192,
-       "population_share": 0.2782108887895566,
-       "quintile": "Highest"
-      }
+     "pending_reason": "quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Lowest, Fourth",
+     "reachable_pool_composition": null,
+     "suppressed_quintiles": [
+      "Lowest",
+      "Fourth"
      ],
-     "suppressed_quintiles": [],
-     "targeting_distortion": 0.0,
-     "targeting_distortion_bottom2": 0.037200463120508155,
-     "top_group_rate": 52.97379838168369
+     "targeting_distortion": null,
+     "targeting_distortion_bottom2": null
     },
     "phone_own_m": {
      "absent_quintiles": [],
      "exclusion_gap": null,
-     "flagged_quintiles": [
-      "Fourth"
-     ],
+     "flagged_quintiles": [],
      "ownership_by_quintile": [
       {
        "cases_unweighted": 18,
@@ -31242,11 +31937,12 @@
       },
       {
        "cases_unweighted": 34,
-       "denominator_weighted": 47.44286,
-       "flagged": true,
+       "complementary": true,
+       "denominator_weighted": null,
+       "flagged": false,
        "quintile": "Fourth",
-       "suppressed": false,
-       "value": 56.77776803506366
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 63,
@@ -31257,10 +31953,11 @@
        "value": 87.07414637660374
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Fourth",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Lowest"
+      "Lowest",
+      "Fourth"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -34227,6 +34924,86 @@
      "targeting_distortion": 0.6723696296314192,
      "targeting_distortion_bottom2": 0.8237335995444912,
      "top_group_rate": 77.08054469246385
+    },
+    "phone_own": {
+     "absent_quintiles": [],
+     "bottom_group_rate": 19.503350078373355,
+     "exclusion_gap": -26.536999128264416,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 281,
+       "denominator_weighted": 0.008246949483406266,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": 12.323758028661606
+      },
+      {
+       "cases_unweighted": 232,
+       "denominator_weighted": 0.006781733670500587,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 28.234116549340875
+      },
+      {
+       "cases_unweighted": 219,
+       "denominator_weighted": 0.005636050284139281,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 33.49868285308251
+      },
+      {
+       "cases_unweighted": 201,
+       "denominator_weighted": 0.005364779650568443,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 47.31473284638205
+      },
+      {
+       "cases_unweighted": 120,
+       "denominator_weighted": 0.002212938842019474,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 74.89278452281259
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.11274109086905473,
+       "population_share": 0.2920054357766635,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.2124030111640142,
+       "population_share": 0.24012552759785596,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.20943454915218546,
+       "population_share": 0.1995595247176809,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.2815749507603976,
+       "population_share": 0.18995445805289193,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.183846398054348,
+       "population_share": 0.07835505385490774,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.38609243889310085,
+     "targeting_distortion_bottom2": 0.6110227075890509,
+     "top_group_rate": 46.04034920663777
     },
     "phone_own_f": {
      "absent_quintiles": [],
@@ -39269,6 +40046,86 @@
      "targeting_distortion_bottom2": 0.733686287924413,
      "top_group_rate": 88.77079324550738
     },
+    "phone_own": {
+     "absent_quintiles": [],
+     "bottom_group_rate": 18.66553228299514,
+     "exclusion_gap": -41.0536267229477,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 144,
+       "denominator_weighted": 0.010448898369613015,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": 9.402158217117115
+      },
+      {
+       "cases_unweighted": 187,
+       "denominator_weighted": 0.013266970996395643,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 25.961248403906595
+      },
+      {
+       "cases_unweighted": 167,
+       "denominator_weighted": 0.011455082021347523,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 33.30766336821046
+      },
+      {
+       "cases_unweighted": 212,
+       "denominator_weighted": 0.014459546487650278,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 56.80592793632585
+      },
+      {
+       "cases_unweighted": 349,
+       "denominator_weighted": 0.02083616004204243,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 76.26106731446124
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.0303724069305257,
+       "population_share": 0.14828145222827405,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.10648256451709263,
+       "population_share": 0.18827302711039734,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.11795694596528547,
+       "population_share": 0.1625603137704087,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.2539390439252658,
+       "population_share": 0.2051969955020656,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.4912490386618304,
+       "population_share": 0.2956882113888542,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.2048294407298389,
+     "targeting_distortion_bottom2": 0.40663541818411675,
+     "top_group_rate": 59.71915900594284
+    },
     "phone_own_f": {
      "absent_quintiles": [],
      "bottom_group_rate": 16.061882317091758,
@@ -41821,6 +42678,86 @@
      "targeting_distortion": 0.7619351792030983,
      "targeting_distortion_bottom2": 0.8903559825357169,
      "top_group_rate": 91.34741818227606
+    },
+    "phone_own": {
+     "absent_quintiles": [],
+     "bottom_group_rate": 22.860665547686537,
+     "exclusion_gap": -21.954035749125893,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 174,
+       "denominator_weighted": 0.007929516245985199,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": 11.416031464322788
+      },
+      {
+       "cases_unweighted": 291,
+       "denominator_weighted": 0.012944076663900603,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 29.871626178542517
+      },
+      {
+       "cases_unweighted": 317,
+       "denominator_weighted": 0.013022180112081094,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 33.54765615132611
+      },
+      {
+       "cases_unweighted": 301,
+       "denominator_weighted": 0.01113380045208412,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 45.94465347319757
+      },
+      {
+       "cases_unweighted": 155,
+       "denominator_weighted": 0.005678860649816214,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 68.43578260782202
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.049896606348360274,
+       "population_share": 0.15637470142768553,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.21312730856438755,
+       "population_share": 0.2552647678349062,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.240799199720408,
+       "population_share": 0.256805013546097,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.28196004548674186,
+       "population_share": 0.219565061403537,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.2142168398801023,
+       "population_share": 0.1119904557877742,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.3190836234557713,
+     "targeting_distortion_bottom2": 0.6389667040041791,
+     "top_group_rate": 44.81470129681243
     },
     "phone_own_f": {
      "absent_quintiles": [],
@@ -48928,11 +49865,12 @@
       },
       {
        "cases_unweighted": 67,
-       "denominator_weighted": 50.759472,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Second",
-       "suppressed": false,
-       "value": 64.21966327782131
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 141,
@@ -48959,13 +49897,96 @@
        "value": 96.32260340696826
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Second",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Lowest"
+      "Lowest",
+      "Second"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
+    },
+    "phone_own": {
+     "absent_quintiles": [],
+     "bottom_group_rate": 17.896281948264043,
+     "exclusion_gap": -50.26709186888007,
+     "flagged_quintiles": [
+      "Lowest"
+     ],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 38,
+       "denominator_weighted": 0.0029473626465353446,
+       "flagged": true,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": 17.97106318370203
+      },
+      {
+       "cases_unweighted": 88,
+       "denominator_weighted": 0.004852179739850079,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 17.850857534534782
+      },
+      {
+       "cases_unweighted": 190,
+       "denominator_weighted": 0.011096928910320004,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 47.60313816698735
+      },
+      {
+       "cases_unweighted": 354,
+       "denominator_weighted": 0.021890936541080246,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 62.52978083618053
+      },
+      {
+       "cases_unweighted": 455,
+       "denominator_weighted": 0.025464413403854552,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 81.96616967422685
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.012844007590854802,
+       "population_share": 0.04448726980327727,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.02100337910553614,
+       "population_share": 0.07323843554659014,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.1280948280402525,
+       "population_share": 0.16749620919621488,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.33192843308567255,
+       "population_share": 0.33042014741356995,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.5061293521776841,
+       "population_share": 0.3843579380403478,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.2887119764294597,
+     "targeting_distortion_bottom2": 0.2875105873929603,
+     "top_group_rate": 68.16337381714412
     },
     "phone_own_f": {
      "absent_quintiles": [],
@@ -48982,11 +50003,12 @@
       },
       {
        "cases_unweighted": 67,
-       "denominator_weighted": 50.759472,
+       "complementary": true,
+       "denominator_weighted": null,
        "flagged": false,
        "quintile": "Second",
-       "suppressed": false,
-       "value": 15.981151261778292
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 141,
@@ -49013,10 +50035,11 @@
        "value": 82.19995781343133
       }
      ],
-     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest",
+     "pending_reason": "quintile cell(s) below 25 unweighted cases: Lowest; quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Second",
      "reachable_pool_composition": null,
      "suppressed_quintiles": [
-      "Lowest"
+      "Lowest",
+      "Second"
      ],
      "targeting_distortion": null,
      "targeting_distortion_bottom2": null
@@ -51326,6 +52349,86 @@
      "targeting_distortion": 0.7363181482599044,
      "targeting_distortion_bottom2": 0.8974141119278952,
      "top_group_rate": 92.61636372409467
+    },
+    "phone_own": {
+     "absent_quintiles": [],
+     "bottom_group_rate": 24.207867745536586,
+     "exclusion_gap": -29.95799760259435,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 237,
+       "denominator_weighted": 0.02164165769918638,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": 14.777694196542784
+      },
+      {
+       "cases_unweighted": 376,
+       "denominator_weighted": 0.0378044652778807,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 29.606293209066546
+      },
+      {
+       "cases_unweighted": 287,
+       "denominator_weighted": 0.029361891509887897,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 44.389762405758866
+      },
+      {
+       "cases_unweighted": 168,
+       "denominator_weighted": 0.015051644045201307,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 53.02742538062294
+      },
+      {
+       "cases_unweighted": 200,
+       "denominator_weighted": 0.01697684687294967,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 72.0832247622549
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.06712675150130527,
+       "population_share": 0.17909867243042524,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.23492301575507438,
+       "population_share": 0.3128563272426717,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.2735679915352889,
+       "population_share": 0.24298858537369789,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.16752626751294422,
+       "population_share": 0.12456206007233057,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.2568559736953873,
+       "population_share": 0.14049435488087453,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.37480317743495345,
+     "targeting_distortion_bottom2": 0.6139784481448325,
+     "top_group_rate": 54.165865348130936
     },
     "phone_own_f": {
      "absent_quintiles": [],
@@ -54658,6 +55761,86 @@
      "targeting_distortion_bottom2": 0.6776039535704814,
      "top_group_rate": 77.35961143728912
     },
+    "phone_own": {
+     "absent_quintiles": [],
+     "bottom_group_rate": 16.20702366530617,
+     "exclusion_gap": -37.4065180751703,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 457,
+       "denominator_weighted": 0.012961527547524537,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": 7.8975879630888475
+      },
+      {
+       "cases_unweighted": 280,
+       "denominator_weighted": 0.008551027604958083,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 28.80234959972662
+      },
+      {
+       "cases_unweighted": 194,
+       "denominator_weighted": 0.0055469693024450826,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 37.65469959027279
+      },
+      {
+       "cases_unweighted": 158,
+       "denominator_weighted": 0.004309706361816676,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 47.78698373563524
+      },
+      {
+       "cases_unweighted": 200,
+       "denominator_weighted": 0.004926503370152546,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 76.67938643250719
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.08969666760862399,
+       "population_share": 0.3571088404158459,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.21581015442723508,
+       "population_share": 0.23559318461300277,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.18302086312499485,
+       "population_share": 0.15282703123959912,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.18046082962942978,
+       "population_share": 0.11873864679592341,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.3310114852097163,
+       "population_share": 0.13573229693562877,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.25117459288931093,
+     "targeting_distortion_bottom2": 0.5154475759062729,
+     "top_group_rate": 53.613541740476464
+    },
     "phone_own_f": {
      "absent_quintiles": [],
      "bottom_group_rate": 8.306190307003721,
@@ -56482,6 +57665,86 @@
      "targeting_distortion": 0.6908884498851816,
      "targeting_distortion_bottom2": 0.8422393383493495,
      "top_group_rate": 91.64733346887887
+    },
+    "phone_own": {
+     "absent_quintiles": [],
+     "bottom_group_rate": 11.878457236827428,
+     "exclusion_gap": -28.274774101031703,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 119,
+       "denominator_weighted": 0.0066157041085158404,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": 2.4575483645185128
+      },
+      {
+       "cases_unweighted": 286,
+       "denominator_weighted": 0.017051011555150132,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 15.53372105099465
+      },
+      {
+       "cases_unweighted": 318,
+       "denominator_weighted": 0.01773445971256288,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 27.655926986539637
+      },
+      {
+       "cases_unweighted": 321,
+       "denominator_weighted": 0.01784138592535378,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 36.71941350235274
+      },
+      {
+       "cases_unweighted": 184,
+       "denominator_weighted": 0.008871346400351357,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 72.04207852835329
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.007870188834060328,
+       "population_share": 0.09712706746272903,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.12821317562859044,
+       "population_share": 0.25033083742258994,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.23741775192949197,
+       "population_share": 0.26036473770039387,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.3171256203180592,
+       "population_share": 0.26193455238873636,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.30937326328979814,
+       "population_share": 0.13024280502555088,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.08102982041623348,
+     "targeting_distortion_bottom2": 0.39165424803780496,
+     "top_group_rate": 40.15323133785913
     },
     "phone_own_f": {
      "absent_quintiles": [],
@@ -60646,6 +61909,86 @@
      "targeting_distortion": 0.5521150299200571,
      "targeting_distortion_bottom2": 0.6673256479271656,
      "top_group_rate": 82.68734204778475
+    },
+    "phone_own": {
+     "absent_quintiles": [],
+     "bottom_group_rate": 27.37247334990578,
+     "exclusion_gap": -40.25472997489469,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 285,
+       "denominator_weighted": 0.005796574430313089,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": 17.783945511555302
+      },
+      {
+       "cases_unweighted": 221,
+       "denominator_weighted": 0.004143135085906391,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 40.78758392189628
+      },
+      {
+       "cases_unweighted": 106,
+       "denominator_weighted": 0.002195791740067888,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 44.26427301873535
+      },
+      {
+       "cases_unweighted": 114,
+       "denominator_weighted": 0.002420379924360421,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 67.81646918893284
+      },
+      {
+       "cases_unweighted": 162,
+       "denominator_weighted": 0.0033689523400118374,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 82.7185518986862
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.12693970705096858,
+       "population_share": 0.3233823300859185,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.20809183019142738,
+       "population_share": 0.23113939000499714,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.11968574814917426,
+       "population_share": 0.12249997956952202,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.20212343617809367,
+       "population_share": 0.1350294228156018,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.34315927843033617,
+       "population_share": 0.18794887752396047,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.39253754840977967,
+     "targeting_distortion_bottom2": 0.6041810899444416,
+     "top_group_rate": 67.62720332480046
     },
     "phone_own_f": {
      "absent_quintiles": [],
@@ -66030,6 +67373,86 @@
      "targeting_distortion_bottom2": 0.6778348570850338,
      "top_group_rate": 71.77296701128465
     },
+    "phone_own": {
+     "absent_quintiles": [],
+     "bottom_group_rate": 28.406371178237794,
+     "exclusion_gap": -20.29051762615291,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 289,
+       "denominator_weighted": 0.020499741028819726,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": 25.990066672604634
+      },
+      {
+       "cases_unweighted": 355,
+       "denominator_weighted": 0.016713223422128384,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 31.370109253244166
+      },
+      {
+       "cases_unweighted": 270,
+       "denominator_weighted": 0.011422508561498712,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 36.480040403274714
+      },
+      {
+       "cases_unweighted": 130,
+       "denominator_weighted": 0.005724450490272299,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 56.93990749424588
+      },
+      {
+       "cases_unweighted": 105,
+       "denominator_weighted": 0.004602219483772937,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 68.765532510209
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.25176683636110325,
+       "population_share": 0.3476763223059263,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.24775304706432186,
+       "population_share": 0.2834568517286982,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.19690627539449268,
+       "population_share": 0.19372614330038096,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.15402574398959318,
+       "population_share": 0.097086879823614,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.14954809719048895,
+       "population_share": 0.0780538028413805,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.724141450563232,
+     "targeting_distortion_bottom2": 0.7914651043173037,
+     "top_group_rate": 48.6968888043907
+    },
     "phone_own_f": {
      "absent_quintiles": [],
      "bottom_group_rate": 15.220753603513279,
@@ -69184,29 +70607,110 @@
      "targeting_distortion_bottom2": 0.6152098128025628,
      "top_group_rate": 78.18480881387723
     },
-    "phone_own_f": {
+    "phone_own": {
      "absent_quintiles": [],
-     "bottom_group_rate": 16.399154379275437,
-     "exclusion_gap": -37.69288287467071,
+     "bottom_group_rate": 26.12377397387007,
+     "exclusion_gap": -28.081415278745002,
      "flagged_quintiles": [
       "Lowest"
      ],
      "ownership_by_quintile": [
       {
-       "cases_unweighted": 25,
-       "denominator_weighted": 40.388467999999996,
+       "cases_unweighted": 40,
+       "denominator_weighted": 0.005770803980411327,
        "flagged": true,
        "quintile": "Lowest",
        "suppressed": false,
-       "value": 4.947585533573593
+       "value": 23.447375189916674
       },
       {
-       "cases_unweighted": 65,
-       "denominator_weighted": 99.778863,
+       "cases_unweighted": 89,
+       "denominator_weighted": 0.010498239985393499,
        "flagged": false,
        "quintile": "Second",
        "suppressed": false,
-       "value": 21.034518102295873
+       "value": 27.59497036270241
+      },
+      {
+       "cases_unweighted": 241,
+       "denominator_weighted": 0.023797628925825372,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 32.86829975907428
+      },
+      {
+       "cases_unweighted": 381,
+       "denominator_weighted": 0.036861966337381105,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 55.50245728262393
+      },
+      {
+       "cases_unweighted": 266,
+       "denominator_weighted": 0.023639554771018128,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 73.66188091204388
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.027092058084371175,
+       "population_share": 0.057381998730231136,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.05800399025075424,
+       "population_share": 0.10438926630610892,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.15661103870949605,
+       "population_share": 0.23663176178562387,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.40963980619969526,
+       "population_share": 0.3665370220068814,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.34865310675568323,
+       "population_share": 0.23505995117115466,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.4721351414010261,
+     "targeting_distortion_bottom2": 0.5260269697217832,
+     "top_group_rate": 54.20518925261507
+    },
+    "phone_own_f": {
+     "absent_quintiles": [],
+     "exclusion_gap": null,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 25,
+       "complementary": true,
+       "denominator_weighted": null,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": true,
+       "value": null
+      },
+      {
+       "cases_unweighted": 65,
+       "complementary": true,
+       "denominator_weighted": null,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": true,
+       "value": null
       },
       {
        "cases_unweighted": 170,
@@ -69233,38 +70737,14 @@
        "value": 78.41925345726388
       }
      ],
-     "pending_reason": null,
-     "reachable_pool_composition": [
-      {
-       "pool_share": 0.0043407040966154916,
-       "population_share": 0.04257123475436375,
-       "quintile": "Lowest"
-      },
-      {
-       "pool_share": 0.045591156380459255,
-       "population_share": 0.10517134248064323,
-       "quintile": "Second"
-      },
-      {
-       "pool_share": 0.14430119402587196,
-       "population_share": 0.2299166545453328,
-       "quintile": "Middle"
-      },
-      {
-       "pool_share": 0.39339800354382337,
-       "population_share": 0.3671807517613065,
-       "quintile": "Fourth"
-      },
-      {
-       "pool_share": 0.4123689419532299,
-       "population_share": 0.25516001645835373,
-       "quintile": "Highest"
-      }
+     "pending_reason": "quintile cell(s) withheld so a suppressed cell cannot be derived from published totals: Lowest, Second",
+     "reachable_pool_composition": null,
+     "suppressed_quintiles": [
+      "Lowest",
+      "Second"
      ],
-     "suppressed_quintiles": [],
-     "targeting_distortion": 0.10196331212052874,
-     "targeting_distortion_bottom2": 0.33796527319034475,
-     "top_group_rate": 54.092037253946145
+     "targeting_distortion": null,
+     "targeting_distortion_bottom2": null
     },
     "phone_own_m": {
      "absent_quintiles": [],
@@ -74578,6 +76058,86 @@
      "targeting_distortion_bottom2": 0.817592812869848,
      "top_group_rate": 82.17123999538862
     },
+    "phone_own": {
+     "absent_quintiles": [],
+     "bottom_group_rate": 16.733010906409312,
+     "exclusion_gap": -30.058023068743495,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 122,
+       "denominator_weighted": 0.014041923231104904,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": 5.720957233821224
+      },
+      {
+       "cases_unweighted": 239,
+       "denominator_weighted": 0.030991700072817017,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 21.72242458568391
+      },
+      {
+       "cases_unweighted": 334,
+       "denominator_weighted": 0.040948592277296574,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 36.798314703657084
+      },
+      {
+       "cases_unweighted": 247,
+       "denominator_weighted": 0.030219855393387746,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 49.749397532249404
+      },
+      {
+       "cases_unweighted": 121,
+       "denominator_weighted": 0.011158306279516528,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 75.45008493528569
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.01744212747489396,
+       "population_share": 0.11025346763135749,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.1461698694688212,
+       "population_share": 0.24333863279141463,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.32716818599869635,
+       "population_share": 0.32151751714421867,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.3264257180923789,
+       "population_share": 0.23727831249345252,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.18279409896520948,
+       "population_share": 0.08761206993955667,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.1582002620834866,
+     "targeting_distortion_bottom2": 0.46271394849628317,
+     "top_group_rate": 46.79103397515281
+    },
     "phone_own_f": {
      "absent_quintiles": [],
      "bottom_group_rate": 8.555547654888597,
@@ -77344,6 +78904,86 @@
      "targeting_distortion_bottom2": 0.7885617238874446,
      "top_group_rate": 91.51916303718193
     },
+    "phone_own": {
+     "absent_quintiles": [],
+     "bottom_group_rate": 11.194326875113191,
+     "exclusion_gap": -33.68697120086109,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 93,
+       "denominator_weighted": 0.012125099510198852,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": 5.259117250935214
+      },
+      {
+       "cases_unweighted": 204,
+       "denominator_weighted": 0.026460772782576213,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 13.91401340499546
+      },
+      {
+       "cases_unweighted": 329,
+       "denominator_weighted": 0.044165712251518885,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 27.31077636880086
+      },
+      {
+       "cases_unweighted": 354,
+       "denominator_weighted": 0.046108611369380346,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 41.720753207647796
+      },
+      {
+       "cases_unweighted": 251,
+       "denominator_weighted": 0.030040920995651702,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 75.56421026134508
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.010934326218591516,
+       "population_share": 0.07630594262668283,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.06313189167453125,
+       "population_share": 0.16652351661993392,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.20682981637815465,
+       "population_share": 0.2779446306643724,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.3298587774722732,
+       "population_share": 0.29017172607849806,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.38924518825644944,
+       "population_share": 0.18905418401051263,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.14329586716576354,
+     "targeting_distortion_bottom2": 0.3050133131413078,
+     "top_group_rate": 44.88129807597428
+    },
     "phone_own_f": {
      "absent_quintiles": [],
      "bottom_group_rate": 5.564546029679782,
@@ -79908,6 +81548,86 @@
      "targeting_distortion": 0.7019176767599047,
      "targeting_distortion_bottom2": 0.805949962087924,
      "top_group_rate": 86.79942881956792
+    },
+    "phone_own": {
+     "absent_quintiles": [],
+     "bottom_group_rate": 13.350156057818635,
+     "exclusion_gap": -39.53839733698697,
+     "flagged_quintiles": [],
+     "ownership_by_quintile": [
+      {
+       "cases_unweighted": 390,
+       "denominator_weighted": 0.03245544636644116,
+       "flagged": false,
+       "quintile": "Lowest",
+       "suppressed": false,
+       "value": 6.521186417296951
+      },
+      {
+       "cases_unweighted": 264,
+       "denominator_weighted": 0.025034588540908086,
+       "flagged": false,
+       "quintile": "Second",
+       "suppressed": false,
+       "value": 22.203397545843785
+      },
+      {
+       "cases_unweighted": 179,
+       "denominator_weighted": 0.016990549985223126,
+       "flagged": false,
+       "quintile": "Middle",
+       "suppressed": false,
+       "value": 37.399896944614056
+      },
+      {
+       "cases_unweighted": 148,
+       "denominator_weighted": 0.011191873701474024,
+       "flagged": false,
+       "quintile": "Fourth",
+       "suppressed": false,
+       "value": 56.25078874938166
+      },
+      {
+       "cases_unweighted": 134,
+       "denominator_weighted": 0.01028617051856346,
+       "flagged": false,
+       "quintile": "Highest",
+       "suppressed": false,
+       "value": 74.81421346148113
+      }
+     ],
+     "pending_reason": null,
+     "reachable_pool_composition": [
+      {
+       "pool_share": 0.07553329658180996,
+       "population_share": 0.3382233225565768,
+       "quintile": "Lowest"
+      },
+      {
+       "pool_share": 0.19837371682964605,
+       "population_share": 0.2608893934023314,
+       "quintile": "Second"
+      },
+      {
+       "pool_share": 0.2267786055355419,
+       "population_share": 0.17706119962681302,
+       "quintile": "Middle"
+      },
+      {
+       "pool_share": 0.22467546790624376,
+       "population_share": 0.11663228002496868,
+       "quintile": "Fourth"
+      },
+      {
+       "pool_share": 0.27463891314675826,
+       "population_share": 0.10719380438931012,
+       "quintile": "Highest"
+      }
+     ],
+     "suppressed_quintiles": [],
+     "targeting_distortion": 0.22332373773300337,
+     "targeting_distortion_bottom2": 0.45718778138944166,
+     "top_group_rate": 52.888553394805605
     },
     "phone_own_f": {
      "absent_quintiles": [],
