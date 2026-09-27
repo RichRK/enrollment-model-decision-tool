@@ -56,8 +56,12 @@ describe("published site (site/dist)", () => {
   });
 
   test("loads no external resource", () => {
-    // The site must not talk to anything but its own files.
-    const matches = [...siteText.matchAll(/(?:src|href)\s*=\s*["'](https?:\/\/[^"']+)/g)]
+    // The site must not talk to anything but its own files. A plain <a> link to a
+    // source is fine: the browser fetches nothing until a reader follows it.
+    const matches = [
+      ...siteText.matchAll(/<(?!a\s)[a-z][\w-]*\b[^>]*?\b(?:src|href)\s*=\s*["'](https?:\/\/[^"']+)/gi),
+      ...siteText.matchAll(/url\(\s*["']?(https?:\/\/[^"')]+)/gi),
+    ]
       .map((m) => m[1])
       .filter((u) => !u.startsWith("http://localhost") && !u.startsWith("http://127."));
     expect([...new Set(matches)]).toEqual([]);

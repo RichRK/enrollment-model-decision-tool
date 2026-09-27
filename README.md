@@ -2,51 +2,59 @@
 
 ## The question
 
-Remote registration scales; in-person enrollment reaches households that remote
-registration cannot. Organisations usually pick one per country. **v2 changes what
-the tool measures.** A regional phone-ownership rate tells you the *size* of the
-group remote enrollment would exclude; it says nothing about its *composition*. For
-a programme targeted at poor households that is the whole question, because the
-exclusion runs along the same axis as the eligibility criterion. Two regions can
-report identical average ownership while one merely misses people and the other
-selects against precisely the households the programme exists to reach.
+Remote enrollment scales; in-person enrollment reaches people that remote
+enrollment cannot. **v3 asks who could enroll by phone, and where they live.**
+Madagascar is split into about 43,000 squares of 2.4 km. Each square gets the
+share of its people who could enroll by phone, from the DHS 2021 phone-ownership
+rate for its survey region and wealth fifth, and a head count from WorldPop. A
+wealth slider narrows the answer to the poorest people in the country, because
+phone ownership falls fastest exactly where a targeted programme most needs to
+reach.
+
+The rate is split by wealth because a regional average hides the composition of
+who is excluded: two regions with the same phone ownership can miss the poor at
+very different rates. That was v2's headline (`targeting_distortion`, still
+computed in `regions.json`); v3 puts the same split on a map instead of a table.
 
 ## Limitations, first
 
-### Four regions have no answer, and they are not random
+- **Blank areas on the map.** Squares exist only where Meta's Relative Wealth
+  Index gives a score, and Meta scored only squares it treated as populated.
+  WorldPop puts about 7% of Madagascar's people (2.1M) in the blank areas, mostly
+  thinly settled countryside. They are left out of every figure, and they may be
+  the hardest people to reach.
+- **Squares outside the survey regions.** About 3,470 people live in coastal
+  squares that fall outside every DHS region's boundary, even after snapping
+  squares within 0.03° to the nearest region. They have no survey figure and
+  show in grey. Nothing is substituted for them.
+- **"At most".** A phone is necessary for remote enrollment, not sufficient.
+  Literacy, an ID for the SIM, trust and signal coverage all lower the number,
+  and none of them is included.
+- **The wealth index and the survey disagree about who is poor.** In the median
+  region, 16% of people fall in a different wealth fifth under Meta's index than
+  under DHS. The page shows a range: the upper figure uses the next-richer
+  fifth's phone rate.
+- **Neighbouring squares often share a score.** The survey reports by region and
+  wealth fifth only, so scores take at most 115 values. The map shows where each
+  applies, not variation within a region.
+- **Merged fifths.** Where a region has fewer than 25 survey cases in one wealth
+  fifth, that fifth is published together with its neighbour as one figure, so
+  its own rate can't be recovered from the region's total. This happens in four
+  regions, and the shared figure leans towards the better-sampled fifth — it may
+  overstate phone reach for the thin one.
+- **DHS data is self-reported and from 2021.** Ownership has almost certainly
+  risen. Whether the wealth gradient has flattened is not knowable from this data.
+- **Personal ownership pools women and men equally.** With household members
+  switched off, the rate is adults aged 15–49 who own a phone themselves. Women's
+  ownership is far lower than men's, and the pooled figure hides that.
+- **Phone sharing is a guess you supply.** "Phone owners also enroll" lets each
+  owner enroll 0–2 others; the survey says nothing about how often that happens.
+- **Regions are DHS survey regions**, which will not match operational areas, and
+  Madagascar's administrative divisions have changed since 2021.
+- **Population is modelled**, not counted — WorldPop 2025 constrained. Last census
+  2018.
 
-The regional metric is computed, from the household and individual recodes.
-**19 of 23 regions have a usable targeting distortion.** The other four do not:
-Antananarivo capital (the survey records no bottom-quintile households at all),
-Analamanga excluding capital (14 unweighted cases in the poorest quintile),
-Analanjirofo (19), and Androy (18 in the *richest* quintile).
-
-Wealth quintiles are national, so a wealthy region holds almost no bottom-quintile
-households and a poor one almost no top-quintile households. The losses land at
-both ends of the distribution — which is where a targeted programme most wants an
-answer. Nothing is estimated in their place.
-
-Where any cell in a region is suppressed, that region's distortion is withheld too.
-It is a share of a total across five quintiles, and a total missing one of its parts
-understates the denominator and flatters the result.
-
-### The regional spread is the point
-
-| | Distortion |
-|---|---|
-| National | 0.27 |
-| Atsinanana | **0.04** |
-| Menabe | **0.69** |
-
-A seventeen-fold spread that the national figure erases. Atsinanana is the sharpest
-case: household phone ownership of **46.3%**, close to the national average and
-enough to clear the cost line under most cost ratios — while its poorest fifth is
-12.1% of the population and **0.5%** of everyone that phone ownership reaches.
-
-On women's personal phone ownership, Vakinankarata and Atsinanana both compute to
-**0.00**. Full table and method in [`pipeline/docs/03-recode.md`](pipeline/docs/03-recode.md).
-
-### The aggregate API cannot produce this, which was checked not assumed
+### The aggregate API cannot produce the regional split, which was checked not assumed
 
 `breakdown=all` returns 38 rows for Madagascar — 1 total + 2 residence + 5 quintile
 + 30 region — the union of the breakdowns, not their cross product. No row carries
@@ -68,33 +76,11 @@ Computed from the API's wealth-quintile breakdown, DHS 2021, all regions pooled:
 | Woman is literate | 41.1% | 94.9% | **0.54** |
 | Household has electricity | 0.4% | 93.0% | **0.01** |
 
-The poorest fifth is 18.5% of Madagascar's population and about 5% of everyone a
-household phone can reach. **The more digital the channel, the worse the
-distortion** — 0.27 for a household phone, 0.14 for a personal one, 0.09 for mobile
-money, 0.05 for internet use. And it is sexed as well as classed: personal phone
-ownership distorts at 0.14 for women against 0.37 for men, so a phone-based channel
-excludes poor women about 2.6 times as hard as poor men. The household-level
-indicator hides that completely.
-
-### Everything else
-
-- **The cost model treats all excluded households as alike.** It assumes one
-  in-person cost per enrollment regardless of who is being reached, when in practice
-  the excluded households are disproportionately the remote, dispersed and poor
-  ones — the expensive ones. Travel time and settlement dispersion (v2 Part 3) are
-  **not yet built**; see *What is not done*.
-- **DHS data is self-reported and from 2021.** Ownership has almost certainly risen.
-  Whether the *gradient* has flattened is not knowable from this data.
-- **Household ownership is not personal access.** Individual ownership among women
-  is far lower and is shown alongside it everywhere.
-- **Regions are DHS survey regions**, which will not match operational areas, and
-  Madagascar's administrative divisions have changed since 2021.
-- **Population is modelled**, not counted — WorldPop 2025 constrained. Last census
-  2018.
-- **Both cost inputs are placeholders you supply.** No cost figure comes from any
-  dataset.
-- **Nothing here measures** identity documentation, trust, intra-household control
-  of a phone, or network coverage.
+Targeting distortion is the poorest fifth's share of everyone a channel reaches,
+divided by its share of the population; below 1.0 means the channel selects
+against the poor. The poorest fifth is 18.5% of Madagascar's population and about
+5% of everyone a household phone can reach. The regional version, with its
+seventeen-fold spread, is in [`pipeline/docs/03-recode.md`](pipeline/docs/03-recode.md).
 
 ## Restricted data — read before any commit
 
@@ -195,9 +181,9 @@ Stated plainly rather than left to be discovered:
   (`Accessibility__202001_Global_Walking_Only_Friction_Surface` and the motorised
   variant, via the MAP WCS endpoint), and Google Open Buildings v3 was confirmed
   reachable. The relevant constants are already in `pipeline/config.py`.
-- **v2 Part 4 mixed-strategy output** — depends on Part 3. The tool shows the
-  targeting distortion and a binary cost recommendation side by side, rather than
-  the combined statement the addendum asks for.
+- **v2 Part 4 mixed-strategy output** — depends on Part 3. v3 dropped the v2 cost
+  calculator; the page shows who could enroll by phone, not which channel is
+  cheaper.
 - **v2 Part 5 coverage layer** — explicitly stretch scope; not pursued.
 - **The repointed `disagreement_flag`** — v2 asks for it to flag regions where the
   headline rate and the targeting distortion disagree. The data for it now exists;
@@ -240,8 +226,8 @@ make serve
 ```
 
 Then open <http://localhost:4321/>. The page needs no `fetch` and makes no network
-requests at all: `pipeline/data/regions.json` is read once, at build time, and
-inlined directly into the HTML.
+requests at all: `pipeline/data/regions.json` and `pipeline/data/squares.json` are
+read once, at build time, and inlined directly into the HTML.
 
 ## What is in here
 
@@ -252,14 +238,17 @@ pipeline/fetch_dhs.py      values, national quintiles, geometry — with id re-v
 pipeline/fetch_worldpop.py constrained population raster
 pipeline/fetch_findex.py   one national reference series
 pipeline/fetch_recode.py   RESTRICTED microdata in, suppressed aggregates out
+pipeline/fetch_rwi.py      Meta's Relative Wealth Index, one row per 2.4 km square
 pipeline/build.py          joins, wealth gradients, emits regions.json
+pipeline/build_squares.py  squares: region, WorldPop count and national wealth fifth
 pipeline/check_data.py     the pipeline half of the data-agreement audit behind `make check-data`
-pipeline/data/regions.json committed output, ~1.2 MB
+pipeline/data/regions.json committed output, ~1.1 MB
+pipeline/data/squares.json committed output, ~1.6 MB, no DHS values in it
 pipeline/docs/dhs-data-terms-...md  the agreement, and what it constrains
 pipeline/docs/01-verification.md    v1 source verification, and the indicator bug it caught
 pipeline/docs/02-crosstab.md        whether the API can cross region x quintile. It cannot.
 pipeline/docs/03-recode.md          recode variables, the validation, and the regional results
-site/                      the viewer: Astro, vanilla JS, inline SVG, no UI framework
+site/                      the viewer: Astro, TypeScript, a canvas map, no UI framework
 site/tests/check-data.test.js  the site half of the data-agreement audit (bun test)
 CLAUDE.md                  restricted-data rules, first thing in the file
 attic/                     Ookla, and why it was dropped
@@ -284,16 +273,13 @@ variant returns structurally valid GeoJSON with empty coordinate arrays — it f
 silently. The json variant carries WKT.
 
 **Missing means missing.** A null stays null through the pipeline, into
-`regions.json`, and renders as "—". Nothing is interpolated and no national figure
-is substituted for a regional one.
-
-**The decision rule is one line of arithmetic, stated in the UI.** Remote-first
-costs the remote price for everyone plus the in-person price for the share who
-cannot complete it, so it wins exactly when
-`reachable share > cost_remote / cost_inperson`.
+`regions.json`, and a square without a survey figure shows grey and counts in
+neither total. Nothing is interpolated and no national figure is substituted for a
+regional one.
 
 **"Reachable share" is a choice, not an index.** Two readings are offered, each a
-real DHS value: household phone ownership, and personal ownership among women. No
+real DHS value: household phone ownership, and personal ownership among adults
+15–49, women and men pooled equally. No
 weighted composite anywhere, because the weights would have to be invented. A third
 reading, "owns a phone and is literate", was dropped — the survey never crosses the
 two conditions, so it could only be published as a pair of Fréchet bounds, and its
@@ -302,4 +288,5 @@ women's literacy exceeds women's phone ownership everywhere.
 
 ## Licence
 
-Code is MIT. `pipeline/data/regions.json` is CC BY 4.0. See [LICENSES.md](LICENSES.md).
+Code is MIT. `pipeline/data/regions.json` is CC BY 4.0; `pipeline/data/squares.json`
+is CC BY-NC 4.0, following the wealth index. See [LICENSES.md](LICENSES.md).
