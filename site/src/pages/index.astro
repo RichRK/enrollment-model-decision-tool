@@ -24,17 +24,8 @@ const regionsJson = fs.readFileSync(regionsPath, "utf-8");
 const inlineSafeJson = regionsJson.replace(/<\/script/gi, "<\\/script");
 
 /* Every figure quoted in the prose below is derived here, from the same file the
- * page ships. None of them is typed by hand.
- *
- * This is not stylistic. The page's whole argument is that a number should never
- * be substituted, imputed or assumed -- and it used to assert six figures in its
- * own copy that the pipeline recomputes on every run. They were all correct, which
- * is exactly the problem: nothing would have told anyone when they stopped being.
- * The worst pair were four paragraphs apart and disagreed by construction, one
- * hardcoded ("Four regions have no answer") and one computed by the script from
- * the same data. */
+ * page ships. None of them is typed by hand, so none can silently go stale. */
 const data = JSON.parse(regionsJson) as Data;
-const surveyYear = data.sources.dhs.survey_year;
 const headline = data.constants.headline_indicator;
 
 const gradientOf = (region: Region) => (region.quintiles || {})[headline] || null;
@@ -53,7 +44,7 @@ const defaultLine = defaultCostRemote / defaultCostInPerson;
 // data, not from memory.
 //
 // Computed on the headline (household) indicator, which is what the prose says it
-// is. That has to stay explicit: the map, the table and the drawer now follow the
+// is. That has to stay explicit: the map, the table and the drawer follow the
 // basis selector, so an unqualified "its targeting distortion is 0.23" here would
 // contradict the 0.15 the table shows for the same region under the women's
 // basis. This sentence is build-time prose and cannot follow a runtime choice --
@@ -77,7 +68,7 @@ const workedRate = worked[headline as "hh_mobile_phone"] as number;
 </head>
 <body>
 
-<Masthead country={data.country} surveyYear={surveyYear} regionCount={data.regions.length} />
+<Masthead country={data.country} regionCount={data.regions.length} />
 
 <main>
 
@@ -131,7 +122,7 @@ const workedRate = worked[headline as "hh_mobile_phone"] as number;
     </section>
   </div>
 
-  <MapColumn surveyYear={surveyYear} regionCount={data.regions.length} />
+  <MapColumn />
 </div>
 
 <RegionDrawer />

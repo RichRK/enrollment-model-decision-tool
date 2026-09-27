@@ -42,7 +42,7 @@ export interface PoolCell {
   population_share: number;
 }
 
-/** A region's wealth breakdown for one indicator. The v2 core. */
+/** A region's wealth breakdown for one indicator. */
 export interface RegionGradient {
   targeting_distortion: number | null;
   targeting_distortion_bottom2: number | null;

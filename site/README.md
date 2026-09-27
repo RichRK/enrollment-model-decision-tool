@@ -7,9 +7,7 @@ rules there (no analytics/tracking, cell suppression, attribution) apply to
 whatever this builds.
 
 `src/pages/index.astro` reads `../pipeline/data/regions.json` off disk at build
-time and inlines it into the page — there's no client-side fetch, so the page
-can't be opened over `file://` and still miss the data the way the old
-fetch-based version could.
+time and inlines it into the page — there's no client-side fetch.
 
 ## Commands
 
@@ -18,7 +16,7 @@ Run from this directory, using [bun](https://bun.sh) rather than npm:
 | Command          | Action                                              |
 | :---------------- | :-------------------------------------------------- |
 | `bun install`      | Install dependencies (once, or after a lockfile change) |
-| `bun run dev`       | Dev server at `localhost:8000` (pinned, matching the port the pre-Astro static site used) — needs `pipeline/data/regions.json` to already exist (`make build` from the repo root, or at least `make -C .. fetch` then the pipeline) |
+| `bun run dev`       | Dev server at `localhost:8000` — needs `pipeline/data/regions.json` to already exist (`make build` from the repo root, or at least `make -C .. fetch` then the pipeline) |
 | `bun run build`     | Production build to `./dist/`, then `bun test tests/check-data.test.js` — the build fails if the audit does |
 | `bun run preview`   | Serve the production build locally                   |
 | `bun run check-data`| Just the audit, against whatever's already in `./dist/`, no rebuild |

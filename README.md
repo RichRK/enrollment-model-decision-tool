@@ -3,8 +3,8 @@
 ## The question
 
 Remote registration scales; in-person enrollment reaches households that remote
-registration cannot. Organisations usually pick one per country. **v2 changes what
-the tool measures.** A regional phone-ownership rate tells you the *size* of the
+registration cannot. Organisations usually pick one per country. A regional
+phone-ownership rate tells you the *size* of the
 group remote enrollment would exclude; it says nothing about its *composition*. For
 a programme targeted at poor households that is the whole question, because the
 exclusion runs along the same axis as the eligibility criterion. Two regions can
@@ -44,7 +44,7 @@ enough to clear the cost line under most cost ratios — while its poorest fifth
 12.1% of the population and **0.5%** of everyone that phone ownership reaches.
 
 On women's personal phone ownership, Vakinankarata and Atsinanana both compute to
-**0.00**. Full table and method in [`pipeline/docs/03-recode.md`](pipeline/docs/03-recode.md).
+**0.00**.
 
 ### The aggregate API cannot produce this, which was checked not assumed
 
@@ -52,7 +52,7 @@ On women's personal phone ownership, Vakinankarata and Atsinanana both compute t
 + 30 region — the union of the breakdowns, not their cross product. No row carries
 both a populated `RegionId` and a non-Region characteristic, `ByVariableId` is empty
 on every row of every indicator tested, and `/characteristics` returns HTTP 501.
-Evidence in [`pipeline/docs/02-crosstab.md`](pipeline/docs/02-crosstab.md). Hence the microdata.
+Hence the microdata.
 
 ### What the national figures show
 
@@ -81,7 +81,7 @@ indicator hides that completely.
 - **The cost model treats all excluded households as alike.** It assumes one
   in-person cost per enrollment regardless of who is being reached, when in practice
   the excluded households are disproportionately the remote, dispersed and poor
-  ones — the expensive ones. Travel time and settlement dispersion (v2 Part 3) are
+  ones — the expensive ones. Travel time and settlement dispersion are
   **not yet built**; see *What is not done*.
 - **DHS data is self-reported and from 2021.** Ownership has almost certainly risen.
   Whether the *gradient* has flattened is not knowable from this data.
@@ -99,26 +99,16 @@ indicator hides that completely.
 ## Restricted data — read before any commit
 
 The microdata this project needs comes under a **signed DHS data agreement**, not an
-open licence. `origin` is a public repository, so the constraints are operational
-rather than theoretical.
+open licence, and `origin` is a public repository. The rules are at the top of
+[`CLAUDE.md`](CLAUDE.md); the full terms are in
+[`pipeline/docs/dhs-data-terms-constraints.md`](pipeline/docs/dhs-data-terms-constraints.md).
 
-The full terms and what they constrain are in
-[`pipeline/docs/dhs-data-terms-constraints.md`](pipeline/docs/dhs-data-terms-constraints.md),
-and the short version a future contributor will actually read is at the top of
-[`CLAUDE.md`](CLAUDE.md). In brief:
-
-- **Record-level data is never committed or redistributed** — not directly, and not
-  inside any tool or dashboard. `pipeline/.gitignore` covers `data/raw/`,
-  `data/interim/`; the root `.gitignore` covers the statistical-package extensions
-  repo-wide. A DHS archive arriving with a filename those patterns miss is *not*
+- A DHS archive arriving with a filename the `.gitignore` patterns miss is *not*
   protected: extend the relevant `.gitignore` rather than moving the file.
-- **Only aggregates are published.** Percentages and unweighted counts by region and
-  wealth quintile — never per-household or per-individual rows, never anything at
-  cluster or enumeration-area level.
-- **Cell suppression is mandatory and not configurable**: flag under 50 unweighted
-  cases, suppress under 25. There is deliberately no option to turn it off.
-- **The site stays non-commercial** — no analytics, tracking, advertising or data
-  capture.
+- An indicator the API returns without an unweighted case count is not published,
+  which is why women's internet use (`CO_INUS_W_U12`) is absent. Any indicator
+  dropped this way is listed under `national.wealth_gradient_withheld` in
+  `regions.json`.
 - **Standing obligation:** any resulting report or publication must be sent to
   `references@dhsprogram.com`. This is a condition of access, not a courtesy.
 
@@ -128,32 +118,8 @@ Before publishing:
 make check-data
 ```
 
-That audits what git can see, whether every published cell carries a usable
-unweighted case count, whether anything falls below the suppression floor,
-attribution, and whether the site has acquired any tracking. It is not decoration —
-it caught a live problem on its first run, described next. It also isn't
-optional in practice: the same audit runs as the last step of `pipeline/run_all.py`
-and as part of `site/package.json`'s `build` script, so `make build` fails on
-either side if the data it just produced doesn't pass. `make check-data` on
-its own is the fast path when you want the audit without a full rebuild.
-
-### A cell with no case count is not published
-
-`CO_INUS_W_U12` (women's internet use in the past 12 months) is returned by the DHS
-API **without an unweighted case count** — an empty string rather than a number, at
-every breakdown level, so it is not recoverable. Under the agreement, a published
-cell has to carry the count that demonstrates it is large enough to be
-non-disclosive.
-
-Its weighted denominators match `CO_MOBB_W_MOB` and `ED_LITR_W_LIT` exactly, both
-drawn on the same base of women interviewed, so the unweighted counts are almost
-certainly identical and could have been borrowed. That would have been reasoning
-rather than evidence. **The indicator was withheld instead**, recorded in
-`regions.json` under `national.wealth_gradient_withheld` so it was visibly absent
-rather than quietly missing.
-
-It cost the most striking card on the site — women's internet use had a targeting
-distortion of 0.02.
+The same audit runs as the last step of `make build`, on both the pipeline and the
+site, so a build whose output fails it fails too.
 
 ## Working with the recodes
 
@@ -173,35 +139,24 @@ the rate for all 23 regions within 0.15 pp. Any disagreement stops the build. Th
 regional check is what proves the region mapping; a mis-mapping leaves national
 totals intact while scrambling the regions.
 
-That check earned its place on the first run. The textbook DHS literacy definition
-— "secondary schooling or higher, or can read a sentence" — is **wrong for this
-survey**, because women with secondary education were still given the reading card;
-93 of them were recorded as unable to read and the education clause counted them all
-as literate. It overstated the richest quintile by 1.2 points. The correct
-definition is the card result alone. Details in
-[`pipeline/docs/03-recode.md`](pipeline/docs/03-recode.md) §3.
-
-This is the same class of error as the `ED_LITR_W_TOT` bug in
-[`pipeline/docs/01-verification.md`](pipeline/docs/01-verification.md) §2: plausible, widely
-documented, and wrong here. Neither was catchable by reading the code.
+That check caught a definition error on its first run: the textbook DHS literacy
+definition is **wrong for this survey**. See the note on `RECODE_LITERACY` in
+`pipeline/config.py`.
 
 ## What is not done
 
 Stated plainly rather than left to be discovered:
 
-- **v2 Part 3 entirely** — travel time from the Malaria Atlas friction surfaces,
-  settlement dispersion, `households_per_field_day`. Not blocked by anything; simply
-  not yet built. Both MAP friction surfaces were confirmed available
-  (`Accessibility__202001_Global_Walking_Only_Friction_Surface` and the motorised
-  variant, via the MAP WCS endpoint), and Google Open Buildings v3 was confirmed
-  reachable. The relevant constants are already in `pipeline/config.py`.
-- **v2 Part 4 mixed-strategy output** — depends on Part 3. The tool shows the
-  targeting distortion and a binary cost recommendation side by side, rather than
-  the combined statement the addendum asks for.
-- **v2 Part 5 coverage layer** — explicitly stretch scope; not pursued.
-- **The repointed `disagreement_flag`** — v2 asks for it to flag regions where the
-  headline rate and the targeting distortion disagree. The data for it now exists;
-  the flag does not. Atsinanana would be its first entry.
+- **Travel time and settlement dispersion** — pricing the households remote
+  enrollment excludes by how expensive they are to reach, rather than at one flat
+  in-person cost. Not blocked by anything; simply not yet built.
+- **A combined mixed-strategy recommendation** — depends on the above. The tool
+  shows the targeting distortion and a binary cost recommendation side by side
+  instead.
+- **A coverage layer** — not pursued.
+- **A disagreement flag** for regions where the headline rate and the targeting
+  distortion disagree. The data for it exists; the flag does not. Atsinanana would
+  be its first entry.
 
 ## How to rebuild
 
@@ -256,49 +211,11 @@ pipeline/build.py          joins, wealth gradients, emits regions.json
 pipeline/check_data.py     the pipeline half of the data-agreement audit behind `make check-data`
 pipeline/data/regions.json committed output, ~1.2 MB
 pipeline/docs/dhs-data-terms-...md  the agreement, and what it constrains
-pipeline/docs/01-verification.md    v1 source verification, and the indicator bug it caught
-pipeline/docs/02-crosstab.md        whether the API can cross region x quintile. It cannot.
-pipeline/docs/03-recode.md          recode variables, the validation, and the regional results
 site/                      the viewer: Astro, vanilla JS, inline SVG, no UI framework
 site/tests/check-data.test.js  the site half of the data-agreement audit (bun test)
 CLAUDE.md                  restricted-data rules, first thing in the file
-attic/                     Ookla, and why it was dropped
 LICENSES.md                sources, attribution, and the microdata terms
 ```
-
-### Notes on the implementation
-
-**Identifiers are re-verified on every run.** `fetch_dhs.py` checks that the survey
-still exists, that no newer standard DHS has appeared, that every configured
-indicator id resolves, that all 23 region polygons come back non-empty, and that no
-indicator returns the same value for every region.
-
-That last check exists because v1 got it wrong. DHS publishes `ED_LITR_W_TOT`,
-labelled "Women's literacy: Total", which reads like the right indicator and is in
-fact the total row of a distribution table — `100.0` in all 23 regions. It exists,
-resolves, returns data, and is inert. The literacy rate is `ED_LITR_W_LIT`. An
-existence check passes the wrong column happily; a variance check does not.
-
-**The DHS geometry endpoint is used with `f=json`, not `f=geojson`.** The geojson
-variant returns structurally valid GeoJSON with empty coordinate arrays — it fails
-silently. The json variant carries WKT.
-
-**Missing means missing.** A null stays null through the pipeline, into
-`regions.json`, and renders as "—". Nothing is interpolated and no national figure
-is substituted for a regional one.
-
-**The decision rule is one line of arithmetic, stated in the UI.** Remote-first
-costs the remote price for everyone plus the in-person price for the share who
-cannot complete it, so it wins exactly when
-`reachable share > cost_remote / cost_inperson`.
-
-**"Reachable share" is a choice, not an index.** Two readings are offered, each a
-real DHS value: household phone ownership, and personal ownership among women. No
-weighted composite anywhere, because the weights would have to be invented. A third
-reading, "owns a phone and is literate", was dropped — the survey never crosses the
-two conditions, so it could only be published as a pair of Fréchet bounds, and its
-optimistic bound turned out to equal the phone figure in all 23 regions because
-women's literacy exceeds women's phone ownership everywhere.
 
 ## Licence
 

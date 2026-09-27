@@ -25,9 +25,6 @@ const siteFiles = existsSync(DIST)
 
 const siteText = siteFiles.map((f) => readFileSync(f, "utf-8")).join("\n");
 
-// Same patterns the Python version of this check used to run, ported as-is --
-// they're testing bytes shipped to the browser, not anything Python- or
-// JS-specific.
 const TRACKING_PATTERNS = [
   [/google-analytics|googletagmanager|gtag\(|\bga\(/, "Google Analytics"],
   [/plausible\.io|fathom|simpleanalytics|matomo|piwik/, "third-party analytics"],

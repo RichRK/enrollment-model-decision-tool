@@ -1,10 +1,9 @@
 /* An analytical instrument, not a dashboard. Restraint is the design.
  *
- * The v2 skin is cartographic: warm paper, a serif for display type, and a map
- * that stays pinned beside the argument instead of sitting under it.
+ * Cartographic: warm paper, a serif for display type, and a map that stays
+ * pinned beside the argument instead of sitting under it.
  *
- * Colour rules followed throughout, unchanged from v1 because they are not
- * decoration:
+ * Colour rules followed throughout, because they are not decoration:
  *  - The two recommendation categories differ in LIGHTNESS as well as hue, so the
  *    map reads correctly in greyscale and under protanopia/deuteranopia/tritanopia.
  *  - Category is never signalled by hue alone: regions near the cost line carry a
@@ -40,8 +39,7 @@
 
   /* The targeting-distortion severity ramp. One enum, several consumers (the
      gradient hero numbers, the drawer hero, the table chips), all driven by
-     classify.ts's distortionClass(). Declared once here because the three colours
-     used to be written out at each consumer and had already drifted.
+     classify.ts's distortionClass(). Declared once here so the consumers cannot drift.
      Not red/green as a pair: the amber and green differ in lightness too. */
   --sev-ok:     #2e7d4f;
   --sev-warn:   #8f6400;
@@ -443,7 +441,7 @@ html.drawer-open body { padding-right: var(--scrollbar-width, 0px); }
   font-size: .95rem !important; margin-bottom: .3rem !important; }
 .table-hint { font-size: .78rem !important; }
 
-/* The source list lives in the footer now, so it carries its own layout rather
+/* The source list lives in the footer, so it carries its own layout rather
    than inheriting the notes section's list rules. */
 .source-list { list-style: none; padding-left: 0; margin: 0 0 1.2rem;
   display: grid; gap: .7rem; max-width: 78ch; }
