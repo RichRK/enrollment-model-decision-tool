@@ -40,6 +40,7 @@ from config import (
     RECODE_LITERACY,
     RECODE_MEN,
     RECODE_MEN_AGE,
+    RECODE_POOLED,
     RECODE_REGION_TO_DHS,
     RECODE_TOLERANCE_PP,
     RECODE_VARS,
@@ -267,6 +268,62 @@ def apply_suppression(cell):
     }
 
 
+def hide(cell):
+    cell.update(value=None, denominator_weighted=None, suppressed=True, flagged=False,
+                complementary=True)
+
+
+def complementary_suppression(by_key):
+    """Withhold extra cells so no suppressed value can be recovered by subtraction.
+
+    Two routes would otherwise recover one:
+
+    *   DHS publishes each region's overall rate and weighted size. A region with
+        exactly one hidden quintile gives it back from the other four.
+    *   A pooled cell is a weighted mix of its components. Beside one published
+        component, it gives back the other.
+
+    So neither may leave exactly one cell hidden. Hiding a cell can break the
+    other rule elsewhere, hence the loop; it only ever hides, so it terminates.
+    by_key is {key: {region_id: {quintile: cell}}}; a quintile missing from a
+    region is absent (nobody sampled), carries no value and is not counted.
+    """
+    changed = True
+    while changed:
+        changed = False
+        for pooled, parts in RECODE_POOLED.items():
+            if pooled not in by_key:
+                continue
+            for region_id, per_quintile in by_key[pooled].items():
+                for quintile, cell in per_quintile.items():
+                    linked = [by_key[k][region_id][quintile] for k in parts
+                              if quintile in by_key[k].get(region_id, {})]
+                    if cell["suppressed"] or sum(c["suppressed"] for c in linked) != 1:
+                        continue
+                    for c in linked:
+                        if not c["suppressed"]:
+                            hide(c)
+                            changed = True
+        for per_region in by_key.values():
+            for per_quintile in per_region.values():
+                shown = [c for c in per_quintile.values() if not c["suppressed"]]
+                if shown and len(per_quintile) - len(shown) == 1:
+                    hide(min(shown, key=lambda c: c["cases_unweighted"]))
+                    changed = True
+
+
+def pooled_frame(parts):
+    """Stack the components' records under one column, each component's weights
+    rescaled to sum to 1 so women and men count equally nationally."""
+    stacked = []
+    for frame, column in parts:
+        part = frame.loc[:, ["region_id", "wealth", "weight"]].copy()
+        part["_pooled"] = frame[column]
+        part["weight"] = part["weight"] / part["weight"].sum()
+        stacked.append(part)
+    return pd.concat(stacked, ignore_index=True)
+
+
 def absent_cell(quintile):
     """A quintile the survey sampled nobody in, as a cell rather than a gap.
 
@@ -293,6 +350,9 @@ def region_summary(region_id, per_quintile):
     absent = [DHS_QUINTILES[i] for i, c in enumerate(ordered) if c is None]
     suppressed = [DHS_QUINTILES[i] for i, c in enumerate(ordered)
                   if c is not None and c["suppressed"]]
+    complementary = [DHS_QUINTILES[i] for i, c in enumerate(ordered)
+                     if c is not None and c.get("complementary")]
+    thin = [q for q in suppressed if q not in complementary]
     flagged = [DHS_QUINTILES[i] for i, c in enumerate(ordered)
                if c is not None and c["flagged"]]
 
@@ -322,9 +382,12 @@ def region_summary(region_id, per_quintile):
         if absent:
             reasons.append("quintile(s) with no households sampled at all: %s"
                            % ", ".join(absent))
-        if suppressed:
+        if thin:
             reasons.append("quintile cell(s) below %d unweighted cases: %s"
-                           % (MIN_CASES_SUPPRESS, ", ".join(suppressed)))
+                           % (MIN_CASES_SUPPRESS, ", ".join(thin)))
+        if complementary:
+            reasons.append("quintile cell(s) withheld so a suppressed cell cannot be "
+                           "derived from published totals: %s" % ", ".join(complementary))
         result.update({
             "reachable_pool_composition": None,
             "exclusion_gap": None,
@@ -384,7 +447,7 @@ def run():
     api_quintiles = read_json(RAW / "dhs_quintiles.json")["indicators"]
     api_regions = api_regional_values()
 
-    output = {}
+    by_key, worked = {}, {}
     for key, spec in RECODE_INDICATORS.items():
         if spec["file"] not in frames:
             continue
@@ -400,15 +463,29 @@ def run():
         national = cells(work, column, by_region=False)
         regional = cells(work, column, by_region=True)
         validate(key, national, regional, api_quintiles, api_regions)
+        if any(key in parts for parts in RECODE_POOLED.values()):
+            worked[key] = (work, column)
+        by_key[key] = regional
 
-        by_region = {}
+    for key, parts in RECODE_POOLED.items():
+        if all(p in worked for p in parts):
+            by_key[key] = cells(pooled_frame([worked[p] for p in parts]), "_pooled",
+                                by_region=True)
+            log("%-16s pooled from %s (no API figure; components checked above)"
+                % (key, " + ".join(parts)))
+
+    suppressed = {}
+    for key, regional in by_key.items():
         for (region_id, quintile), cell in regional.items():
-            by_region.setdefault(region_id, {})[quintile] = apply_suppression(cell)
+            suppressed.setdefault(key, {}).setdefault(region_id, {})[quintile] = \
+                apply_suppression(cell)
+    complementary_suppression(suppressed)
 
-        output[key] = {
-            region_id: region_summary(region_id, per_quintile)
-            for region_id, per_quintile in by_region.items()
-        }
+    output = {
+        key: {region_id: region_summary(region_id, per_quintile)
+              for region_id, per_quintile in per_region.items()}
+        for key, per_region in suppressed.items()
+    }
 
     # A last look before anything is written: no cell below the floor may carry a
     # value, and every cell must carry a count.

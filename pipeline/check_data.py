@@ -25,6 +25,7 @@ import sys
 from pathlib import Path
 
 from common import SourceError
+from config import RECODE_POOLED
 
 ROOT = Path(__file__).resolve().parent  # this directory (pipeline/)
 
@@ -172,6 +173,32 @@ def run():
             check("No cell under the suppression floor carries a rendered value",
                   not rendered_thin,
                   "; ".join(rendered_thin[:5]) if rendered_thin else "")
+
+        # A withheld cell must not be recoverable by subtraction: from DHS's
+        # published region total when it is the only one withheld in its region,
+        # or from a pooled cell beside one published component.
+        def withheld(cell):
+            return cell.get("value") is None and not truly_absent(cell)
+
+        single, linked = [], []
+        for region in payload.get("regions", []):
+            per_indicator = region.get("quintiles") or {}
+            by_q = {}
+            for key, summary in per_indicator.items():
+                row = (summary or {}).get("ownership_by_quintile") or []
+                by_q[key] = {c.get("quintile"): c for c in row}
+                if sum(withheld(c) for c in row) == 1:
+                    single.append("%s/%s" % (region["name"], key))
+            for pooled, parts in RECODE_POOLED.items():
+                for quintile, cell in by_q.get(pooled, {}).items():
+                    comps = [by_q.get(k, {}).get(quintile) for k in parts]
+                    if (cell.get("value") is not None and None not in comps
+                            and sum(withheld(c) for c in comps) == 1):
+                        linked.append("%s/%s/%s" % (region["name"], pooled, quintile))
+        check("No indicator withholds exactly one quintile in a region",
+              not single, "; ".join(single[:5]))
+        check("No pooled cell is published beside exactly one withheld component",
+              not linked, "; ".join(linked[:5]))
 
         withheld = payload.get("national", {}).get("wealth_gradient_withheld") or {}
         check("Indicators withheld for missing case counts are recorded, not silently dropped",

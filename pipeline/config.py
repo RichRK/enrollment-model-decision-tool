@@ -128,6 +128,14 @@ RECODE_INDICATORS = {
     "literacy_f": {"file": "individual", "var": None, "api": "ED_LITR_W_LIT"},
 }
 
+# Indicators pooled from two others' records, weighted so each component counts
+# equally nationally: phone_own is adults 15-49, women and men together. DHS
+# publishes no pooled figure, so it cannot be checked against the API; its
+# components are. A pooled cell and its components are linked -- any one can be
+# derived from the other two -- which fetch_recode.complementary_suppression
+# accounts for.
+RECODE_POOLED = {"phone_own": ("phone_own_f", "phone_own_m")}
+
 # Literacy is the reading-card result alone: v155 in (1, 2). Nothing else.
 #
 # The textbook DHS definition is "secondary schooling or higher, OR can read a
