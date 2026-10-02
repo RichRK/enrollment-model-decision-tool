@@ -114,18 +114,15 @@ RECODE_MEN_AGE = {"var": "mv012", "max": 49}
 # Sample weights carry six implied decimal places in DHS recodes.
 RECODE_WEIGHT_SCALE = 1_000_000.0
 
-# Scope note: the registered project covers phone ownership, literacy and
-# electricity access by region and wealth quintile. Only those are computed from
-# the microdata. Mobile money, bank accounts and internet use are present in the
-# recodes and are deliberately NOT computed here -- they would need the project
-# scope extending first. The national-level versions on the site come from the
-# public aggregate API, which is not covered by the agreement.
+# Scope note: only phone ownership is computed from the microdata. Literacy,
+# electricity, mobile money, bank accounts and internet use are present in the
+# recodes and are deliberately NOT computed here -- they are outside the project
+# scope. Their API figures in regions.json come from the public aggregate API,
+# which is not covered by the agreement.
 RECODE_INDICATORS = {
     "hh_mobile_phone": {"file": "household", "var": "hv243a", "api": "HC_HEFF_H_MPH"},
-    "hh_electricity": {"file": "household", "var": "hv206", "api": "HC_ELEC_H_ELC"},
     "phone_own_f": {"file": "individual", "var": "v169a", "api": "CO_MOBB_W_MOB"},
     "phone_own_m": {"file": "men", "var": "mv169a", "api": "CO_MOBB_M_MOB"},
-    "literacy_f": {"file": "individual", "var": None, "api": "ED_LITR_W_LIT"},
 }
 
 # Indicators pooled from two others' records, weighted so each component counts
@@ -134,30 +131,6 @@ RECODE_INDICATORS = {
 # components are. Any one of a pooled cell and its two components can be derived
 # from the other two, so the components' cells are not published.
 RECODE_POOLED = {"phone_own": ("phone_own_f", "phone_own_m")}
-
-# Literacy is the reading-card result alone: v155 in (1, 2). Nothing else.
-#
-# The textbook DHS definition is "secondary schooling or higher, OR can read a
-# whole or partial sentence", and applying it here was WRONG -- it overstated the
-# richest quintile by 1.2 points and Antananarivo capital by 2.2. The reason is
-# visible in the survey's own v106 x v155 table: in Madagascar 2021 women with
-# secondary or higher education were still administered the reading card, so the
-# education clause is redundant, and it is worse than redundant because 93 women
-# with secondary education were recorded as unable to read at all, plus 4 as
-# visually impaired. The education clause counted all of them as literate; DHS does
-# not.
-#
-# v155 in this survey takes 0 (cannot read at all), 1 (part of a sentence),
-# 2 (a whole sentence) and 4 (blind/visually impaired). Code 3, "no card with the
-# required language", does not occur. Women in 0 and 4 stay in the denominator.
-#
-# Reproduces ED_LITR_W_LIT to within 0.03 pp on every wealth quintile. Do not
-# "improve" this by adding the education clause back; the assertion in
-# fetch_recode.py will stop the build, which is the point.
-RECODE_LITERACY = {
-    "reading": "v155",
-    "reading_literate": (1, 2),
-}
 
 # Recode region code -> DHS API RegionId. Explicit and auditable: the pipeline
 # joins on RegionId and never on names. Drafted by name matching, then verified by
