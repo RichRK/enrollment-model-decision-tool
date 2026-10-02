@@ -19,10 +19,9 @@ than two.
 
 Correctness is not assumed. Every figure computed here that the public aggregate
 API also publishes is checked against it, and the build stops on disagreement.
-That check is what proves the variable choices, the weight scaling and the
-literacy definition -- getting any of them wrong would produce plausible regional
-numbers that are quietly false, which is the failure mode this project keeps
-running into.
+That check is what proves the variable choices and the weight scaling -- getting
+either wrong would produce plausible regional numbers that are quietly false,
+which is the failure mode this project keeps running into.
 """
 
 import numpy as np
@@ -37,7 +36,6 @@ from config import (
     RECODE_HOUSEHOLD,
     RECODE_INDICATORS,
     RECODE_INDIVIDUAL,
-    RECODE_LITERACY,
     RECODE_MEN,
     RECODE_MEN_AGE,
     RECODE_POOLED,
@@ -67,7 +65,7 @@ def indicator_columns(kind):
     not two -- and forgetting the second used to surface as a bare KeyError deep in
     run() rather than as anything a reader could connect to the config."""
     return [spec["var"] for spec in RECODE_INDICATORS.values()
-            if spec["file"] == kind and spec["var"]]
+            if spec["file"] == kind]
 
 
 def load_recode(kind, path, extra_columns=()):
@@ -85,22 +83,6 @@ def load_recode(kind, path, extra_columns=()):
                                   v["weight"]: "weight"})
     frame["weight"] = frame["weight"] / RECODE_WEIGHT_SCALE
     log("%s recode: %d records" % (kind, len(frame)))
-    return frame
-
-
-def load_individual():
-    """The individual recode, plus the derived literacy column.
-
-    Literacy is the reading-card result alone -- see the long note on RECODE_LITERACY
-    in config.py for why the education clause is not here. Women who cannot read, and
-    women recorded as visually impaired, are not literate but remain in the
-    denominator.
-    """
-    frame = load_recode("individual", RECODE_INDIVIDUAL,
-                        extra_columns=[RECODE_LITERACY["reading"]])
-    reading = frame[RECODE_LITERACY["reading"]]
-    frame["literacy_f"] = reading.isin(RECODE_LITERACY["reading_literate"]).astype("float64")
-    frame.loc[reading.isna(), "literacy_f"] = np.nan
     return frame
 
 
@@ -429,7 +411,7 @@ def run():
         return
 
     frames = {"household": map_regions(load_recode("household", RECODE_HOUSEHOLD)),
-              "individual": map_regions(load_individual())}
+              "individual": map_regions(load_recode("individual", RECODE_INDIVIDUAL))}
     if RECODE_MEN.exists():
         frames["men"] = map_regions(load_men())
     else:
@@ -443,14 +425,9 @@ def run():
     for key, spec in RECODE_INDICATORS.items():
         if spec["file"] not in frames:
             continue
-        frame = frames[spec["file"]]
-        # An indicator either names a raw recode variable, which needs the DHS
-        # yes/no coding collapsing to 0/1/NaN, or it is derived upstream into a
-        # column named for the key itself (literacy_f, in load_individual).
-        column = spec["var"] or key
-        work = frame.copy()
-        if spec["var"]:
-            work[column] = binary(work[column])
+        column = spec["var"]
+        work = frames[spec["file"]].copy()
+        work[column] = binary(work[column])
 
         national = cells(work, column, by_region=False)
         regional = cells(work, column, by_region=True)
